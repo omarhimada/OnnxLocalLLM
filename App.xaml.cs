@@ -27,5 +27,5 @@ namespace UI {
 
 
 
-// Expects genai_config.json, model.onnx, model.onnx_data, special_tokens_map.json, and tokenizer.json
-// See huggingface.co/nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4/blob/main/
+// Expects genai_config.json, model.onnx, model.onnx_data, special_tokens_map.json, and tokenizer_config.json
+// See huggingface.co/nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4/tree/main/
