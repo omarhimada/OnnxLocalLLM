@@ -15,7 +15,7 @@ namespace UI.Utility {
 				return string.Empty;
 			}
 
-			StringBuilder prompt = new(_mistral3TokenStartTurn);
+			StringBuilder prompt = new();
 
 			// TODO
 			//bool isFirstUserMessage = true;
@@ -28,6 +28,11 @@ namespace UI.Utility {
 				}
 
 				if (msg.Role == ChatRole.User) {
+					/* tokenizer_config.json
+					 * includes chat_template that expects two newlines between instruction and user query */
+					prompt.Append(_twoNewLinesVerbatimNoReturn);
+
+					// Do not include additional {_mistral3InstructEnd} ([/INST]) when add_generation_prompt: true
 					prompt.Append($"{msg.Text}{_ws}{_mistral3InstructEnd}");
 
 					// TODO chat history and contextualize 'first' vs non-first user messages
@@ -36,14 +41,7 @@ namespace UI.Utility {
 					//	content = $"{systemPrompt}\n\n{content}";
 					//	isFirstUserMessage = false;
 					//}
-
-					// Space after [INST] and before [/INST]
-
 				}
-				//else if (msg.Role == ChatRole.Assistant) {
-				//	// Note: Add a space before assistant content and close with EOS </s>
-				//	prompt.Append($" {msg.Text} {_mistral3TokenStop}");
-				//}
 			}
 
 			// The model is now primed to respond after the last [/INST]

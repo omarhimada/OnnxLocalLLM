@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.AI;
+using Microsoft.ML.OnnxRuntimeGenAI;
 using System.Windows;
 using UI.Utility;
 using static UI.Constants;
@@ -6,7 +7,7 @@ using static UI.Constants;
 namespace UI {
 	public partial class MainWindow : Window {
 		private readonly IChatClient _client;
-
+		private readonly Tokenizer _tokenizer;
 		private readonly bool _expectingCodeResponse = true;
 		private readonly ChatOptions _chatOptions;
 		private readonly CancellationTokenSource _cts = new();
@@ -14,8 +15,9 @@ namespace UI {
 
 		private bool InterruptButtonEnabled { get; set; } = true;
 
-		public MainWindow(IChatClient client, bool? codeMode = true) {
+		public MainWindow(IChatClient client, Tokenizer tokenizer, bool? codeMode = true) {
 			_client = client;
+			_tokenizer = tokenizer;
 
 			if (!(codeMode ?? true)) {
 				_expectingCodeResponse = false;
@@ -42,8 +44,14 @@ namespace UI {
 				TheirResponse.Text = string.Empty;
 				ToggleInterruptButton();
 				ChatButton.IsEnabled = false;
+				string formattedMessagesAsOneString = ConstructMessages.AsFormattedString(MessageText.Text);
+				string formattedPrompt = _tokenizer.ApplyChatTemplate(
+					string.Empty,
+					formattedMessagesAsOneString,
+					null,
+					false);
 
-				await ChatWithModelAsync(ConstructMessages.AsFormattedString(MessageText.Text));
+				await ChatWithModelAsync(formattedPrompt);
 
 			} catch (Exception) {
 				TheirResponse.Text = _userFriendlyErrorResponse;

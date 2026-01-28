@@ -11,9 +11,14 @@
 		//internal const string _n = @"\n";
 		internal const string _ws = @" ";
 
-		internal const string _mistral3DefaultInstruction = "You are a helpful C# programming assistant.";
+		internal const string _mistral3DefaultInstruction = "You are a helpful assistant.";
 		internal const string _userFriendlyErrorResponse = "I'm sorry, something went wrong. I cannot respond.";
 		internal const string _userFriendlyStoppedResponse = "(Stopped.)";
+
+		internal const string _twoNewLinesVerbatimNoReturn = @"\n\n";
+
+		internal const string _userFriendlyModelDirectoryErrorResponse =
+			"Model files not found. Ensure that the model files exist at the specified: ";
 
 		internal const string _appContextSwitchForSelectionBrush =
 			"Switch.System.Windows.Controls.Text.UseAdornerForTextboxSelectionRendering";
