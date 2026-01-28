@@ -1,4 +1,4 @@
-﻿{
+{
   "model": {
     "bos_token_id": 1,
     "context_length": 32768,

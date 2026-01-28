@@ -8,13 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    
+    <None Remove="Mistral-7B\special_tokens_map.json" />
   </ItemGroup>
 
   <ItemGroup>
 	<Content Include="Mistral-7B\genai_config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+	<Content Include="Mistral-7B\special_tokens_map.json">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
     <Content Include="Mistral-7B\tokenizer.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
