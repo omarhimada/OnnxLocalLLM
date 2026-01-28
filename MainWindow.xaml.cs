@@ -12,6 +12,8 @@ namespace UI {
 		private readonly CancellationTokenSource _cts = new();
 		private float _getTemperature() => _expectingCodeResponse ? 0.115f : 0.7f;
 
+		private bool InterruptButtonEnabled { get; set; } = true;
+
 		public MainWindow(IChatClient client, bool? codeMode = true) {
 			_client = client;
 
@@ -28,11 +30,11 @@ namespace UI {
 
 			InitializeComponent();
 
-			InterruptButton.IsEnabled = false;
+			ToggleInterruptButton();
 		}
 
 		internal void ToggleInterruptButton() {
-			InterruptButton.IsEnabled = !InterruptButton.IsEnabled;
+			InterruptButtonEnabled = !InterruptButtonEnabled;
 		}
 
 		internal async void ChatButtonClick(object sender, RoutedEventArgs e) {
@@ -52,6 +54,10 @@ namespace UI {
 		}
 
 		internal async void InterruptButtonClick(object sender, RoutedEventArgs e) {
+			if (!InterruptButtonEnabled) {
+				return;
+			}
+
 			try {
 				await _cts.CancelAsync();
 				TheirResponse.Text = _userFriendlyStoppedResponse;
@@ -73,5 +79,7 @@ namespace UI {
 				TheirResponse.Text += update.Text;
 			}
 		}
+
+		internal void CloseButton_Click(object sender, RoutedEventArgs e) => this.Close();
 	}
 }

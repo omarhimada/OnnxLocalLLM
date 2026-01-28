@@ -5,6 +5,9 @@ using System.Windows;
 namespace UI {
 	using static Constants;
 	public partial class App : Application {
+		public App() {
+			AppContext.SetSwitch(_appContextSwitchForSelectionBrush, false);
+		}
 
 		protected override void OnStartup(StartupEventArgs e) {
 			base.OnStartup(e);

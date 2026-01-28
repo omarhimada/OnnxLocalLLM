@@ -14,5 +14,8 @@
 		internal const string _mistral3DefaultInstruction = "You are a helpful C# programming assistant.";
 		internal const string _userFriendlyErrorResponse = "I'm sorry, something went wrong. I cannot respond.";
 		internal const string _userFriendlyStoppedResponse = "(Stopped.)";
+
+		internal const string _appContextSwitchForSelectionBrush =
+			"Switch.System.Windows.Controls.Text.UseAdornerForTextboxSelectionRendering";
 	}
 }

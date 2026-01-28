@@ -5,12 +5,90 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UI"
         mc:Ignorable="d"
-        Title=" " Height="530" Width="800">
-    <Grid Background="Black">
-        <TextBox x:Name="MessageText" HorizontalAlignment="Center" TextWrapping="Wrap" Text="..." VerticalAlignment="Top" Width="780" Height="234" Background="Black" FontFamily="Cascadia Mono ExtraLight" SelectionBrush="#FF022200" Foreground="White" FontSize="14" CaretBrush="White" AcceptsReturn="True" MaxLines="1729" RenderTransformOrigin="0.5,0.5" Margin="0,10,0,0" />
-        <Button x:Name="ChatButton" Content="° chat᪙ °" HorizontalAlignment="Center" Margin="0,245,0,0" VerticalAlignment="Top" Width="92" AutomationProperties.Name="ChatButton" Background="#FF111111" FontFamily="Cascadia Mono ExtraLight" FontSize="14" Foreground="White" Height="25" Click="ChatButtonClick"/>
-        <Button x:Name="InterruptButton" Content="⨯ interrupt ⨯" HorizontalAlignment="Left" VerticalAlignment="Center" Width="123" AutomationProperties.Name="ChatButton" Background="#FF111111" FontFamily="Cascadia Mono ExtraLight" FontSize="14" Foreground="White" Height="25" Click="InterruptButtonClick" Margin="667,0,0,0"/>
+        Title=" " Height="544" Width="800"
+        Background="Black"
+        WindowStyle="None"
+        AllowsTransparency="False">
+    <Window.Resources>
+        <SolidColorBrush x:Key="TextBoxBorderNormal" Color="#333333"/>
+        <Style x:Key="NoFocusBlueTextBox" TargetType="{x:Type TextBox}">
+            <Setter Property="Background" Value="Black"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource TextBoxBorderNormal}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
 
-        <TextBox x:Name="TheirResponse" HorizontalAlignment="Center" Margin="0,270,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="780" Height="234" Background="Black" IsReadOnly="True" SelectionBrush="#FF89FFD9" Foreground="White" MaxLines="1729" FontFamily="Cascadia Mono ExtraLight" FontSize="14"/>
-    </Grid>
+            <!-- important: replace template so focus trigger can’t override border brush -->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border x:Name="Bd"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <!-- keep the SAME border when focused -->
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Bd"
+                                    Property="BorderBrush"
+                                    Value="{StaticResource TextBoxBorderNormal}"/>
+                            </Trigger>
+
+                            <!-- optional: also keep same on mouse over -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd"
+                                    Property="BorderBrush"
+                                    Value="{StaticResource TextBoxBorderNormal}"/>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.55"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <WindowChrome.WindowChrome>
+        <!-- CaptionHeight defines the draggable area at the top -->
+        <!-- CornerRadius="0" ensures square corners on supported versions -->
+        <WindowChrome CaptionHeight="30" 
+	                  ResizeBorderThickness="5" 
+	                  CornerRadius="0"
+	                  GlassFrameThickness="0"/>
+    </WindowChrome.WindowChrome>
+    <Border BorderThickness="1" BorderBrush="#333333">
+        <Grid Background="Black">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Background="#1A1A1A">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                    <TextBlock Text="" Foreground="Gray" FontFamily="Cascadia Mono ExtraLight" FontSize="12"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button Content="✕" Width="45" Background="Transparent" Foreground="White" BorderThickness="0" Click="CloseButton_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1" Background="Black" Margin="0,0,0,-3">
+                <TextBox x:Name="MessageText" HorizontalAlignment="Center" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="780" Height="234" Background="Black" FontFamily="Cascadia Mono ExtraLight" SelectionBrush="#FF022200" Foreground="White" FontSize="14" CaretBrush="White" AcceptsReturn="True" MaxLines="1729" RenderTransformOrigin="0.5,0.5" Margin="0,10,0,0" FocusVisualStyle="{x:Null}" Style="{StaticResource NoFocusBlueTextBox}" />
+                
+                <Button x:Name="ChatButton" Content="° chat °" HorizontalAlignment="Center" VerticalAlignment="Center" Width="92" AutomationProperties.Name="ChatButton" Background="#FF111111" FontFamily="Cascadia Mono ExtraLight" FontSize="14" Foreground="White" Height="25" Click="ChatButtonClick"/>
+                <Button x:Name="InterruptButton" Content="⨯ interrupt ⨯" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,9,0" Width="123" AutomationProperties.Name="InterruptButton" Background="#FF111111" FontFamily="Cascadia Mono ExtraLight" FontSize="14" Foreground="White" Height="25" Click="InterruptButtonClick"/>
+
+                <TextBox x:Name="TheirResponse" HorizontalAlignment="Center" Margin="0,0,0,10" TextWrapping="Wrap" Text="..." VerticalAlignment="Bottom" Width="780" Height="234" Background="Black" IsReadOnly="True" SelectionBrush="#FF89FFD9" Foreground="White" MaxLines="1729" FontFamily="Cascadia Mono ExtraLight" FontSize="14" FocusVisualStyle="{x:Null}" Style="{StaticResource NoFocusBlueTextBox}" />
+            </Grid>
+        </Grid>
+    </Border>
 </Window>
