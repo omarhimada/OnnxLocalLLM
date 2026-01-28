@@ -26,9 +26,9 @@ namespace UI {
 				FrequencyPenalty = 1.12f
 			};
 
-			InterruptButton.IsEnabled = false;
-
 			InitializeComponent();
+
+			InterruptButton.IsEnabled = false;
 		}
 
 		internal void ToggleInterruptButton() {
