@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UI"
         mc:Ignorable="d"
-        Title=" " Height="544" Width="800"
+        Title="ONNX Local LLM" Height="544" Width="800"
         Background="Black"
         WindowStyle="None"
         AllowsTransparency="False">
@@ -20,7 +20,6 @@
             <Setter Property="Padding" Value="4"/>
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
 
-            <!-- important: replace template so focus trigger can’t override border brush -->
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TextBox}">
@@ -33,14 +32,12 @@
                         </Border>
 
                         <ControlTemplate.Triggers>
-                            <!-- keep the SAME border when focused -->
                             <Trigger Property="IsKeyboardFocused" Value="True">
                                 <Setter TargetName="Bd"
                                     Property="BorderBrush"
                                     Value="{StaticResource TextBoxBorderNormal}"/>
                             </Trigger>
 
-                            <!-- optional: also keep same on mouse over -->
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Bd"
                                     Property="BorderBrush"
@@ -57,8 +54,6 @@
         </Style>
     </Window.Resources>
     <WindowChrome.WindowChrome>
-        <!-- CaptionHeight defines the draggable area at the top -->
-        <!-- CornerRadius="0" ensures square corners on supported versions -->
         <WindowChrome CaptionHeight="30" 
 	                  ResizeBorderThickness="5" 
 	                  CornerRadius="0"

@@ -12,20 +12,35 @@ namespace UI {
 		protected override void OnStartup(StartupEventArgs e) {
 			base.OnStartup(e);
 
-			if (!Directory.Exists(DebugModelPath)) {
-				MessageBox.Show($"{_userFriendlyModelDirectoryErrorResponse}{DebugModelPath}");
-				return;
+			// Show loading screen while model attempts to load into memory
+			LoadingWindow splash = new();
+			splash.Show();
+			splash.Activate();
+
+			try {
+				if (!Directory.Exists(DebugModelPath)) {
+					MessageBox.Show($"{_userFriendlyModelDirectoryErrorResponse}{DebugModelPath}");
+					return;
+				}
+
+				#region Loading: 2-3 seconds of loading the model into RAM before the window appears...
+				using Config config = new(DebugModelPath);
+				using Model model = new(config);
+				using Tokenizer tokenizer = new(model);
+
+				using OnnxRuntimeGenAIChatClient onnxChatClient = new(model);
+
+				// TODO config option constructor for 'codeMode'  
+				MainWindow mainWindow = new(onnxChatClient, tokenizer);
+				#endregion
+
+				mainWindow.Show();
+			} catch (Exception) {
+				MessageBox.Show(_userFriendlyErrorOccurredDuringInitialization);
+				Shutdown();
+			} finally {
+				splash.Hide();
 			}
-
-			using Config config = new(DebugModelPath);
-			using Model model = new(config);
-			using Tokenizer tokenizer = new(model);
-
-			using OnnxRuntimeGenAIChatClient onnxChatClient = new(model);
-
-			// TODO config option constructor for 'codeMode'  
-			MainWindow mainWindow = new(onnxChatClient, tokenizer);
-			mainWindow.Show();
 		}
 	}
 }

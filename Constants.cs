@@ -3,12 +3,13 @@
 		// nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4
 		internal static string DebugModelPath => $"{AppContext.BaseDirectory}..\\..\\..\\Mistral-7B";
 
+		internal const string _pathToTokenizerJson = @"\Mistral-7B\tokenizer_config.json";
+
 		internal const string _mistral3TokenStartTurn = @"<s>";
 		internal const string _mistral3TokenStop = @"</s>";
 		internal const string _mistral3InstructStart = @"[INST]";
 		internal const string _mistral3InstructEnd = @"[/INST]";
 
-		//internal const string _n = @"\n";
 		internal const string _ws = @" ";
 
 		internal const string _mistral3DefaultInstruction = "You are a helpful assistant.";
@@ -22,5 +23,14 @@
 
 		internal const string _appContextSwitchForSelectionBrush =
 			"Switch.System.Windows.Controls.Text.UseAdornerForTextboxSelectionRendering";
+
+		internal const string _userFriendlyExceptionCaughtWhileAttemptingToDeserializeResponse =
+			"An error occurred while trying to read the 'tokenizer_config.json' of your ONNX model.\r\n";
+
+		internal const string _userFriendlyWarningChatTemplateIsAttemptingToDefault =
+			"Your 'tokenizer_config.json' either doesn't contain a 'chat_template', or something went wrong while deserializing. Proceeding with default behaviour attempt.";
+
+		internal const string _userFriendlyErrorOccurredDuringInitialization =
+			"An error occurred during initialization. Please refer to the README.";
 	}
 }

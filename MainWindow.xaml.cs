@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.AI;
 using Microsoft.ML.OnnxRuntimeGenAI;
+using System.Text.Json;
 using System.Windows;
 using UI.Utility;
 using static UI.Constants;
@@ -45,20 +46,53 @@ namespace UI {
 				ToggleInterruptButton();
 				ChatButton.IsEnabled = false;
 				string formattedMessagesAsOneString = ConstructMessages.AsFormattedString(MessageText.Text);
-				string formattedPrompt = _tokenizer.ApplyChatTemplate(
-					string.Empty,
-					formattedMessagesAsOneString,
-					null,
-					false);
 
-				await ChatWithModelAsync(formattedPrompt);
+				TokenizerConfigMistral? tokenizerConfigMistral = null;
+				string chatTemplate = string.Empty;
+				#region Deserialize tokenizer_config.json
+				try {
+					// Attempt to deserialize the tokenizer_config.json for the model
+					tokenizerConfigMistral =
+						JsonSerializer.Deserialize<TokenizerConfigMistral>(_pathToTokenizerJson);
 
+					// Retrieve the 'chat_template' string 
+					chatTemplate = tokenizerConfigMistral?.ChatTemplate ?? string.Empty;
+
+				} catch (Exception exception) {
+					MessageBox.Show($"{_userFriendlyExceptionCaughtWhileAttemptingToDeserializeResponse}{exception.Message}");
+				}
+				#endregion
+
+				// Warn user chatTemplate is defaulting to empty string.
+				if (string.IsNullOrEmpty(chatTemplate)) {
+					MessageBox.Show($"{_userFriendlyWarningChatTemplateIsAttemptingToDefault}");
+				}
+
+				if (tokenizerConfigMistral != null) {
+					string formattedPrompt = _tokenizer.ApplyChatTemplate(
+						chatTemplate,
+						formattedMessagesAsOneString,
+						null,
+						false);
+
+					await ChatWithModelAsync(formattedPrompt);
+				} else {
+					SomethingWentWrong();
+				}
 			} catch (Exception) {
-				TheirResponse.Text = _userFriendlyErrorResponse;
+				SomethingWentWrong();
 			} finally {
-				ToggleInterruptButton();
-				ChatButton.IsEnabled = true;
+				AllowUserInputEntry();
 			}
+		}
+
+		private void SomethingWentWrong() {
+			TheirResponse.Text = _userFriendlyErrorResponse;
+		}
+
+		private void AllowUserInputEntry() {
+			ToggleInterruptButton();
+			ChatButton.IsEnabled = true;
 		}
 
 		internal async void InterruptButtonClick(object sender, RoutedEventArgs e) {

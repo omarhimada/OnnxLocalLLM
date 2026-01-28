@@ -1,8 +1,48 @@
 # ONNX Local LLM
+- Local LLM chat desktop application that uses ONNX Runtime Generative AI.
+- Does not make any networking requests outside of the local machine.
+
+![Screenshot of the chat interface as it begins to load](LoadingScreenshot.png)
 
 ![Screenshot of the chat interface](Screenshot.png)
 
-- If you're going to change the ONNX model ensure you change all of the associated config `json` to UTF-8 without BOM:
+## Setup
+- Your directory setup should look something like the diagram below, although the `model.onnx_data` is missing. This is due to its size (~4 GB).
+ - See **NVidia's ONNX Mistral-7B-Instruct** @ [HuggingFace](https://huggingface.co/nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4/tree/main)
+ - Download the `model.onnx_data` and place it inside the `\Mistral-B` directory.
+```
+OnnxLocalLLM\Mistral-7B
+			|
+			| genai_config.json
+			| model.onnx
+			| model.onnx_data
+			| special_tokens_map.json
+			| tokenizer_config.json
+			| tokenizer.json
+			|_____________________
+```
+
+### Cloning/forking and changing ONNX models
+- The ONNX directory structure is important. 
+- As soon as the application begins to load it looks for the all of the expected JSON including the ONNX and associated data within that directory.
+- See `App.xaml.cs`
+```csharp
+using Config config = new(DebugModelPath);
+using Model model = new(config);
+using Tokenizer tokenizer = new(model);
+
+using OnnxRuntimeGenAIChatClient onnxChatClient = new(model);
+```
+- You may have to update the deserialized **JSON ➜ C# POCO** `MistralTokenizerConfig.cs` because it assumes the structure of this particular model's `tokenizer_config.json`.
+ - *(Unless the structure of the ONNX model is the same)*
+
+#### Encoding ONNX-related JSON
+- It is seemingly typical to download JSON that is not UTF-8 and this leads to unexpected exceptions getting thrown during runtime.
+- The JSON included has already been converted from `UTF-8 (with a signature)` to UTF-8 `(without a signature)`
+- You can easily convert UTF-8 with BOM to UTF-8 without BOM in most IDEs. Depending on your IDE the *save with different encoding* methodology may be different. 
+- "`UTF-8 with a signature` and `UTF-8 with BOM (Byte Order Mark)` are the exact same thing. You must ensure you have neither. Only UTF-8 for the ONNX JSON.
+
+- - There are some helpful PowerShell scripts if you'd prefer to use them instead:
 ```powershell
 $cfg = "C:\...\OnnxLocalLLM\Mistral-7B\genai_config.json"
 $text = Get-Content $cfg -Raw
