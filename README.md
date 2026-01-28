@@ -1,5 +1,8 @@
-# OnnxLocalLLM
+# ONNX Local LLM
 
+
+
+- If you're going to change the ONNX model ensure you change all of the associated config `json` to UTF-8 without BOM:
 ```powershell
 $cfg = "C:\...\OnnxLocalLLM\Mistral-7B\genai_config.json"
 $text = Get-Content $cfg -Raw
