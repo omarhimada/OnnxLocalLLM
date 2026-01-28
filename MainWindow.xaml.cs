@@ -1,29 +1,76 @@
 ﻿using Microsoft.Extensions.AI;
 using System.Windows;
+using UI.Utility;
+using static UI.Constants;
 
 namespace UI {
 	public partial class MainWindow : Window {
 		private readonly IChatClient _client;
 
-		public MainWindow(IChatClient client) {
+		private readonly bool _expectingCodeResponse = true;
+		private readonly ChatOptions _chatOptions;
+		private readonly CancellationTokenSource _cts = new();
+		private float _getTemperature() => _expectingCodeResponse ? 0.115f : 0.7f;
+
+		public MainWindow(IChatClient client, bool? codeMode = true) {
 			_client = client;
+
+			if (!(codeMode ?? true)) {
+				_expectingCodeResponse = false;
+			}
+
+			_chatOptions = new() {
+				Temperature = _getTemperature(),
+				TopK = 51,
+				TopP = 0.95f,
+				FrequencyPenalty = 1.12f
+			};
+
+			InterruptButton.IsEnabled = false;
 
 			InitializeComponent();
 		}
 
-		internal async Task ChatWithModelAsync(string userInput) {
-			await foreach (ChatResponseUpdate update in _client.GetStreamingResponseAsync(userInput)) {
-				TheirResponse.Text += update.Text;
+		internal void ToggleInterruptButton() {
+			InterruptButton.IsEnabled = !InterruptButton.IsEnabled;
+		}
+
+		internal async void ChatButtonClick(object sender, RoutedEventArgs e) {
+			try {
+				TheirResponse.Text = string.Empty;
+				ToggleInterruptButton();
+				ChatButton.IsEnabled = false;
+
+				await ChatWithModelAsync(ConstructMessages.AsFormattedString(MessageText.Text));
+
+			} catch (Exception) {
+				TheirResponse.Text = _userFriendlyErrorResponse;
+			} finally {
+				ToggleInterruptButton();
+				ChatButton.IsEnabled = true;
 			}
 		}
 
-		internal async void Button_Click(object sender, RoutedEventArgs e) {
+		internal async void InterruptButtonClick(object sender, RoutedEventArgs e) {
 			try {
-				TheirResponse.Text = string.Empty;
+				await _cts.CancelAsync();
+				TheirResponse.Text = _userFriendlyStoppedResponse;
 
-				await ChatWithModelAsync(MessageText.Text.Trim());
+				ChatButton.IsEnabled = true;
+				ToggleInterruptButton();
+
 			} catch (Exception) {
-				TheirResponse.Text = "I'm sorry, something went wrong. I cannot respond.";
+				TheirResponse.Text = _userFriendlyErrorResponse;
+			} finally {
+				ChatButton.IsEnabled = true;
+			}
+		}
+
+		internal async Task ChatWithModelAsync(string userInput) {
+			CancellationToken ct = _cts.Token;
+
+			await foreach (ChatResponseUpdate update in _client.GetStreamingResponseAsync(userInput, _chatOptions, ct)) {
+				TheirResponse.Text += update.Text;
 			}
 		}
 	}

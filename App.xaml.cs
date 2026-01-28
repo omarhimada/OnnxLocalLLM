@@ -16,8 +16,10 @@ namespace UI {
 
 			using Config config = new(DebugModelPath);
 			using Model model = new(config);
+
 			using OnnxRuntimeGenAIChatClient onnxChatClient = new(model);
 
+			// TODO config option constructor for 'codeMode'  
 			MainWindow mainWindow = new(onnxChatClient);
 			mainWindow.Show();
 		}

@@ -7,8 +7,10 @@
         mc:Ignorable="d"
         Title=" " Height="530" Width="800">
     <Grid Background="Black">
-        <TextBox x:Name="MessageText" HorizontalAlignment="Center" TextWrapping="Wrap" Text="..." VerticalAlignment="Top" Width="800" Height="244" Background="Black" FontFamily="Cascadia Mono ExtraLight" SelectionBrush="#FF022200" Foreground="White" FontSize="14" CaretBrush="White" AcceptsReturn="True" MaxLines="1729"/>
-        <Button x:Name="ChatButton" Content="° chat᪙ °" HorizontalAlignment="Center" Margin="0,245,0,0" VerticalAlignment="Top" Width="92" AutomationProperties.Name="ChatButton" Background="#FF111111" FontFamily="Cascadia Mono ExtraLight" FontSize="14" Foreground="White" Height="25" Click="Button_Click"/>
-        <TextBox x:Name="TheirResponse" HorizontalAlignment="Center" Margin="0,270,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="800" Height="234" Background="Black" IsReadOnly="True" SelectionBrush="#FF89FFD9" Foreground="White" MaxLines="1729" FontFamily="Cascadia Mono ExtraLight" FontSize="14"/>
+        <TextBox x:Name="MessageText" HorizontalAlignment="Center" TextWrapping="Wrap" Text="..." VerticalAlignment="Top" Width="780" Height="234" Background="Black" FontFamily="Cascadia Mono ExtraLight" SelectionBrush="#FF022200" Foreground="White" FontSize="14" CaretBrush="White" AcceptsReturn="True" MaxLines="1729" RenderTransformOrigin="0.5,0.5" Margin="0,10,0,0" />
+        <Button x:Name="ChatButton" Content="° chat᪙ °" HorizontalAlignment="Center" Margin="0,245,0,0" VerticalAlignment="Top" Width="92" AutomationProperties.Name="ChatButton" Background="#FF111111" FontFamily="Cascadia Mono ExtraLight" FontSize="14" Foreground="White" Height="25" Click="ChatButtonClick"/>
+        <Button x:Name="InterruptButton" Content="⨯ interrupt ⨯" HorizontalAlignment="Left" VerticalAlignment="Center" Width="123" AutomationProperties.Name="ChatButton" Background="#FF111111" FontFamily="Cascadia Mono ExtraLight" FontSize="14" Foreground="White" Height="25" Click="InterruptButtonClick" Margin="667,0,0,0"/>
+
+        <TextBox x:Name="TheirResponse" HorizontalAlignment="Center" Margin="0,270,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="780" Height="234" Background="Black" IsReadOnly="True" SelectionBrush="#FF89FFD9" Foreground="White" MaxLines="1729" FontFamily="Cascadia Mono ExtraLight" FontSize="14"/>
     </Grid>
 </Window>
