@@ -1,0 +1,7 @@
+﻿bin/
+obj/
+Mistral-7B/*.onnx
+Mistral-7B/*.onnx.data
+/.vs/OnnxLocalLLM.slnx
+/Mistral-7B/model.onnx_data
+/UI.csproj.user
