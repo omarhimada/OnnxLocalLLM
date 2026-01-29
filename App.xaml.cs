@@ -22,14 +22,21 @@ namespace UI {
 			splash.Show();
 			splash.Activate();
 
+			string modelPath = DebugModelPath;
+
 			try {
 				if (!Directory.Exists(DebugModelPath)) {
-					MessageBox.Show($"{_userFriendlyModelDirectoryErrorResponse}{DebugModelPath}");
-					return;
+					// Published
+					modelPath = DebugModelPath.TrimStart($"{AppContext.BaseDirectory}..\\..\\..").ToString();
+
+					if (!Directory.Exists(modelPath)) {
+						MessageBox.Show($"{_userFriendlyModelDirectoryErrorResponse}{modelPath}");
+						return;
+					}
 				}
 
 				#region Loading: 2-3 seconds of loading the model into RAM before the window appears...
-				Config config = new(DebugModelPath);
+				Config config = new(modelPath);
 				//config.AppendProvider(_dml);
 
 				_model = new(config);
