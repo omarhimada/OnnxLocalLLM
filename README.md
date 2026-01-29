@@ -8,10 +8,9 @@
 
 ![Screenshot of the chat interface](voila.png)
 
-
 ## Setup
-- Your directory setup should look something like the diagram below, although the `model.onnx_data` is missing. This is due to its size (~4 GB).
- - See **NVidia's ONNX Mistral-7B-Instruct** @ [HuggingFace](https://huggingface.co/nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4/tree/main)
+- Your directory setup should look something like the diagram below, although the `model.onnx` and `model.onnx_data` excluded. This is due to size (~4 GB).
+ - See **NVidia's ONNX Mistral-7B-Instruct** @ [HuggingFace](https://huggingface.co/nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4/tree/main) to download them both.
  - Download the `model.onnx_data` and place it inside the `\Mistral-B` directory.
 ```
 OnnxLocalLLM\Mistral-7B
