@@ -48,6 +48,10 @@ namespace UI {
 			}
 		}
 
+		/// <summary>
+		/// Handles the click event for the interrupt button, attempting to cancel the current operation and update the user
+		/// interface accordingly.
+		/// </summary>
 		internal async void InterruptButtonClick(object sender, RoutedEventArgs e) {
 			if (!InterruptButtonEnabled) {
 				return;
@@ -72,7 +76,7 @@ namespace UI {
 
 			Sequences sequences = _tokenizer.Encode(systemAndUserMessage);
 
-			_generatorParams.SetSearchOption(_maxLengthParameter, 4096);
+			_generatorParams.SetSearchOption(_maxLengthParameter, 8192);
 			_generatorParams.SetSearchOption(_doSample, true);
 			_generatorParams.SetSearchOption(_temperature, _getTemperature());
 			_generatorParams.SetSearchOption(_topK, 51);
@@ -90,6 +94,7 @@ namespace UI {
 					IEnumerable<char> outputPiece = _tokenizer.Decode(new[] { nextToken });
 
 					if (outputPiece != null) {
+						// TODO batch instead of char-by-char (although currently it is incredibly fast)
 						// Update UI from background thread
 						Dispatcher.Invoke(() => {
 							foreach (char c in outputPiece) {
