@@ -6,7 +6,7 @@
 
 - After ~2-3 seconds:
 
-![Screenshot of the chat interface](Screenshot.png)
+![Screenshot of the chat interface](voila.png)
 
 
 ## Setup
