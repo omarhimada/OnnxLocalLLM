@@ -15,6 +15,7 @@
 
 		internal const string _mistral3DefaultInstruction = "You are a helpful assistant.";
 		internal const string _userFriendlyErrorResponse = "I'm sorry, something went wrong. I cannot respond.";
+		internal const string _userFriendlyParsingUserInputToMessageException = "Sorry, I'm couldn't understand what you're trying to say to me.";
 		internal const string _userFriendlyStoppedResponse = "(Stopped.)";
 
 		internal const string _doSample = "do_sample";

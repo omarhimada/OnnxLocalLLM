@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <AssemblyTitle>Local LLM</AssemblyTitle>
+    <ApplicationIcon>iconv0.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="MistralChatEngine.cs" />
@@ -12,10 +14,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="known-issues.txt" />
     <None Remove="Mistral-7B\special_tokens_map.json" />
+    <None Remove="temporary_icon.png" />
   </ItemGroup>
 
   <ItemGroup>
+	<Content Include="iconv0.ico" />
 	<Content Include="Mistral-7B\genai_config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

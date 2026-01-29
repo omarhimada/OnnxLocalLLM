@@ -5,17 +5,13 @@ using System.Windows;
 namespace UI {
 	using static Constants;
 	public partial class App : Application {
-		private Model _model;
-		private Tokenizer _tokenizer;
-		private GeneratorParams _generatorParams;
-		private Generator _generator;
+		private readonly Model? _model;
+		private readonly Tokenizer? _tokenizer;
+		private readonly GeneratorParams? _generatorParams;
+		private readonly Generator? _generator;
 
 		public App() {
 			AppContext.SetSwitch(_appContextSwitchForSelectionBrush, false);
-		}
-
-		protected override void OnStartup(StartupEventArgs e) {
-			base.OnStartup(e);
 
 			// Show loading screen while model attempts to load into memory
 			LoadingWindow splash = new();
@@ -39,13 +35,17 @@ namespace UI {
 				Config config = new(modelPath);
 				//config.AppendProvider(_dml);
 
+				// ~ 5.01 seconds
 				_model = new(config);
+
+				// ~ 0.0508 seconds
 				_tokenizer = new(_model);
+
+				// ~ 0.0002 seconds
 				_generatorParams = new(_model);
-				_generator = new(_model, _generatorParams);
 
 				// TODO config option constructor for 'codeMode'  
-				MainWindow mainWindow = new(_tokenizer, _generatorParams, _generator);
+				MainWindow mainWindow = new(_model, _tokenizer, _generatorParams);
 				#endregion
 
 				mainWindow.Show();

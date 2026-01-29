@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UI"
         mc:Ignorable="d"
-        Title="ONNX Local LLM" Height="544" Width="800"
+        Title="ONNX Chat" Width="800" Height="Auto" MaxHeight="1280" 
         Background="Black"
         WindowStyle="None"
         AllowsTransparency="False">
@@ -59,30 +59,45 @@
 	                  CornerRadius="0"
 	                  GlassFrameThickness="0"/>
     </WindowChrome.WindowChrome>
-    <Border BorderThickness="1" BorderBrush="#333333">
-        <Grid Background="Black">
+    <Border x:Name="Boundary" BorderThickness="1" BorderBrush="#333333">
+        <Grid x:Name="OuterGrid" Background="Black">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" Background="#1A1A1A">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
-                    <TextBlock Text="" Foreground="Gray" FontFamily="Cascadia Mono ExtraLight" FontSize="12"/>
+            <Grid x:Name="TitleBar" Grid.Row="0" Background="Black">
+                <StackPanel x:Name="TitleBarPanel"  Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                    <!-- Currently invisible -->
+                    <TextBlock x:Name="TitleBarText" Text="" Foreground="Gray" FontFamily="Cascadia Mono ExtraLight" FontSize="12"/>
                 </StackPanel>
-
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" WindowChrome.IsHitTestVisibleInChrome="True">
-                    <Button Content="✕" Width="45" Background="Transparent" Foreground="White" BorderThickness="0" Click="CloseButton_Click"/>
+                <StackPanel x:Name="CloseButtonPanel" Orientation="Horizontal" HorizontalAlignment="Right" WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button x:Name="CloseButton" Content="✕" Width="45" Background="Transparent" Foreground="White" BorderThickness="0" Click="CloseButton_Click"/>
                 </StackPanel>
             </Grid>
 
-            <Grid Grid.Row="1" Background="Black" Margin="0,0,0,-3">
-                <TextBox x:Name="MessageText" HorizontalAlignment="Center" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="780" Height="234" Background="Black" FontFamily="Cascadia Mono ExtraLight" SelectionBrush="#FF022200" Foreground="White" FontSize="14" CaretBrush="White" AcceptsReturn="True" MaxLines="1729" RenderTransformOrigin="0.5,0.5" Margin="0,10,0,0" FocusVisualStyle="{x:Null}" Style="{StaticResource NoFocusBlueTextBox}" />
-                
-                <Button x:Name="ChatButton" Content="° chat °" HorizontalAlignment="Center" VerticalAlignment="Center" Width="92" AutomationProperties.Name="ChatButton" Background="#FF111111" FontFamily="Cascadia Mono ExtraLight" FontSize="14" Foreground="White" Height="25" Click="ChatButtonClick"/>
-                <Button x:Name="InterruptButton" Content="⨯ interrupt ⨯" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,9,0" Width="123" AutomationProperties.Name="InterruptButton" Background="#FF111111" FontFamily="Cascadia Mono ExtraLight" FontSize="14" Foreground="White" Height="25" Click="InterruptButtonClick"/>
+            <Grid x:Name="ChatWrap" Grid.Row="1" Background="Black">
+                <StackPanel Orientation="Vertical">
+	                <StackPanel x:Name="UserInputWithButtons" Orientation="Vertical" HorizontalAlignment="Center" Background="Black">
+		                <TextBox x:Name="UserInputText" HorizontalAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap" Text="" Width="800" Height="Auto" Padding="10" MinHeight="120" MaxHeight="490" Background="Black" FontFamily="Cascadia Mono ExtraLight" SelectionBrush="#FF474747" SelectionTextBrush="#FF89FFD9" Foreground="White" MaxLines="1729" FontSize="14" Margin="0,0,0,0" CaretBrush="White" AcceptsReturn="True" FocusVisualStyle="{x:Null}" Style="{StaticResource NoFocusBlueTextBox}" />
+		                <StackPanel x:Name="ButtonsPanel"  Orientation="Horizontal" HorizontalAlignment="Center">
+			                <Button x:Name="ChatButton" Content=" chat " 
+			                        HorizontalAlignment="Left" Width="Auto" Height="25" 
+			                        Background="#FF111111" Foreground="White" FontFamily="Cascadia Mono ExtraLight" FontSize="14"
+			                        Click="ChatButtonClick" AutomationProperties.Name="ChatButton"/>
 
-                <TextBox x:Name="TheirResponse" HorizontalAlignment="Center" Margin="0,0,0,10" TextWrapping="Wrap" Text="..." VerticalAlignment="Bottom" Width="780" Height="234" Background="Black" IsReadOnly="True" SelectionBrush="#FF89FFD9" Foreground="White" MaxLines="1729" FontFamily="Cascadia Mono ExtraLight" FontSize="14" FocusVisualStyle="{x:Null}" Style="{StaticResource NoFocusBlueTextBox}" />
+			                <Button x:Name="InterruptButton" Content=" interrupt " 
+			                        HorizontalAlignment="Right" Width="Auto" Height="25"
+			                        Background="#FF111111" Foreground="White" FontFamily="Cascadia Mono ExtraLight" FontSize="14" 
+			                        Click="InterruptButtonClick" AutomationProperties.Name="InterruptButton" HorizontalContentAlignment="Center" />
+		                </StackPanel>
+	                </StackPanel>
+	                <StackPanel x:Name="ResponseWrap" Background="Black" Margin="0,0,0,0">
+		                <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center">
+                            <TextBox x:Name="TheirResponse" HorizontalAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap" Text="" Width="800" Height="Auto" Padding="10" MaxHeight="920" Background="Black" FontFamily="Cascadia Mono ExtraLight" SelectionBrush="#FF474747" SelectionTextBrush="#FF89FFD9" Foreground="White" MaxLines="1729" FontSize="14" Margin="0,0,0,0" IsReadOnly="True" FocusVisualStyle="{x:Null}" Style="{StaticResource NoFocusBlueTextBox}" />
+		                </StackPanel>
+	                </StackPanel>
+                </StackPanel>
             </Grid>
         </Grid>
     </Border>

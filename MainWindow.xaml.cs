@@ -5,8 +5,15 @@ using static UI.Constants;
 
 namespace UI {
 	public partial class MainWindow : Window {
+		/// <summary>
+		/// Must re-initialize the generator after each response.
+		/// Better to re-initialize after the response as opposed to before your next input is tokenized.
+		/// (e.g.: user reads initial output of the model and then by the time they comprehend, the generator is re-initialized)
+		/// </summary>
+		internal Generator? _generator;
+
+		private readonly Model _model;
 		private readonly Tokenizer _tokenizer;
-		private readonly Generator _generator;
 		private readonly GeneratorParams _generatorParams;
 
 		private readonly bool _expectingCodeResponse = true;
@@ -16,9 +23,9 @@ namespace UI {
 
 		private bool InterruptButtonEnabled { get; set; } = true;
 
-		public MainWindow(Tokenizer tokenizer, GeneratorParams generatorParams, Generator generator, bool? codeMode = true) {
+		public MainWindow(Model model, Tokenizer tokenizer, GeneratorParams generatorParams, bool? codeMode = true) {
+			_model = model;
 			_tokenizer = tokenizer;
-			_generator = generator;
 			_generatorParams = generatorParams;
 
 			if (!(codeMode ?? true)) {
@@ -38,11 +45,17 @@ namespace UI {
 				TheirResponse.Text = string.Empty;
 				ToggleInterruptButton();
 				ChatButton.IsEnabled = false;
-				string systemAndUserMessage = ConstructMessages.AsFormattedString(MessageText.Text);
-
+				string systemAndUserMessage = string.Empty;
+				try {
+					systemAndUserMessage = ConstructMessages.AsFormattedString(UserInputText.Text);
+				} catch (Exception promptConstructionException) {
+					SomethingWentWrong(true);
+					DebugWrite.Line(nameof(ConstructMessages.AsFormattedString), promptConstructionException);
+				}
 				await ChatWithModelAsync(systemAndUserMessage);
-			} catch (Exception) {
+			} catch (Exception chatButtonClickException) {
 				SomethingWentWrong();
+				DebugWrite.Line(nameof(ChatButtonClick), chatButtonClickException);
 			} finally {
 				AllowUserInputEntry();
 			}
@@ -65,10 +78,26 @@ namespace UI {
 				ToggleInterruptButton();
 
 			} catch (Exception) {
-				TheirResponse.Text = _userFriendlyErrorResponse;
+				SomethingWentWrong();
 			} finally {
 				ChatButton.IsEnabled = true;
 			}
+		}
+
+		internal void InitializeGeneratorOrReInitialize() {
+			_generator?.Dispose();
+			_generator = new(_model, _generatorParams);
+		}
+
+		internal void SetGeneratorParameterSearchOptions() {
+			#region Set generator parameters
+			_generatorParams.SetSearchOption(_maxLengthParameter, 8192);
+			_generatorParams.SetSearchOption(_doSample, true);
+			_generatorParams.SetSearchOption(_temperature, _getTemperature());
+			_generatorParams.SetSearchOption(_topK, 51);
+			_generatorParams.SetSearchOption(_topP, 0.9f);
+			_generatorParams.SetSearchOption(_repetitionPenalty, 1.12f);
+			#endregion
 		}
 
 		internal async Task ChatWithModelAsync(string systemAndUserMessage) {
@@ -76,14 +105,10 @@ namespace UI {
 
 			Sequences sequences = _tokenizer.Encode(systemAndUserMessage);
 
-			_generatorParams.SetSearchOption(_maxLengthParameter, 8192);
-			_generatorParams.SetSearchOption(_doSample, true);
-			_generatorParams.SetSearchOption(_temperature, _getTemperature());
-			_generatorParams.SetSearchOption(_topK, 51);
-			_generatorParams.SetSearchOption(_topP, 0.9f);
-			_generatorParams.SetSearchOption(_repetitionPenalty, 1.12f);
+			SetGeneratorParameterSearchOptions();
+			InitializeGeneratorOrReInitialize();
 
-			_generator.AppendTokenSequences(sequences);
+			_generator!.AppendTokenSequences(sequences);
 
 			await Task.Run(() => {
 				while (!_generator.IsDone()) {
@@ -106,8 +131,12 @@ namespace UI {
 			}, ct);
 		}
 
-		private void SomethingWentWrong() {
-			TheirResponse.Text = _userFriendlyErrorResponse;
+		private void SomethingWentWrong(bool couldNotParseUserInput = false) {
+			TheirResponse.Text += $"{_userFriendlyErrorResponse}\n";
+
+			if (couldNotParseUserInput) {
+				TheirResponse.Text += $"{_userFriendlyParsingUserInputToMessageException}\n";
+			}
 		}
 
 		private void AllowUserInputEntry() {

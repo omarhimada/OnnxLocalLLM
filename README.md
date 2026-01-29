@@ -24,7 +24,7 @@
 
 - QOL improvements:
     - Changing models via dropdown menu selection
-    - You have to scroll to see their full response, it should scroll as they're responding so you read while they 'speak', so-to-speak.
+    - You have currently have to scroll to see their full response, it should scroll as they're responding so you read while they 'speak', so-to-speak.
 
 ## Setup
 - Your directory setup should look something like the diagram below, although the `model.onnx` and `model.onnx_data` excluded. This is due to size (~4 GB).

@@ -3,3 +3,5 @@ bin/
 obj/
 .vs/
 Mistral-7B/*.onnx_data
+/known-issues.txt
+/temporary_icon.png
