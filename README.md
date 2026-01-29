@@ -30,20 +30,18 @@ OnnxLocalLLM\Mistral-7B
 - As soon as the application begins to load it looks for the all of the expected JSON including the ONNX and associated data within that directory.
 - See `App.xaml.cs`
 ```csharp
-using Config config = new(DebugModelPath);
-using Model model = new(config);
-using Tokenizer tokenizer = new(model);
+Config config = new(DebugModelPath);
+Model model = new(config);
+Tokenizer tokenizer = new(model);
 
 using OnnxRuntimeGenAIChatClient onnxChatClient = new(model);
 ```
-- You may have to update the deserialized **JSON ➜ C# POCO** `MistralTokenizerConfig.cs` because it assumes the structure of this particular model's `tokenizer_config.json`.
- - *(Unless the structure of the ONNX model is the same)*
-
 #### Encoding ONNX-related JSON
 - It is seemingly typical to download JSON that is UTF-8 with BOM and this leads to unexpected exceptions getting thrown during runtime.
 - The JSON included in this repository has already been converted from `UTF-8 (with a signature)` to `UTF-8 (without a signature)`
 - You can easily convert UTF-8 with BOM to UTF-8 without BOM in most IDEs. Depending on your IDE the *save with different encoding* methodology may be different. 
-- "`UTF-8 with a signature` and `UTF-8 with BOM (Byte Order Mark)` are the exact same thing. You must ensure you have neither. Only UTF-8 for the ONNX JSON.
+- `UTF-8 with a signature` and `UTF-8 with BOM (Byte Order Mark)` are the exact same thing. You must ensure you have neither. Only `UTF-8` for the ONNX JSON.
+- I also removed the `chat_template` from the `tokenizer_config.json` due to Jinja incompatibilities. **The logic I implemented with C# essentially mimics the Jinja logic, though.**
 
 - - There are some helpful PowerShell scripts if you'd prefer to use them instead:
 ```powershell
