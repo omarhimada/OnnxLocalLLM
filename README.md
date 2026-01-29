@@ -8,6 +8,24 @@
 
 ![Screenshot of the chat interface](voila.png)
 
+## Roadmap
+- Priorities:
+    1. Contextual memory/conversation state management
+        - The model should remember what you spoke about yesterday, for example.
+        - Ensure this is done locally beside the model on the local machine.
+            - SQLite is one possibility.
+    2. Leveraging CUDA 
+        - Currently due to the locality the perceived lag between simple chat responses (with a small enough model i.e.: **Mini**stral 3) is milliseconds.
+            - This is due to the lack of the typical API request/response you find with online chat interfaces
+            - Also, this does not operate like LM Studio, Ollama, or Eloi, involving a secondary API and WebSocket communication between the layers on the local machine.
+        	- **(i.e.: the complete locality while ensuring UI updates do not occur on the UI thread of the system seems to be more than sufficient for a responsive, healthy user experience)**
+    3. Learning with visuals/reading documents/retrieval augmentation with a local database
+        - This use of a local database is quite common for similar projects although I weigh this priority less than the first two task items
+
+- QOL improvements:
+    - Changing models via dropdown menu selection
+    - You have to scroll to see their full response, it should scroll as they're responding so you read while they 'speak', so-to-speak.
+
 ## Setup
 - Your directory setup should look something like the diagram below, although the `model.onnx` and `model.onnx_data` excluded. This is due to size (~4 GB).
  - See **NVidia's ONNX Mistral-7B-Instruct** @ [HuggingFace](https://huggingface.co/nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4/tree/main) to download them both.
