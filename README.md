@@ -4,6 +4,8 @@
 
 ![Screenshot of the chat interface as it begins to load](LoadingScreenshot.png)
 
+- After ~2-3 seconds:
+
 ![Screenshot of the chat interface](Screenshot.png)
 
 
@@ -38,8 +40,8 @@ using OnnxRuntimeGenAIChatClient onnxChatClient = new(model);
  - *(Unless the structure of the ONNX model is the same)*
 
 #### Encoding ONNX-related JSON
-- It is seemingly typical to download JSON that is not UTF-8 and this leads to unexpected exceptions getting thrown during runtime.
-- The JSON included has already been converted from `UTF-8 (with a signature)` to UTF-8 `(without a signature)`
+- It is seemingly typical to download JSON that is UTF-8 with BOM and this leads to unexpected exceptions getting thrown during runtime.
+- The JSON included in this repository has already been converted from `UTF-8 (with a signature)` to `UTF-8 (without a signature)`
 - You can easily convert UTF-8 with BOM to UTF-8 without BOM in most IDEs. Depending on your IDE the *save with different encoding* methodology may be different. 
 - "`UTF-8 with a signature` and `UTF-8 with BOM (Byte Order Mark)` are the exact same thing. You must ensure you have neither. Only UTF-8 for the ONNX JSON.
 
