@@ -6,6 +6,7 @@
 
 ![Screenshot of the chat interface](Screenshot.png)
 
+
 ## Setup
 - Your directory setup should look something like the diagram below, although the `model.onnx_data` is missing. This is due to its size (~4 GB).
  - See **NVidia's ONNX Mistral-7B-Instruct** @ [HuggingFace](https://huggingface.co/nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4/tree/main)
