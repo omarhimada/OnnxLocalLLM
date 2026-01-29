@@ -110,6 +110,6 @@ namespace UI {
 			ChatButton.IsEnabled = true;
 		}
 
-		internal void CloseButton_Click(object sender, RoutedEventArgs e) => this.Close();
+		internal void CloseButton_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 	}
 }
