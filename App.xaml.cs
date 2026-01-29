@@ -5,6 +5,11 @@ using System.Windows;
 namespace UI {
 	using static Constants;
 	public partial class App : Application {
+		private Model _model;
+		private Tokenizer _tokenizer;
+		private GeneratorParams _generatorParams;
+		private Generator _generator;
+
 		public App() {
 			AppContext.SetSwitch(_appContextSwitchForSelectionBrush, false);
 		}
@@ -24,19 +29,21 @@ namespace UI {
 				}
 
 				#region Loading: 2-3 seconds of loading the model into RAM before the window appears...
-				using Config config = new(DebugModelPath);
-				using Model model = new(config);
-				using Tokenizer tokenizer = new(model);
+				Config config = new(DebugModelPath);
+				//config.AppendProvider(_dml);
 
-				using OnnxRuntimeGenAIChatClient onnxChatClient = new(model);
+				_model = new(config);
+				_tokenizer = new(_model);
+				_generatorParams = new(_model);
+				_generator = new(_model, _generatorParams);
 
 				// TODO config option constructor for 'codeMode'  
-				MainWindow mainWindow = new(onnxChatClient, tokenizer);
+				MainWindow mainWindow = new(_tokenizer, _generatorParams, _generator);
 				#endregion
 
 				mainWindow.Show();
-			} catch (Exception) {
-				MessageBox.Show(_userFriendlyErrorOccurredDuringInitialization);
+			} catch (Exception exception) {
+				MessageBox.Show($"{_userFriendlyErrorOccurredDuringInitialization}\r\n{exception.Message}");
 				Shutdown();
 			} finally {
 				splash.Hide();

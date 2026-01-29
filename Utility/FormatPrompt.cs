@@ -17,9 +17,6 @@ namespace UI.Utility {
 
 			StringBuilder prompt = new();
 
-			// TODO
-			//bool isFirstUserMessage = true;
-
 			foreach (ChatMessage msg in messages) {
 				// For Mistral3 assume the instruction [INST] is the 'system' prompt.
 
@@ -31,16 +28,7 @@ namespace UI.Utility {
 					/* tokenizer_config.json
 					 * includes chat_template that expects two newlines between instruction and user query */
 					prompt.Append(_twoNewLinesVerbatimNoReturn);
-
-					// Do not include additional {_mistral3InstructEnd} ([/INST]) when add_generation_prompt: true
 					prompt.Append($"{msg.Text}{_ws}{_mistral3InstructEnd}");
-
-					// TODO chat history and contextualize 'first' vs non-first user messages
-					// Per Mistral docs, prepend system prompt to the FIRST user message
-					//if (isFirstUserMessage && !string.IsNullOrEmpty(systemPrompt)) {
-					//	content = $"{systemPrompt}\n\n{content}";
-					//	isFirstUserMessage = false;
-					//}
 				}
 			}
 
