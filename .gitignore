@@ -5,3 +5,6 @@ obj/
 Mistral-7B/*.onnx_data
 /known-issues.txt
 /temporary_icon.png
+/a.txt
+/temporary_icon2.png
+/temporary_icon3.png
