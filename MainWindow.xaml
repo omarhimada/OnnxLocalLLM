@@ -93,13 +93,14 @@
 			                        Click="InterruptButtonClick" AutomationProperties.Name="InterruptButton" HorizontalContentAlignment="Center" />
 		                </StackPanel>
                     </StackPanel>
-	                <ScrollViewer VerticalScrollBarVisibility="Auto">
+	                
                         <StackPanel x:Name="ResponseWrap" Background="Black" Margin="0,0,0,0">
 	                        <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center">
-		                        <TextBox x:Name="TheirResponse" HorizontalAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap" Text="" Width="800" Height="Auto" Padding="10" MaxHeight="920" Background="Black" FontFamily="Cascadia Mono ExtraLight" SelectionBrush="#FF474747" SelectionTextBrush="#FF89FFD9" Foreground="White" MaxLines="1729" FontSize="14" Margin="0,0,0,0" IsReadOnly="True" FocusVisualStyle="{x:Null}" Style="{StaticResource NoFocusBlueTextBox}" />
-	                        </StackPanel>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <TextBox x:Name="TheirResponse" HorizontalAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap" Text="" Width="800" Height="Auto" Padding="10" MaxHeight="920" Background="Black" FontFamily="Cascadia Mono ExtraLight" SelectionBrush="#FF474747" SelectionTextBrush="#FF89FFD9" Foreground="White" MaxLines="1729" FontSize="14" Margin="0,0,0,0" IsReadOnly="True" FocusVisualStyle="{x:Null}" Style="{StaticResource NoFocusBlueTextBox}" />
+                                </ScrollViewer>
+                            </StackPanel>
                         </StackPanel>
-	                </ScrollViewer>
                 </StackPanel>
             </Grid>
         </Grid>
