@@ -84,3 +84,5 @@ $cfg = "C:\...\OnnxLocalLLM\Mistral-7B\tokenizer.json"
 $text = Get-Content $cfg -Raw
 [IO.File]::WriteAllText($cfg, $text, (New-Object System.Text.UTF8Encoding($false)))
 ```
+
+`dotnet add package Microsoft.SemanticKernel.Connectors.SqliteVec --version 1.70.0-preview`
