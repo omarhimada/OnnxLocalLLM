@@ -7,8 +7,9 @@
         mc:Ignorable="d"
         Title="Chat" Width="800" Height="Auto" MaxHeight="1280" 
         Background="Black"
+        AllowsTransparency="False"
         WindowStyle="None"
-        AllowsTransparency="False">
+        WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <SolidColorBrush x:Key="TextBoxBorderNormal" Color="#333333"/>
         <Style x:Key="NoFocusBlueTextBox" TargetType="{x:Type TextBox}">
