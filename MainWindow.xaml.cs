@@ -6,7 +6,7 @@ using static UI.Constants;
 namespace UI {
 	public partial class MainWindow : Window {
 		/// <summary>
-		/// Must re-initialize the generator after each response.
+		/// Re-initialize the generator after each response.
 		/// Better to re-initialize after the response as opposed to before your next input is tokenized.
 		/// (e.g.: user reads initial output of the model and then by the time they comprehend, the generator is re-initialized)
 		/// </summary>
@@ -91,7 +91,7 @@ namespace UI {
 
 		internal void SetGeneratorParameterSearchOptions() {
 			#region Set generator parameters
-			_generatorParams.SetSearchOption(_maxLengthParameter, 8192);
+			_generatorParams.SetSearchOption(_maxLengthParameter, 8192); // 16384 // 32768
 			_generatorParams.SetSearchOption(_doSample, true);
 			_generatorParams.SetSearchOption(_temperature, _getTemperature());
 			_generatorParams.SetSearchOption(_topK, 51);

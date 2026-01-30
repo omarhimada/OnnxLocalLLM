@@ -8,7 +8,6 @@ namespace UI {
 		private readonly Model? _model;
 		private readonly Tokenizer? _tokenizer;
 		private readonly GeneratorParams? _generatorParams;
-		private readonly Generator? _generator;
 
 		public App() {
 			AppContext.SetSwitch(_appContextSwitchForSelectionBrush, false);
