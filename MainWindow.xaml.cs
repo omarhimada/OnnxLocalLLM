@@ -1,5 +1,7 @@
 ﻿using Microsoft.ML.OnnxRuntimeGenAI;
 using System.Windows;
+using UI.Memory;
+using UI.Memory.Contextualize;
 using UI.Utility;
 using static UI.Constants;
 
@@ -12,21 +14,44 @@ namespace UI {
 		/// </summary>
 		internal Generator? _generator;
 
-		private readonly Model _model;
-		private readonly Tokenizer _tokenizer;
-		private readonly GeneratorParams _generatorParams;
+		internal readonly Model _model;
+		internal readonly LocalNomicEmbeddingGenerator _localNomicEmbeddingGenerator;
 
-		private readonly bool _expectingCodeResponse = true;
-		private readonly CancellationTokenSource _cts = new();
+		internal readonly Tokenizer _tokenizer;
+		internal readonly GeneratorParams _generatorParams;
 
-		private float _getTemperature() => _expectingCodeResponse ? 0.115f : 0.7f;
+		internal readonly bool _expectingCodeResponse = true;
+		internal readonly CancellationTokenSource _cts = new();
 
-		private bool InterruptButtonEnabled { get; set; } = true;
+		internal Remember _remember;
 
-		public MainWindow(Model model, Tokenizer tokenizer, GeneratorParams generatorParams, bool? codeMode = true) {
+		internal MainWindow(
+			Model model,
+			LocalNomicEmbeddingGenerator localNomicEmbeddingGenerator,
+			Tokenizer tokenizer,
+			GeneratorParams generatorParams,
+			bool? codeMode = true) {
+
+			// Make sure the 'x' button in the top right actually closes the process.
+			Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
+
 			_model = model;
+			_localNomicEmbeddingGenerator = localNomicEmbeddingGenerator;
+
 			_tokenizer = tokenizer;
 			_generatorParams = generatorParams;
+
+			CancellationToken ct = _cts.Token;
+
+			_remember = new Remember(_localNomicEmbeddingGenerator);
+
+			// Load their 'memories'. They should remember what we spoke about yesterday, a week ago, maybe even years.
+			Task allowAbilityToRememberTask = Task.Run(async () => {
+				// This should initialize their memories.db if it does not already exist
+				await Remember.StartAsync(_localNomicEmbeddingGenerator, ct);
+			}, ct);
+
+			Task.WaitAll(allowAbilityToRememberTask);
 
 			if (!(codeMode ?? true)) {
 				_expectingCodeResponse = false;
@@ -143,6 +168,8 @@ namespace UI {
 			ToggleInterruptButton();
 			ChatButton.IsEnabled = true;
 		}
+		private float _getTemperature() => _expectingCodeResponse ? 0.115f : 0.7f;
+		private bool InterruptButtonEnabled { get; set; } = true;
 
 		internal void CloseButton_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 	}

@@ -1,43 +1,63 @@
-﻿namespace UI.Memory {
+﻿using UI.Memory.Contextualize;
+
+namespace UI.Memory {
 	using Microsoft.Extensions.AI;
 	using Microsoft.Extensions.VectorData;
 	using Microsoft.SemanticKernel.Connectors.SqliteVec;
+	using static Constants;
 
 	internal class Remember : IDisposable {
-		internal const string _db = "Data Source=chat_history.db";
-		internal const string _discussions = "discussions";
+		internal const string _db = "Data Source=memories.db";
+		internal const string _dbDiscussions = "discussions";
 
 		internal static SqliteVectorStore? _vectorStore;
 
 		internal static SqliteCollection<long, Discussion>? _memories;
 		internal static IEmbeddingGenerator<string, Embedding<float>>? _embedder;
 
-		public static async Task InitAsync(
+		private readonly CancellationTokenSource _cts = new();
+
+		private readonly SqliteCollectionOptions _sqliteOptions = new() {
+			VectorVirtualTableName = "Recollections"
+		};
+
+		/// <summary>
+		/// Initializes a new instance of the Remember class and synchronously starts the memory initialization process using
+		/// the specified embedding generator.
+		/// </summary>
+		/// <remarks>This constructor blocks until the memory initialization process completes. If the initialization
+		/// fails, an exception may be thrown. Use this constructor only when synchronous initialization is
+		/// required.</remarks>
+		/// <param name="embeddingGenerator">The embedding generator to use for initializing memory. Cannot be null.</param>
+		internal Remember(LocalNomicEmbeddingGenerator embeddingGenerator) {
+			CancellationToken ct = _cts.Token;
+			_memories =
+				new(_db, _memoriesDbName, _sqliteOptions);
+
+			Task memoryInitializationTask = Task.Run(async () => {
+				await StartAsync(embeddingGenerator, ct);
+			}, ct);
+
+			Task.WaitAll(memoryInitializationTask);
+		}
+
+		internal static async Task StartAsync(
 			IEmbeddingGenerator<string, Embedding<float>> embedder,
 			CancellationToken ct = default) {
+
 			_embedder = embedder;
 
 			_vectorStore?.Dispose();
 			_vectorStore = new(_db);
 
-			_memories = _vectorStore.GetCollection<long, Discussion>(_discussions);
+			_memories = _vectorStore.GetCollection<long, Discussion>(_dbDiscussions);
 			await _memories.EnsureCollectionExistsAsync(ct);
-		}
-
-		public static async Task Remembering() {
-			// 2. Initialize the persistent SQLite store (Survives app restarts)
-			SqliteCollection<ulong, Discussion> memories = _vectorStore!.GetCollection<ulong, Discussion>(_discussions);
-			await memories.EnsureCollectionExistsAsync();
-
-			if (await memories.CollectionExistsAsync()) {
-
-			}
 		}
 
 		/// <summary>
 		/// Store a discussion that had occurred.
 		/// </summary>
-		public static async Task MemorizeDiscussionAsync(string text, CancellationToken ct = default) {
+		internal static async Task MemorizeDiscussionAsync(string text, CancellationToken ct = default) {
 			if (_memories is null || _embedder is null) {
 				throw new InvalidOperationException("Order of operations is incorrect. Initialize memory first.");
 			}
@@ -58,9 +78,9 @@
 		}
 
 		/// <summary>
-		/// Think backwards for a second, try to remember before responding.
+		/// Try to remember before responding.
 		/// </summary>
-		public static async Task<IReadOnlyList<Discussion>> RememberDiscussionAsync(
+		internal static async Task<IReadOnlyList<Discussion>> RememberDiscussionAsync(
 			string query,
 			int topK = 8,
 			int candidatePool = 33,

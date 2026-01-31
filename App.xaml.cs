@@ -1,13 +1,18 @@
 ﻿using Microsoft.ML.OnnxRuntimeGenAI;
 using System.IO;
+using System.Text;
 using System.Windows;
+using UI.Memory.Contextualize;
 
 namespace UI {
 	using static Constants;
+
 	public partial class App : Application {
 		private readonly Model? _model;
+		private readonly Model? _embedModel;
 		private readonly Tokenizer? _tokenizer;
 		private readonly GeneratorParams? _generatorParams;
+		private readonly LocalNomicEmbeddingGenerator _localNomicEmbeddingGenerator;
 
 		public App() {
 			AppContext.SetSwitch(_appContextSwitchForSelectionBrush, false);
@@ -17,22 +22,24 @@ namespace UI {
 			splash.Show();
 			splash.Activate();
 
-			string modelPath = DebugModelPath;
-
 			try {
-				if (!Directory.Exists(DebugModelPath)) {
-					// Published
-					modelPath = DebugModelPath.TrimStart($"{AppContext.BaseDirectory}..\\..\\..").ToString();
+				// (Mistral-7B or Mistral-14B) and nomic-embed-text-1-5
+				(string? modelPath, string? embedModelPath) = EnsureRequiredModelsArePresent();
 
-					if (!Directory.Exists(modelPath)) {
-						MessageBox.Show($"{_userFriendlyModelDirectoryErrorResponse}{modelPath}");
-						return;
-					}
+				if (modelPath == null || embedModelPath == null) {
+					// Previous method already displayed the friendly user message and provided some guidance.
+					Current.Shutdown();
+					return;
 				}
+
+				// Embed model
+
+				// Initialize embedding generator locally
+				_localNomicEmbeddingGenerator = new(embedModelPath);
 
 				#region Loading: 2-3 seconds of loading the model into RAM before the window appears...
 				Config config = new(modelPath);
-				//config.AppendProvider(_dml);
+				//config.AppendProvider("dml");
 
 				// ~ 5.01 seconds
 				_model = new(config);
@@ -44,7 +51,7 @@ namespace UI {
 				_generatorParams = new(_model);
 
 				// TODO config option constructor for 'codeMode'  
-				MainWindow mainWindow = new(_model, _tokenizer, _generatorParams);
+				MainWindow mainWindow = new(_model, _localNomicEmbeddingGenerator, _tokenizer, _generatorParams);
 				#endregion
 
 				mainWindow.Show();
@@ -54,6 +61,70 @@ namespace UI {
 			} finally {
 				splash.Hide();
 			}
+		}
+
+		/// <summary>
+		/// Checks whether all required models (Mistral3 and nomic-embed-text) are present and accessible.
+		/// </summary>
+		private static (string? modelPath, string? embedModelPath) EnsureRequiredModelsArePresent() {
+			string? modelPathToReturn = null;
+
+			// Construct a detailed message to show the user if neither of the required models could be found.
+			StringBuilder potentialFriendlyUserErrorMessage = new();
+
+			// Attempt to retrieve the Mistral model ONNX
+			if (!TryRequiredModelIsPresent(DebugModelPath, out string? modelPathToUse) && modelPathToUse == null) {
+				potentialFriendlyUserErrorMessage.AppendLine($"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{modelPathToUse}");
+			}
+
+			// Attempt to retrieve the embedding model ONNX
+			if (!TryRequiredModelIsPresent(DebugEmbedModelPath, out string? embedModelPathToUse) || embedModelPathToUse == null) {
+				potentialFriendlyUserErrorMessage.AppendLine($"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{embedModelPathToUse}");
+			}
+
+			if (modelPathToReturn == null && embedModelPathToUse == null) {
+				MessageBox.Show(potentialFriendlyUserErrorMessage.ToString(), "Please refer to the README.md or post an issue at https://github.com/OnnxLocalLLM");
+			}
+
+			return (modelPathToUse!, embedModelPathToUse!);
+		}
+
+		/// <summary>
+		/// Checks whether the required model directories are present at either the specified debug path or its published location.
+		/// </summary>
+		private static bool TryRequiredModelIsPresent(string debugPath, out string? pathToUse) {
+			pathToUse = null;
+			if (debugPath.EndsWith(_debugEmbedModelPathSuffix)) {
+				#region Verify embed model is present 
+				if (!File.Exists(debugPath)) {
+					// Try the embed model from the published directory instead of the debugging directory:
+					pathToUse = debugPath.TrimStart($"{AppContext.BaseDirectory}..\\..\\..").ToString();
+					if (!File.Exists(pathToUse)) {
+						// If we still cannot find the required model(s) then show the user a friendly message and return false.
+						MessageBox.Show($"{_userFriendlyModelDirectoryErrorResponse}{pathToUse}");
+						return false;
+					}
+				} else {
+					pathToUse = debugPath;
+				}
+				#endregion
+			} else {
+				#region Verify LLM is present first assume the user is debugging the application first
+				if (!Directory.Exists(debugPath)) {
+					// Assume the program is published and the directory is close to the executable.
+					string publishedLocation = debugPath.TrimStart($"{AppContext.BaseDirectory}..\\..\\..").ToString();
+
+					if (!Directory.Exists(publishedLocation)) {
+						// If we still cannot find the required model(s) then show the user a friendly message and return false.
+						MessageBox.Show($"{_userFriendlyModelDirectoryErrorResponse}{publishedLocation}");
+						return false;
+					}
+				} else {
+					pathToUse = debugPath;
+				}
+				#endregion
+			}
+			return pathToUse != null;
 		}
 	}
 }

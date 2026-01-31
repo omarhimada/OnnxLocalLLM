@@ -10,36 +10,74 @@
 
 ## Roadmap
 - Priorities:
-    1. Contextual memory/conversation state management
+    1. Contextual memory/conversation state management **~ 80% complete**
+        - Loading `nomic-embed-text-1-5` locally 
+        - Initializes a local SQLite database if it does not exist
+          - Utilizing a `VectorData` abstraction to use the SQLite database as a vector store for performance.
+          -  Implmented two methods:
+            1. `MemorizeDiscussion(...) // Store a discussion that had occurred.`
+            2. `RememberDisciossion(...) // Try to remember before responding`
+          - `VectorSearch` occurs with decay parameters like `halfLifeDays = 365, etc.`
+          - The goal is that this model lives in this one machine and learns forever. 
+            
         - The model should remember what you spoke about yesterday, for example.
         - Ensure this is done locally beside the model on the local machine.
             - SQLite is one possibility.
-    2. Leveraging CUDA 
-        - Currently due to the locality the perceived lag between simple chat responses (with a small enough model i.e.: **Mini**stral 3) is milliseconds.
-            - This is due to the lack of the typical API request/response you find with online chat interfaces
+
+    2. Leveraging CUDA **~ 90% complete**
+        -  Utilizing `Microsoft.AI.OnnxRuntime.SessionOptions` to attempt to enable GPU if available.
+            - This is expected to function easily, although yet untested. I've had no issues with other tech stacks.
+            - 
+        - Currently, due to the locality, the perceived latency between user chat input and model response is ~milliseconds.
+            - This is due to the lack of the typical API request/response you find with online chat interfaces.
+                - Although they're able to learn via parsing the internet, with retrieval augmentation you can also teach them without compromising proprietary information or sensitive government documentation.
+                - *(Companies and governments sign contracts with OpenAI, Amazon, Meta, Google, and Copilot). That is an absense of zero-trust mentality you'd expect within government organizations or R&D medical laboratories, for example.*
+                - 
             - Also, this does not operate like LM Studio, Ollama, or Eloi, involving a secondary API and WebSocket communication between the layers on the local machine.
-        	- **(i.e.: the complete locality while ensuring UI updates do not occur on the UI thread of the system seems to be more than sufficient for a responsive, healthy user experience)**
+            - Thte model is loaded into memory and is localized on your machine. This is quite distinct.        	
+
     3. Learning with visuals/reading documents/retrieval augmentation with a local database
         - This use of a local database is quite common for similar projects although I weigh this priority less than the first two task items
 
-- QOL improvements:
+- Plan:
+    - After priorities are met:
+        - Attempt Mistral-3-14B locally instead of Mistral-3-7B due to my hardware available 
+            - `RTX 5090, 32 GB DDR5 RAM, AMD Ryzen 7 9800XD` (typical desktop setup, mid-to-upper-end consumer hardware)
+            - I plan on watching the model's `memories.db` grow into gigabytes. Recalling and contextualizing every detail of my life for years.
+            - This seems important to me. You're welcome to disagree.
+
+- Other planned QOL improvements:
     - Changing models via dropdown menu selection
     - You have currently have to scroll to see their full response, it should scroll as they're responding so you read while they 'speak', so-to-speak.
 
 ## Setup
 - Your directory setup should look something like the diagram below, although the `model.onnx` and `model.onnx_data` excluded. This is due to size (~4 GB).
  - See **NVidia's ONNX Mistral-7B-Instruct** @ [HuggingFace](https://huggingface.co/nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4/tree/main) to download them both.
- - Download the `model.onnx_data` and place it inside the `\Mistral-B` directory.
+- You'll have to do the same for **nomic-embed-text-1-5** @ [HuggingFace](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5/tree/main/onnx) 
+ - Get the ~500 MB `.onnx`, everything else is included 
+- Download those three missing pieces and place them in their appropriate directories
+- In total you'll have to grab three different things from HF. The GitHub repository limitations are unfortunate.
 ```
-OnnxLocalLLM\Mistral-7B
-			|
-			| genai_config.json
-			| model.onnx
-			| model.onnx_data
-			| special_tokens_map.json
-			| tokenizer_config.json
-			| tokenizer.json
-			|_____________________
+    .OnnxLocalLLM
+	|
+	| genai_config.json
+	| model.onnx  <---------------------- Download this
+	| model.onnx_data <------------------ Download this
+	| special_tokens_map.json
+	| tokenizer_config.json
+	| tokenizer.json
+	|_____________________\Mistral-7B
+	|
+	| config.json
+    | config_sentence_transformers.json
+	| genai_config.json
+    | model.onnx  <---------------------- Download this.
+    | modules.json
+	| special_tokens_map.json
+	| tokenizer_config.json
+	| tokenizer.json
+    | vocab.txt
+	|_____________________\Nomic-Embed-Text-1-5
 ```
 
 ### Cloning/forking and changing ONNX models
@@ -84,5 +122,3 @@ $cfg = "C:\...\OnnxLocalLLM\Mistral-7B\tokenizer.json"
 $text = Get-Content $cfg -Raw
 [IO.File]::WriteAllText($cfg, $text, (New-Object System.Text.UTF8Encoding($false)))
 ```
-
-`dotnet add package Microsoft.SemanticKernel.Connectors.SqliteVec --version 1.70.0-preview`

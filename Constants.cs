@@ -2,11 +2,18 @@
 	internal static class Constants {
 		// nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4
 		internal static string DebugModelPath => $"{AppContext.BaseDirectory}..\\..\\..\\Mistral-7B";
-		internal const string _dml = "dml";
-		internal const string _pathToTokenizerJson = "\\Mistral-7B\\tokenizer_config.json";
+		// nomic-ai/nomic-embed-text-v1.5
+		internal const string _debugEmbedModelPathSuffix = "Nomic-Embed-Text-1-5\\model.onnx";
+		internal static string DebugEmbedModelPath => $"{AppContext.BaseDirectory}..\\..\\..\\{_debugEmbedModelPathSuffix}";
+
+		internal const string _memoriesDbName = "memories";
+
+		// Unused
+		//internal const string _dml = "dml";
+		//internal const string _pathToTokenizerJson = "\\Mistral-7B\\tokenizer_config.json";
 
 		internal const string _mistral3TokenStartTurn = @"<s>";
-		internal const string _mistral3TokenStop = @"</s>";
+		// internal const string _mistral3TokenStop = @"</s>";
 		internal const string _mistral3InstructStart = @"[INST]";
 		internal const string _mistral3InstructEnd = @"[/INST]";
 
@@ -27,7 +34,7 @@
 		internal const string _twoNewLinesVerbatimNoReturn = "\n\n";
 
 		internal const string _userFriendlyModelDirectoryErrorResponse =
-			"Model files not found. Ensure that the model files exist at the specified: ";
+			"Model file could not be found. Ensure that the required model files exist at the specified location: ";
 
 		internal const string _appContextSwitchForSelectionBrush =
 			"Switch.System.Windows.Controls.Text.UseAdornerForTextboxSelectionRendering";
@@ -40,5 +47,8 @@
 
 		internal const string _userFriendlyErrorOccurredDuringInitialization =
 			"An error occurred during initialization. Please refer to the README.";
+
+		internal const string _userFriendlyErrorOccurredTryingToLoadModels =
+			"Please refer to the README.md or post an issue at https://github.com/omarhimada/OnnxLocalLLM";
 	}
 }

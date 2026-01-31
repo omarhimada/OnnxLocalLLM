@@ -17,7 +17,25 @@
     <None Remove="a.txt" />
     <None Remove="iconv0.ico" />
     <None Remove="known-issues.txt" />
+    <None Remove="Mistral-14B\genai_config.json" />
+    <None Remove="Mistral-14B\model.onnx" />
+    <None Remove="Mistral-14B\Readme.txt" />
+    <None Remove="Mistral-14B\special_tokens_map.json" />
+    <None Remove="Mistral-14B\tokenizer.json" />
+    <None Remove="Mistral-14B\tokenizer_config.json" />
+    <None Remove="Mistral-7B\model.onnx" />
     <None Remove="Mistral-7B\special_tokens_map.json" />
+    <None Remove="Mistral-7B\tokenizer.json" />
+    <None Remove="Mistral-7B\tokenizer_config.json" />
+    <None Remove="Nomic-Embed-Text-1-5\config.json" />
+    <None Remove="Nomic-Embed-Text-1-5\config_sentence_transformers.json" />
+    <None Remove="Nomic-Embed-Text-1-5\model.onnx" />
+    <None Remove="Nomic-Embed-Text-1-5\modules.json" />
+    <None Remove="Nomic-Embed-Text-1-5\sentence_bert_config.json" />
+    <None Remove="Nomic-Embed-Text-1-5\special_tokens_map.json" />
+    <None Remove="Nomic-Embed-Text-1-5\tokenizer.json" />
+    <None Remove="Nomic-Embed-Text-1-5\tokenizer_config.json" />
+    <None Remove="Nomic-Embed-Text-1-5\vocab.txt" />
     <None Remove="temporary_icon.png" />
   </ItemGroup>
 
@@ -25,15 +43,69 @@
 	<Content Include="iconv1.ico">
 	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
+	<Content Include="Mistral-14B\genai_config.json">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<!--<Content Include="Mistral-14B\model.onnx">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>-->
+	<Content Include="Mistral-14B\special_tokens_map.json">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="Mistral-14B\tokenizer.json">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="Mistral-14B\tokenizer_config.json">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
 	<Content Include="Mistral-7B\genai_config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+	<Content Include="Mistral-7B\model.onnx">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
 	<Content Include="Mistral-7B\special_tokens_map.json">
 	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
     <Content Include="Mistral-7B\genai_config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Mistral-7B\tokenizer.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Mistral-7B\tokenizer_config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Nomic-Embed-Text-1-5\config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Nomic-Embed-Text-1-5\config_sentence_transformers.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Nomic-Embed-Text-1-5\model.onnx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Nomic-Embed-Text-1-5\modules.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Nomic-Embed-Text-1-5\sentence_bert_config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Nomic-Embed-Text-1-5\special_tokens_map.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Nomic-Embed-Text-1-5\tokenizer.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Nomic-Embed-Text-1-5\tokenizer_config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Nomic-Embed-Text-1-5\vocab.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <!--<Content Include="Nomic-Embed-Text-1-5\model.onnx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>-->
   </ItemGroup>
 
 	<ItemGroup>
@@ -45,16 +117,11 @@
 		<PackageReference Include="Microsoft.KernelMemory.Core" Version="0.98.250508.3" />
 		<PackageReference Include="Microsoft.ML" Version="5.0.0" />
 		<PackageReference Include="Microsoft.ML.OnnxRuntimeGenAI.DirectML" Version="0.11.4" />
+		<PackageReference Include="Microsoft.SemanticKernel.Connectors.Sqlite" Version="1.51.0-preview" />
 		<PackageReference Include="Microsoft.SemanticKernel.Connectors.SqliteVec" Version="1.70.0-preview" />
 
 
 		<!--<PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.23.2" />
 		<PackageReference Include="Microsoft.ML.OnnxRuntime.Extensions" Version="0.14.0" />-->
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="Mistral-7B\tokenizer_config.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
 	</ItemGroup>
 </Project>
