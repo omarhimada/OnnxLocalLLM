@@ -4,7 +4,11 @@ obj/
 .vs/
 Mistral-7B/*.onnx_data
 /known-issues.txt
-/temporary_icon.png
-/a.txt
-/temporary_icon2.png
-/temporary_icon3.png
+/a.*
+/temp**
+/Mistral-14B/model.onnx_data
+/Mistral-14B/Readme.txt
+/Nomic-Embed-Text-1-5/model.onnx
+/.images/temp*.png
+/Nomic-Embed-Text-1-5/model.onnx
+/Nomic-Embed-Text-1-5/genai_config.json
