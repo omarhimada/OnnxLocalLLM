@@ -18,7 +18,6 @@
     <None Remove="iconv0.ico" />
     <None Remove="known-issues.txt" />
     <None Remove="Mistral-14B\genai_config.json" />
-    <None Remove="Mistral-14B\model.onnx" />
     <None Remove="Mistral-14B\Readme.txt" />
     <None Remove="Mistral-14B\special_tokens_map.json" />
     <None Remove="Mistral-14B\tokenizer.json" />

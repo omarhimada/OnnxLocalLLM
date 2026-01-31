@@ -13,3 +13,4 @@ Mistral-7B/*.onnx_data
 /Nomic-Embed-Text-1-5/model.onnx
 /Nomic-Embed-Text-1-5/genai_config.json
 /Mistral-14B/model.onnx
+/Mistral-7B/model.onnx
