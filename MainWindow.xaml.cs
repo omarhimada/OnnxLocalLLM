@@ -73,14 +73,12 @@ namespace UI {
 				string systemAndUserMessage = string.Empty;
 				try {
 					systemAndUserMessage = ConstructMessages.AsFormattedString(UserInputText.Text);
-				} catch (Exception promptConstructionException) {
+				} catch (Exception) {
 					SomethingWentWrong(true);
-					DebugWrite.Line(nameof(ConstructMessages.AsFormattedString), promptConstructionException);
 				}
 				await ChatWithModelAsync(systemAndUserMessage);
-			} catch (Exception chatButtonClickException) {
+			} catch (Exception) {
 				SomethingWentWrong();
-				DebugWrite.Line(nameof(ChatButtonClick), chatButtonClickException);
 			} finally {
 				AllowUserInputEntry();
 			}
