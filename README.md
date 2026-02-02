@@ -7,8 +7,8 @@
 
 ## Roadmap
 - Priorities:
-    1. Contextual memory/conversation state management **~ 80% complete**
-        - ☑ Initializes a local SQLite database if it does not exist
+    1. Contextual memory/conversation state management **80% complete**
+        - Initializes a local SQLite database if it does not exist
   		- Utilizing a `VectorData` abstraction to use the SQLite database as a vector store for performance.
       	-  Implmented two methods:
             1. `MemorizeDiscussion(...) // Store a discussion that had occurred.`
@@ -17,7 +17,7 @@
           - The goal is that they keep learning and you backup the local database yourself. i.e.: *the model lives in this one machine and learns forever.*
           - The model should remember what you spoke about yesterday, for example.
         
-    2. Leveraging CUDA **~ 90% complete**
+    2. Leveraging CUDA **90% complete**
         -  Utilizing `Microsoft.AI.OnnxRuntime.SessionOptions` to attempt to enable GPU if available.
             - This is expected to function easily, although yet untested. I've had no issues with other tech stacks.
             - 
