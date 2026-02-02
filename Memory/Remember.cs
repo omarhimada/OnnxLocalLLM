@@ -29,7 +29,7 @@ namespace UI.Memory {
 		/// fails, an exception may be thrown. Use this constructor only when synchronous initialization is
 		/// required.</remarks>
 		/// <param name="embeddingGenerator">The embedding generator to use for initializing memory. Cannot be null.</param>
-		internal Remember(LocalNomicEmbeddingGenerator embeddingGenerator) {
+		internal Remember(LocalEmbeddingGenerator embeddingGenerator) {
 			CancellationToken ct = _cts.Token;
 			_memories =
 				new(_db, _memoriesDbName, _sqliteOptions);

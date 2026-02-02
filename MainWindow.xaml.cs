@@ -15,7 +15,7 @@ namespace UI {
 		internal Generator? _generator;
 
 		internal readonly Model _model;
-		internal readonly LocalNomicEmbeddingGenerator _localNomicEmbeddingGenerator;
+		internal readonly LocalEmbeddingGenerator _localEmbeddingGenerator;
 
 		internal readonly Tokenizer _tokenizer;
 		internal readonly GeneratorParams _generatorParams;
@@ -27,7 +27,7 @@ namespace UI {
 
 		internal MainWindow(
 			Model model,
-			LocalNomicEmbeddingGenerator localNomicEmbeddingGenerator,
+			LocalEmbeddingGenerator localEmbeddingGenerator,
 			Tokenizer tokenizer,
 			GeneratorParams generatorParams,
 			bool? codeMode = true) {
@@ -36,19 +36,19 @@ namespace UI {
 			Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
 			_model = model;
-			_localNomicEmbeddingGenerator = localNomicEmbeddingGenerator;
+			_localEmbeddingGenerator = localEmbeddingGenerator;
 
 			_tokenizer = tokenizer;
 			_generatorParams = generatorParams;
 
 			CancellationToken ct = _cts.Token;
 
-			_remember = new Remember(_localNomicEmbeddingGenerator);
+			_remember = new Remember(_localEmbeddingGenerator);
 
 			// Load their 'memories'. They should remember what we spoke about yesterday, a week ago, maybe even years.
 			Task allowAbilityToRememberTask = Task.Run(async () => {
 				// This should initialize their memories.db if it does not already exist
-				await Remember.StartAsync(_localNomicEmbeddingGenerator, ct);
+				await Remember.StartAsync(_localEmbeddingGenerator, ct);
 			}, ct);
 
 			Task.WaitAll(allowAbilityToRememberTask);

@@ -3,14 +3,13 @@ using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using System.Windows;
 
-
 namespace UI.Memory.Contextualize {
-	internal sealed class LocalNomicEmbeddingGenerator : IEmbeddingGenerator<string, Embedding<float>> {
+	internal sealed class LocalEmbeddingGenerator : IEmbeddingGenerator<string, Embedding<float>> {
 		internal const string _inputIds = "input_ids";
 		internal const string _attentionMask = "attention_mask";
 
 		private readonly InferenceSession _session;
-		internal LocalNomicEmbeddingGenerator(string embedModelPath) {
+		internal LocalEmbeddingGenerator(string embedModelPath) {
 			// Optimization: Use SessionOptions to enable GPU if available
 			SessionOptions options = new();
 			try {

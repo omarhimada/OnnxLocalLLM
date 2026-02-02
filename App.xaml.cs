@@ -9,10 +9,10 @@ namespace UI {
 
 	public partial class App : Application {
 		private readonly Model? _model;
-		private readonly Model? _embedModel;
+		//private readonly Model? _embedModel; TODO
 		private readonly Tokenizer? _tokenizer;
 		private readonly GeneratorParams? _generatorParams;
-		private readonly LocalNomicEmbeddingGenerator _localNomicEmbeddingGenerator;
+		private readonly LocalEmbeddingGenerator _localEmbeddingGenerator;
 
 		public App() {
 			AppContext.SetSwitch(_appContextSwitchForSelectionBrush, false);
@@ -35,7 +35,7 @@ namespace UI {
 				// Embed model
 
 				// Initialize embedding generator locally
-				_localNomicEmbeddingGenerator = new(embedModelPath);
+				_localEmbeddingGenerator = new(embedModelPath);
 
 				#region Loading: 2-3 seconds of loading the model into RAM before the window appears...
 				Config config = new(modelPath);
@@ -51,7 +51,7 @@ namespace UI {
 				_generatorParams = new(_model);
 
 				// TODO config option constructor for 'codeMode'  
-				MainWindow mainWindow = new(_model, _localNomicEmbeddingGenerator, _tokenizer, _generatorParams);
+				MainWindow mainWindow = new(_model, _localEmbeddingGenerator, _tokenizer, _generatorParams);
 				#endregion
 
 				mainWindow.Show();
@@ -73,12 +73,12 @@ namespace UI {
 			StringBuilder potentialFriendlyUserErrorMessage = new();
 
 			// Attempt to retrieve the Mistral model ONNX
-			if (!TryRequiredModelIsPresent(DebugModelPath, out string? modelPathToUse) && modelPathToUse == null) {
+			if (!TryRequiredModelIsPresent(_debugModeModelPath, out string? modelPathToUse) && modelPathToUse == null) {
 				potentialFriendlyUserErrorMessage.AppendLine($"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{modelPathToUse}");
 			}
 
 			// Attempt to retrieve the embedding model ONNX
-			if (!TryRequiredModelIsPresent(DebugEmbedModelPath, out string? embedModelPathToUse) || embedModelPathToUse == null) {
+			if (!TryRequiredModelIsPresent(_debugModeEmbedModelPath, out string? embedModelPathToUse) || embedModelPathToUse == null) {
 				potentialFriendlyUserErrorMessage.AppendLine($"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{embedModelPathToUse}");
 			}
 
@@ -94,7 +94,7 @@ namespace UI {
 		/// </summary>
 		private static bool TryRequiredModelIsPresent(string debugPath, out string? pathToUse) {
 			pathToUse = null;
-			if (debugPath.EndsWith(_debugEmbedModelPathSuffix)) {
+			if (debugPath == _debugModeEmbedModelPath) {
 				#region Verify embed model is present 
 				if (!File.Exists(debugPath)) {
 					// Try the embed model from the published directory instead of the debugging directory:

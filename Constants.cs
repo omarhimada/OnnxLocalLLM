@@ -1,16 +1,11 @@
 ﻿namespace UI {
 	internal static class Constants {
 		// nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4
-		internal static string DebugModelPath => $"{AppContext.BaseDirectory}..\\..\\..\\Mistral-7B";
+		internal static string _debugModeModelPath => $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Mistral-7B";
 		// nomic-ai/nomic-embed-text-v1.5
-		internal const string _debugEmbedModelPathSuffix = "Nomic-Embed-Text-1-5\\model.onnx";
-		internal static string DebugEmbedModelPath => $"{AppContext.BaseDirectory}..\\..\\..\\{_debugEmbedModelPathSuffix}";
+		internal static string _debugModeEmbedModelPath => $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Nomic-Embed-Text-1-5\\model.onnx";
 
 		internal const string _memoriesDbName = "memories";
-
-		// Unused
-		//internal const string _dml = "dml";
-		//internal const string _pathToTokenizerJson = "\\Mistral-7B\\tokenizer_config.json";
 
 		internal const string _mistral3TokenStartTurn = @"<s>";
 		// internal const string _mistral3TokenStop = @"</s>";
@@ -20,7 +15,7 @@
 		internal const string _ws = @" ";
 		internal const string _maxLengthParameter = "max_length";
 
-		internal const string _mistral3DefaultInstruction = "You are a helpful assistant.";
+		internal const string _mistral3DefaultInstruction = "You are a helpful assistant. You exist.";
 		internal const string _userFriendlyErrorResponse = "I'm sorry, something went wrong. I cannot respond.";
 		internal const string _userFriendlyParsingUserInputToMessageException = "Sorry, I'm couldn't understand what you're trying to say to me.";
 		internal const string _userFriendlyStoppedResponse = "(Stopped.)";
