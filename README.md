@@ -1,8 +1,6 @@
 # Local LLM ONNX
 - Local LLM chat desktop application that uses ONNX Runtime Generative AI.
 - Does not make any networking requests outside of the local machine.
-
-![Screenshot of the chat interface as it begins to load](/.images/LoadingScreenshot.png)
 ![An example](/.images/da-c_NAaohtsks.png)
 
 ## Roadmap
