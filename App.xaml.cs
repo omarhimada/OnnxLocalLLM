@@ -3,24 +3,25 @@ using System.IO;
 using System.Text;
 using System.Windows;
 using UI.Memory.Contextualize;
+using static UI.Constants;
 
 namespace UI {
-	using static Constants;
+	internal partial class App : Application {
+		internal Model? _model;
+		internal Tokenizer? _tokenizer;
+		internal GeneratorParams? _generatorParams;
+		internal LocalEmbeddingGenerator? _localEmbeddingGenerator;
 
-	public partial class App : Application {
-		private readonly Model? _model;
-		//private readonly Model? _embedModel; TODO
-		private readonly Tokenizer? _tokenizer;
-		private readonly GeneratorParams? _generatorParams;
-		private readonly LocalEmbeddingGenerator _localEmbeddingGenerator;
+		internal static readonly LoadingWindow _splashWindow = new();
 
-		public App() {
+		protected override async void OnStartup(StartupEventArgs e) {
+			base.OnStartup(e);
+
 			AppContext.SetSwitch(_appContextSwitchForSelectionBrush, false);
 
 			// Show loading screen while model attempts to load into memory
-			LoadingWindow splash = new();
-			splash.Show();
-			splash.Activate();
+			_splashWindow.Show();
+			_splashWindow.Activate();
 
 			try {
 				// (Mistral-7B or Mistral-14B) and nomic-embed-text-1-5
@@ -31,8 +32,6 @@ namespace UI {
 					Current.Shutdown();
 					return;
 				}
-
-				// Embed model
 
 				// Initialize embedding generator locally
 				_localEmbeddingGenerator = new(embedModelPath);
@@ -49,17 +48,19 @@ namespace UI {
 
 				// ~ 0.0002 seconds
 				_generatorParams = new(_model);
-
-				// TODO config option constructor for 'codeMode'  
-				MainWindow mainWindow = new(_model, _localEmbeddingGenerator, _tokenizer, _generatorParams);
 				#endregion
 
+				// TODO config option constructor for 'codeMode'  
+				MainWindow mainWindow = new();
+				await mainWindow.InitializeAsync(_model, _localEmbeddingGenerator, _tokenizer, _generatorParams);
+
 				mainWindow.Show();
+
 			} catch (Exception exception) {
 				MessageBox.Show($"{_userFriendlyErrorOccurredDuringInitialization}\r\n{exception.Message}");
 				Shutdown();
 			} finally {
-				splash.Hide();
+				//FinishedInitializing();
 			}
 		}
 
@@ -74,16 +75,20 @@ namespace UI {
 
 			// Attempt to retrieve the Mistral model ONNX
 			if (!TryRequiredModelIsPresent(_debugModeModelPath, out string? modelPathToUse) && modelPathToUse == null) {
-				potentialFriendlyUserErrorMessage.AppendLine($"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{modelPathToUse}");
+				potentialFriendlyUserErrorMessage.AppendLine(
+					$"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{modelPathToUse}");
 			}
 
 			// Attempt to retrieve the embedding model ONNX
-			if (!TryRequiredModelIsPresent(_debugModeEmbedModelPath, out string? embedModelPathToUse) || embedModelPathToUse == null) {
-				potentialFriendlyUserErrorMessage.AppendLine($"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{embedModelPathToUse}");
+			if (!TryRequiredModelIsPresent(_debugModeEmbedModelPath, out string? embedModelPathToUse) ||
+				embedModelPathToUse == null) {
+				potentialFriendlyUserErrorMessage.AppendLine(
+					$"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{embedModelPathToUse}");
 			}
 
 			if (modelPathToReturn == null && embedModelPathToUse == null) {
-				MessageBox.Show(potentialFriendlyUserErrorMessage.ToString(), "Please refer to the README.md or post an issue at https://github.com/OnnxLocalLLM");
+				MessageBox.Show(potentialFriendlyUserErrorMessage.ToString(),
+					"Please refer to the README.md or post an issue at https://github.com/OnnxLocalLLM");
 			}
 
 			return (modelPathToUse!, embedModelPathToUse!);
@@ -95,7 +100,8 @@ namespace UI {
 		private static bool TryRequiredModelIsPresent(string debugPath, out string? pathToUse) {
 			pathToUse = null;
 			if (debugPath == _debugModeEmbedModelPath) {
-				#region Verify embed model is present 
+				#region Verify embed model is present
+
 				if (!File.Exists(debugPath)) {
 					// Try the embed model from the published directory instead of the debugging directory:
 					pathToUse = debugPath.TrimStart($"{AppContext.BaseDirectory}..\\..\\..").ToString();
@@ -107,9 +113,11 @@ namespace UI {
 				} else {
 					pathToUse = debugPath;
 				}
+
 				#endregion
 			} else {
 				#region Verify LLM is present first assume the user is debugging the application first
+
 				if (!Directory.Exists(debugPath)) {
 					// Assume the program is published and the directory is close to the executable.
 					string publishedLocation = debugPath.TrimStart($"{AppContext.BaseDirectory}..\\..\\..").ToString();
@@ -122,12 +130,20 @@ namespace UI {
 				} else {
 					pathToUse = debugPath;
 				}
+
 				#endregion
 			}
+
 			return pathToUse != null;
+		}
+
+		/// <summary>
+		/// Allow the main window's constructor to close the application's loading
+		/// window after it has initialized its components and memory store,
+		/// and show the main window at the same time.
+		/// </summary>
+		internal static void FinishedInitializing() {
+			_splashWindow.Hide();
 		}
 	}
 }
-
-// Expects genai_config.json, model.onnx, model.onnx_data, special_tokens_map.json, and tokenizer_config.json
-// See huggingface.co/nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4/tree/main/

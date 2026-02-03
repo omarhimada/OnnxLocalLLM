@@ -6,14 +6,14 @@ namespace UI.Memory {
 	using Microsoft.SemanticKernel.Connectors.SqliteVec;
 	using static Constants;
 
-	internal class Remember : IDisposable {
-		internal const string _db = "Data Source=memories.db";
-		internal const string _dbDiscussions = "discussions";
+	class Remember : IDisposable {
+		protected static string _db = $"Data Source={Environment.ProcessPath}\\..\\memories.db";
+		protected const string _dbDiscussions = "discussions";
 
-		internal static SqliteVectorStore? _vectorStore;
+		protected static SqliteVectorStore? _vectorStore;
 
-		internal static SqliteCollection<long, Discussion>? _memories;
-		internal static IEmbeddingGenerator<string, Embedding<float>>? _embedder;
+		protected static SqliteCollection<long, Discussion>? _memories;
+		protected static IEmbeddingGenerator<string, Embedding<float>>? _embedder;
 
 		private readonly CancellationTokenSource _cts = new();
 

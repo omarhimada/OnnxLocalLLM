@@ -4,8 +4,8 @@ namespace UI {
 	/// <summary>
 	/// Interaction logic for Loading.xaml
 	/// </summary>
-	public partial class LoadingWindow : Window {
-		public LoadingWindow() {
+	internal partial class LoadingWindow : Window {
+		internal LoadingWindow() {
 			InitializeComponent();
 		}
 	}

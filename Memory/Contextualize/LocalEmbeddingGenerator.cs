@@ -25,8 +25,6 @@ namespace UI.Memory.Contextualize {
 			} catch (Exception) {
 				options.AppendExecutionProvider_CPU();
 			}
-			//
-			//options.AppendExecutionProvider_GPU();
 
 			_session = new InferenceSession(embedModelPath, options);
 		}
@@ -39,19 +37,18 @@ namespace UI.Memory.Contextualize {
 			List<Embedding<float>> results = [];
 
 			foreach (string text in values) {
-				// 1. Tokenize (Placeholder: use a library like Microsoft.ML.Tokenizers)
+				// Tokenize (TODO: use Microsoft.ML.Tokenizers)
 				(DenseTensor<long> inputIds, DenseTensor<long> Mask) tokens = Tokenize(text);
 
-				// 2. Prepare ONNX Inputs
+				// Prepare
 				List<NamedOnnxValue> inputs = [
 					NamedOnnxValue.CreateFromTensor(_inputIds, tokens.inputIds),
 					NamedOnnxValue.CreateFromTensor(_attentionMask, tokens.Mask)
 				];
 
-				// 3. Run Inference
+				// Inference
 				using IDisposableReadOnlyCollection<DisposableNamedOnnxValue> output = _session.Run(inputs);
-				float[] vector = output.First().AsEnumerable<float>().ToArray();
-
+				float[] vector = output[0].AsEnumerable<float>().ToArray();
 				results.Add(new Embedding<float>(vector));
 			}
 
@@ -60,12 +57,17 @@ namespace UI.Memory.Contextualize {
 
 		// Nomic typically requires a specific prefix (e.g., search_document: )
 		private (DenseTensor<long> inputIds, DenseTensor<long> Mask) Tokenize(string text) {
-			// Use Microsoft.ML.Tokenizers with the nomic vocab file here
+			// TODO Use Microsoft.ML.Tokenizers with the nomic vocab file here
 			throw new NotImplementedException("Integrate a BERT-compatible tokenizer.");
 		}
 
 		public void Dispose() => _session.Dispose();
 		public object? GetService(Type serviceType, object? serviceKey = null) => null;
-		Task<GeneratedEmbeddings<Embedding<float>>> IEmbeddingGenerator<string, Embedding<float>>.GenerateAsync(IEnumerable<string> values, EmbeddingGenerationOptions? options, CancellationToken cancellationToken) => GenerateAsync(values, options, cancellationToken);
+
+		// TODO refactor this
+		Task<GeneratedEmbeddings<Embedding<float>>> IEmbeddingGenerator<string, Embedding<float>>.GenerateAsync(
+			IEnumerable<string> values,
+			EmbeddingGenerationOptions? options,
+			CancellationToken cancellationToken) => GenerateAsync(values, options, cancellationToken);
 	}
 }

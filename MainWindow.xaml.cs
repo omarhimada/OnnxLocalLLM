@@ -6,34 +6,35 @@ using UI.Utility;
 using static UI.Constants;
 
 namespace UI {
-	public partial class MainWindow : Window {
+	internal partial class MainWindow : Window {
+		internal Model? _model;
+		internal Tokenizer? _tokenizer;
+		internal LocalEmbeddingGenerator? _localEmbeddingGenerator;
+
 		/// <summary>
 		/// Re-initialize the generator after each response.
 		/// Better to re-initialize after the response as opposed to before your next input is tokenized.
 		/// (e.g.: user reads initial output of the model and then by the time they comprehend, the generator is re-initialized)
 		/// </summary>
 		internal Generator? _generator;
+		internal GeneratorParams? _generatorParams;
 
-		internal readonly Model _model;
-		internal readonly LocalEmbeddingGenerator _localEmbeddingGenerator;
+		internal bool _expectingCodeResponse = true;
+		internal CancellationTokenSource _cts = new();
 
-		internal readonly Tokenizer _tokenizer;
-		internal readonly GeneratorParams _generatorParams;
+		internal Remember? _remember;
 
-		internal readonly bool _expectingCodeResponse = true;
-		internal readonly CancellationTokenSource _cts = new();
+		protected override void OnInitialized(EventArgs e) {
+			base.OnInitialized(e);
 
-		internal Remember _remember;
+			App.FinishedInitializing();
+		}
 
-		internal MainWindow(
-			Model model,
+		internal async Task InitializeAsync(Model model,
 			LocalEmbeddingGenerator localEmbeddingGenerator,
 			Tokenizer tokenizer,
 			GeneratorParams generatorParams,
 			bool? codeMode = true) {
-
-			// Make sure the 'x' button in the top right actually closes the process.
-			Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
 			_model = model;
 			_localEmbeddingGenerator = localEmbeddingGenerator;
@@ -41,24 +42,26 @@ namespace UI {
 			_tokenizer = tokenizer;
 			_generatorParams = generatorParams;
 
-			CancellationToken ct = _cts.Token;
-
 			_remember = new Remember(_localEmbeddingGenerator);
-
-			// Load their 'memories'. They should remember what we spoke about yesterday, a week ago, maybe even years.
-			Task allowAbilityToRememberTask = Task.Run(async () => {
-				// This should initialize their memories.db if it does not already exist
-				await Remember.StartAsync(_localEmbeddingGenerator, ct);
-			}, ct);
-
-			Task.WaitAll(allowAbilityToRememberTask);
 
 			if (!(codeMode ?? true)) {
 				_expectingCodeResponse = false;
 			}
 
-			InitializeComponent();
+			CancellationToken ct = _cts.Token;
+
+			// Load memories. They should remember what we spoke about yesterday, a week ago, maybe even years.
+			// This should initialize their memories.db if it does not already exist
+			await Remember.StartAsync(_localEmbeddingGenerator, ct);
+
 			ToggleInterruptButton();
+		}
+
+		internal MainWindow() {
+			InitializeComponent();
+
+			// Make sure the 'x' button in the top right actually closes the process.
+			Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
 		}
 
 		internal void ToggleInterruptButton() {
