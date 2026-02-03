@@ -3,7 +3,7 @@
 - Virtually zero latency due to a lack of HTTP (e.g.: API calls to OpenAI) and zero WebSocket middle-layer (Ollama, LM Studio, etc.).
 - Does not make any networking requests outside of the local machine.
 - Loads `Mistral-3` and `nomic-embed-text-1-5` locally.
-![An example](/.images/20260202-Mistral-3-14B-local-ONNX.png)
+![An example](/.images/20260202-Mistral-3-14B-local-ONNX.gif)
 
 ## Roadmap
 - Priorities:
