@@ -1,26 +1,23 @@
 # Local LLM ONNX
 - Local LLM chat desktop application that uses ONNX Runtime Generative AI.
+- Virtually zero latency due to a lack of HTTP (e.g.: API calls to OpenAI) and zero WebSocket middle-layer (Ollama, LM Studio, etc.).
 - Does not make any networking requests outside of the local machine.
-
-![An example](/.images/da-c_NAaohtsks.png)
+- Loads `Mistral-3` and `nomic-embed-text-1-5` locally.
+![An example](/.images/voila.png)
 
 ## Roadmap
 - Priorities:
-    1. Contextual memory/conversation state management **~ 80% complete**
-        - Loading `nomic-embed-text-1-5` locally 
+    1. Contextual memory/conversation state management **80% complete**
         - Initializes a local SQLite database if it does not exist
-          - Utilizing a `VectorData` abstraction to use the SQLite database as a vector store for performance.
-          -  Implmented two methods:
+  		- Utilizing a `VectorData` abstraction to use the SQLite database as a vector store for performance.
+      	-  Implmented two methods:
             1. `MemorizeDiscussion(...) // Store a discussion that had occurred.`
             2. `RememberDisciossion(...) // Try to remember before responding`
           - `VectorSearch` occurs with decay parameters like `halfLifeDays = 365, etc.`
-          - The goal is that this model lives in this one machine and learns forever. 
-            
-        - The model should remember what you spoke about yesterday, for example.
-        - Ensure this is done locally beside the model on the local machine.
-            - SQLite is one possibility.
-
-    2. Leveraging CUDA **~ 90% complete**
+          - The goal is that they keep learning and you backup the local database yourself. i.e.: *the model lives in this one machine and learns forever.*
+          - The model should remember what you spoke about yesterday, for example.
+        
+    2. Leveraging CUDA **90% complete**
         -  Utilizing `Microsoft.AI.OnnxRuntime.SessionOptions` to attempt to enable GPU if available.
             - This is expected to function easily, although yet untested. I've had no issues with other tech stacks.
             - 
@@ -47,22 +44,22 @@
     - You have currently have to scroll to see their full response, it should scroll as they're responding so you read while they 'speak', so-to-speak.
 
 ## Setup
-- Your directory setup should look something like the diagram below, although the `model.onnx` and `model.onnx_data` excluded. This is due to size (~4 GB).
+- Your directory setup should look something like the diagram below, although the `model.onnx_data` excluded. This is due to size (several gigabytes).
  - See **NVidia's ONNX Mistral-7B-Instruct** @ [HuggingFace](https://huggingface.co/nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4/tree/main) to download them both.
 - You'll have to do the same for **nomic-embed-text-1-5** @ [HuggingFace](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5/tree/main/onnx) 
  - Get the ~500 MB `.onnx`, everything else is included 
-- Download those three missing pieces and place them in their appropriate directories
-- In total you'll have to grab three different things from HF. The GitHub repository limitations are unfortunate.
+- In total you'll have to grab the onnx_data for Mistral and the Nomic onnx for the embedding from HF. The GitHub repository limitations are unfortunate.
 ```
-    .OnnxLocalLLM
+    .OnnxLocalLLM\Mistral-7B______________________________
 	|
 	| genai_config.json
-	| model.onnx  <---------------------- Download this
+	| model.onnx
 	| model.onnx_data <------------------ Download this
 	| special_tokens_map.json
 	| tokenizer_config.json
 	| tokenizer.json
-	|_____________________\Mistral-7B
+	|____________________________________________________
+	|.OnnxLocalLLM\Nomic-Embed-Text-1-5
 	|
 	| config.json
     | config_sentence_transformers.json
@@ -73,7 +70,7 @@
 	| tokenizer_config.json
 	| tokenizer.json
     | vocab.txt
-	|_____________________\Nomic-Embed-Text-1-5
+	|____________________________________________________
 ```
 
 ### Cloning/forking and changing ONNX models
