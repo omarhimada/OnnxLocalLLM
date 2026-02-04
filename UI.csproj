@@ -37,6 +37,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Utility\DnsLogger.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Remove="ONNX\Mistral-14B\model.onnx_data" />
 	  <None Remove="ONNX\Mistral-7B\model.onnx_data" />
 	  <None Remove="ONNX\Nomic-Embed-Text-1-5\model.onnx" />

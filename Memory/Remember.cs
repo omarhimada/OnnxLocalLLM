@@ -1,19 +1,24 @@
-﻿using UI.Memory.Contextualize;
-
-namespace UI.Memory {
+﻿namespace UI.Memory {
 	using Microsoft.Extensions.AI;
 	using Microsoft.Extensions.VectorData;
 	using Microsoft.SemanticKernel.Connectors.SqliteVec;
 	using static Constants;
 
-	class Remember : IDisposable {
+	internal class Remember : IDisposable {
+#if DEBUG
+		// If debugging you will continuously erase the memories.db due to rebuilding the solution erasing the /bin/Debug/
+		// So, keep the memories.db in the Windows user's home directory instead.
+		protected static string _db = $"Data Source={Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\memories.db";
+#else
+		// If published/building in Release mode, the memories.db will be beside the executable
 		protected static string _db = $"Data Source={Environment.ProcessPath}\\..\\memories.db";
+#endif
 		protected const string _dbDiscussions = "discussions";
 
 		protected static SqliteVectorStore? _vectorStore;
 
 		protected static SqliteCollection<long, Discussion>? _memories;
-		protected static IEmbeddingGenerator<string, Embedding<float>>? _embedder;
+		protected static LocalEmbeddingGenerator? _embedder;
 
 		private readonly CancellationTokenSource _cts = new();
 
@@ -31,8 +36,7 @@ namespace UI.Memory {
 		/// <param name="embeddingGenerator">The embedding generator to use for initializing memory. Cannot be null.</param>
 		internal Remember(LocalEmbeddingGenerator embeddingGenerator) {
 			CancellationToken ct = _cts.Token;
-			_memories =
-				new(_db, _memoriesDbName, _sqliteOptions);
+			_memories = new(_db, _memoriesDbName, _sqliteOptions);
 
 			Task memoryInitializationTask = Task.Run(async () => {
 				await StartAsync(embeddingGenerator, ct);
@@ -42,7 +46,7 @@ namespace UI.Memory {
 		}
 
 		internal static async Task StartAsync(
-			IEmbeddingGenerator<string, Embedding<float>> embedder,
+			LocalEmbeddingGenerator embedder,
 			CancellationToken ct = default) {
 
 			_embedder = embedder;
@@ -58,73 +62,73 @@ namespace UI.Memory {
 		/// Store a discussion that had occurred.
 		/// </summary>
 		internal static async Task MemorizeDiscussionAsync(string text, CancellationToken ct = default) {
-			if (_memories is null || _embedder is null) {
-				throw new InvalidOperationException("Order of operations is incorrect. Initialize memory first.");
+			if (_memories is not null && _embedder is not null && !string.IsNullOrEmpty(_embedder._vocabularyPath)) {
+				try {
+					ReadOnlyMemory<float> vec = await _embedder.GenerateVectorAsync(text, cancellationToken: ct);
+
+					long id = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+					Discussion turn = new() {
+						Id = id,
+						Text = text,
+						Vector = vec,
+						UnixTimeMilliseconds = id
+					};
+
+					await _memories.UpsertAsync(turn, ct);
+				} catch (Exception) {
+					// Fail silently, continue
+					// TODO
+				}
 			}
-
-			ReadOnlyMemory<float> vec = await _embedder.GenerateVectorAsync(text, cancellationToken: ct);
-
-			// Use Unix ms as a simple unique-ish key. If you expect collisions, add a counter or random suffix by switching to string keys.
-			long id = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-
-			Discussion turn = new() {
-				Id = id,
-				Text = text,
-				Vector = vec,
-				UnixTimeMilliseconds = id
-			};
-
-			await _memories.UpsertAsync(turn, ct);
 		}
 
 		/// <summary>
-		/// Try to remember before responding.
+		/// Try to remember before responding. It is possible to forget, so this method can return null.
 		/// </summary>
-		internal static async Task<IReadOnlyList<Discussion>> RememberDiscussionAsync(
+		internal static async Task<IReadOnlyList<Discussion>?> RememberDiscussionAsync(
 			string query,
 			int topK = 8,
-			int candidatePool = 33,
+			int candidates = 33,
 			double halfLifeDays = 365,
 			CancellationToken ct = default) {
 
-			if (_memories is null || _embedder is null) {
-				throw new InvalidOperationException("Memory is not initialized.");
-			}
+			if (_memories is not null && _embedder is not null) {
+				ReadOnlyMemory<float> embeddingVectorQuery =
+					await _embedder.GenerateVectorAsync(query, cancellationToken: ct);
 
-			ReadOnlyMemory<float> embeddingVectorQuery =
-				await _embedder.GenerateVectorAsync(query, cancellationToken: ct);
+				// Retrieve candidate set from vector search (bigger than topK)
+				List<(Discussion Turn, double AdjustedDistance)> scored = new(candidates);
+				long nowMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-			// Retrieve candidate set from vector search (bigger than topK)
-			List<(Discussion Turn, double AdjustedDistance)> scored = new(candidatePool);
-			long nowMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+				// When VectorSearchResult score is null fallback to ordering sequentially with an index 'rank'
+				int rank = 0;
+				await foreach (VectorSearchResult<Discussion> hit in _memories.SearchAsync(embeddingVectorQuery, top: candidates, cancellationToken: ct)) {
+					Discussion turn = hit.Record;
 
-			// When VectorSearchResult score is null fallback to ordering sequentially with an index 'rank'
-			int rank = 0;
-			await foreach (VectorSearchResult<Discussion> hit in _memories.SearchAsync(embeddingVectorQuery, top: candidatePool, cancellationToken: ct)) {
-				Discussion turn = hit.Record;
+					// With VectorSearchResult the hit.Score is distance, so lower is better
+					double baseDistance = hit.Score ?? rank;
+					double adjustedDistance = baseDistance;
 
-				// With VectorSearchResult the hit.Score is distance, so lower is better
-				double baseDistance = hit.Score ?? rank;
-				double adjustedDistance = baseDistance;
+					if (!double.IsPositiveInfinity(halfLifeDays) && halfLifeDays > 0) {
+						double ageDays = Math.Max(0, (nowMs - turn.UnixTimeMilliseconds) / 86_400_000.0);
+						double decay = Math.Exp(-Math.Log(2) * ageDays / halfLifeDays);
 
-				if (!double.IsPositiveInfinity(halfLifeDays) && halfLifeDays > 0) {
-					double ageDays = Math.Max(0, (nowMs - turn.UnixTimeMilliseconds) / 86_400_000.0);
-					double decay = Math.Exp(-Math.Log(2) * ageDays / halfLifeDays);
+						// Older memories become effectively 'more distant'
+						adjustedDistance = baseDistance / Math.Max(decay, 1e-9);
+					}
 
-					// Older memories become effectively 'more distant'
-					adjustedDistance = baseDistance / Math.Max(decay, 1e-9);
+					scored.Add((turn, adjustedDistance));
+					rank++;
 				}
 
-				scored.Add((turn, adjustedDistance));
-				rank++;
+				// 'scored' is filtered such that 'OrderBy' time complexity O(NlogN) doesn't get out of control
+				return scored
+					.OrderBy(x => x.AdjustedDistance)
+					.Take(topK)
+					.Select(x => x.Turn)
+					.ToList();
 			}
-
-			// 'scored' is filtered such that 'OrderBy' time complexity O(NlogN) doesn't get out of control
-			return scored
-				.OrderBy(x => x.AdjustedDistance)
-				.Take(topK)
-				.Select(x => x.Turn)
-				.ToList();
+			return null;
 		}
 
 		/// <summary>

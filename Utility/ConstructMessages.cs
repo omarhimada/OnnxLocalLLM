@@ -2,7 +2,7 @@
 
 namespace UI.Utility {
 	internal static class ConstructMessages {
-		public static string AsFormattedString(string? userPrompt, string? instruction = Constants._mistral3DefaultInstruction) {
+		public static string AsFormattedString(string? userPrompt, string? instruction = $"{Constants._mistral3DefaultInstruction}{Constants._art}{Constants._algorithms}") {
 			if (string.IsNullOrEmpty(userPrompt)) {
 				return string.Empty;
 			}

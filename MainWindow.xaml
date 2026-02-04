@@ -6,53 +6,71 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UI"
         mc:Ignorable="d"
-        Title="Chat" Width="800" Height="Auto" MaxHeight="1280" 
+        Title="OLLM" Width="800" MinHeight="512"
         Background="Black"
         AllowsTransparency="False"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <SolidColorBrush x:Key="TextBoxBorderNormal" Color="#333333"/>
-        <Style x:Key="NoFocusBlueTextBox" TargetType="{x:Type TextBox}">
+        <!-- Gray -->
+        <SolidColorBrush x:Key="GraySolidColorBrush" Color="#333333"/>
+        <SolidColorBrush x:Key="LightSolidColorBrush" Color="#E3E3E3"/>
+
+        <Style x:Key="{x:Type ScrollBar}" TargetType="{x:Type ScrollBar}">
+            <Setter Property="Width" Value="5"/>
+            <Setter Property="MinWidth" Value="5"/>
+            <Setter Property="Background" Value="{StaticResource GraySolidColorBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LightSolidColorBrush}"/>
+        </Style>
+        <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
+            <Setter Property="CaretBrush" Value="White"/>
             <Setter Property="Background" Value="Black"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="CaretBrush" Value="White"/>
-            <Setter Property="BorderBrush" Value="{StaticResource TextBoxBorderNormal}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="4"/>
+            <Setter Property="FontFamily" Value="Cascadia Mono ExtraLight" />
+            <Setter Property="FontSize" Value="14" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-
+            <Setter Property="BorderBrush" Value="{StaticResource GraySolidColorBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="0,0,0,0"/>
+            <Setter Property="Margin" Value="0,0,0,0"/>
+            <Setter Property="MinHeight" Value="256" />
+            <Setter Property="SelectionBrush" Value="#FF474747" />
+            <Setter Property="SelectionTextBrush" Value="#FF89FFD9" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Top" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TextBox}">
-                        <Border x:Name="Bd"
+                        <Border x:Name="BorderTemplate"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             SnapsToDevicePixels="True">
-                            <ScrollViewer x:Name="PART_ContentHost"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Width="798" />
                         </Border>
 
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Bd"
+                                <Setter TargetName="BorderTemplate"
                                     Property="BorderBrush"
-                                    Value="{StaticResource TextBoxBorderNormal}"/>
+                                    Value="{StaticResource GraySolidColorBrush}"/>
                             </Trigger>
 
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd"
+                                <Setter TargetName="BorderTemplate"
                                     Property="BorderBrush"
-                                    Value="{StaticResource TextBoxBorderNormal}"/>
+                                    Value="{StaticResource GraySolidColorBrush}"/>
                             </Trigger>
 
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.55"/>
+                                <Setter TargetName="BorderTemplate" Property="Opacity" Value="0.55"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Width" Value="800" />
         </Style>
     </Window.Resources>
     <WindowChrome.WindowChrome>
@@ -67,42 +85,64 @@
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-
             <Grid x:Name="TitleBar" Grid.Row="0" Background="Black">
                 <StackPanel x:Name="TitleBarPanel"  Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
                     <!-- Currently invisible -->
                     <TextBlock x:Name="TitleBarText" Text="" Foreground="Gray" FontFamily="Cascadia Mono ExtraLight" FontSize="12"/>
                 </StackPanel>
                 <StackPanel x:Name="CloseButtonPanel" Orientation="Horizontal" HorizontalAlignment="Right" WindowChrome.IsHitTestVisibleInChrome="True">
-                    <Button x:Name="CloseButton" Content="✕" Width="45" Background="Transparent" Foreground="White" BorderThickness="0" Click="CloseButton_Click"/>
+                    <Button x:Name="CloseButton" Content="✕" Width="45" Background="Transparent" Foreground="#FFFFAECB" BorderThickness="0" Click="CloseButton_Click"/>
                 </StackPanel>
+                <CheckBox 
+                    x:Name="CodeModeEnabled" 
+                    Content="code mode" 
+                    HorizontalAlignment="Left" 
+                    Margin="10,0,0,0" 
+                    VerticalAlignment="Center" 
+                    Foreground="#FF6BE985" 
+                    FontFamily="Cascadia Mono ExtraLight" 
+                    ToolTip="Lowers the temperature hyperparameter. Useful for producing code." 
+                    Background="Black" 
+                    IsChecked="True" 
+                    BorderBrush="#FF414141" 
+                    Padding="5,0,0,0" 
+                    Checked="CodeModeEnabled_Checked"
+                    Unchecked="CodeModeEnabled_Unchecked" />
             </Grid>
+            <Grid x:Name="MainWindowContent" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            <Grid x:Name="ChatWrap" Grid.Row="1" Background="Black">
-                <StackPanel Orientation="Vertical">
-	                <StackPanel x:Name="UserInputWithButtons" Orientation="Vertical" HorizontalAlignment="Center" Background="Black">
-		                <TextBox x:Name="UserInputText" HorizontalAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap" Text="" Width="800" Height="Auto" Padding="10" MinHeight="120" MaxHeight="490" Background="Black" FontFamily="Cascadia Mono ExtraLight" SelectionBrush="#FF474747" SelectionTextBrush="#FF89FFD9" Foreground="White" MaxLines="1729" FontSize="14" Margin="0,0,0,0" CaretBrush="White" AcceptsReturn="True" FocusVisualStyle="{x:Null}" Style="{StaticResource NoFocusBlueTextBox}" />
-		                <StackPanel x:Name="ButtonsPanel"  Orientation="Horizontal" HorizontalAlignment="Center">
-			                <Button x:Name="ChatButton" Content=" chat " 
-			                        HorizontalAlignment="Left" Width="Auto" Height="25" 
-			                        Background="#FF111111" Foreground="White" FontFamily="Cascadia Mono ExtraLight" FontSize="14"
-			                        Click="ChatButtonClick" AutomationProperties.Name="ChatButton"/>
+                <TextBox x:Name="UserInputText"
+                         Grid.Row="0"
+                         Text=""
+                         AcceptsReturn="True" 
+                         FocusVisualStyle="{x:Null}" 
+                         Style="{StaticResource TextBoxStyle}" />
 
-			                <Button x:Name="InterruptButton" Content=" interrupt " 
-			                        HorizontalAlignment="Right" Width="Auto" Height="25"
-			                        Background="#FF111111" Foreground="White" FontFamily="Cascadia Mono ExtraLight" FontSize="14" 
-			                        Click="InterruptButtonClick" AutomationProperties.Name="InterruptButton" HorizontalContentAlignment="Center" />
-		                </StackPanel>
-                    </StackPanel>
-	                
-                        <StackPanel x:Name="ResponseWrap" Background="Black" Margin="0,0,0,0">
-	                        <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                    <TextBox x:Name="TheirResponse" HorizontalAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap" Text="" Width="800" Height="Auto" Padding="10" MaxHeight="920" Background="Black" FontFamily="Cascadia Mono ExtraLight" SelectionBrush="#FF474747" SelectionTextBrush="#FF89FFD9" Foreground="White" MaxLines="1729" FontSize="14" Margin="0,0,0,0" IsReadOnly="True" FocusVisualStyle="{x:Null}" Style="{StaticResource NoFocusBlueTextBox}" />
-                                </ScrollViewer>
-                            </StackPanel>
-                        </StackPanel>
+                <StackPanel x:Name="ButtonsPanel" 
+                            Grid.Row="1"
+                            Orientation="Horizontal" HorizontalAlignment="Center">
+
+                    <Button x:Name="ChatButton" Content=" chat " IsDefault="True"
+		                    HorizontalAlignment="Left" Width="Auto" Height="25" 
+		                    Background="#FF111111" Foreground="White" FontFamily="Cascadia Mono ExtraLight" FontSize="14"
+		                    Click="ChatButtonClick" AutomationProperties.Name="ChatButton" />
+                    <Button x:Name="InterruptButton" Content=" interrupt " 
+		                    HorizontalAlignment="Right" Width="Auto" Height="25"
+		                    Background="#FF111111" Foreground="White" FontFamily="Cascadia Mono ExtraLight" FontSize="14" 
+		                    Click="InterruptButtonClick" AutomationProperties.Name="InterruptButton" HorizontalContentAlignment="Center" />
                 </StackPanel>
+
+                <TextBox x:Name="TheirResponse" 
+                         Grid.Row="2"
+                         Text="" 
+                         IsReadOnly="True" 
+                         FocusVisualStyle="{x:Null}" 
+                         Style="{StaticResource TextBoxStyle}" />
             </Grid>
         </Grid>
     </Border>
