@@ -106,8 +106,9 @@
                     IsChecked="True" 
                     BorderBrush="#FF414141" 
                     Padding="5,0,0,0" 
-                    Checked="CodeModeEnabled_Checked"
-                    Unchecked="CodeModeEnabled_Unchecked" />
+                    WindowChrome.IsHitTestVisibleInChrome="True"
+                    Checked="CodeModeEnabled_Changed"
+                    Unchecked="CodeModeEnabled_Changed" />
             </Grid>
             <Grid x:Name="MainWindowContent" Grid.Row="1">
                 <Grid.RowDefinitions>

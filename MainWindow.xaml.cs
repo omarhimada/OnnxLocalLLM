@@ -1,5 +1,6 @@
 ﻿using Microsoft.ML.OnnxRuntimeGenAI;
 using System.Windows;
+using System.Windows.Controls;
 using UI.Memory;
 using UI.Utility;
 using static UI.Constants;
@@ -122,12 +123,12 @@ namespace UI {
 		}
 
 		#region Code-mode temperature toggler event handlers
-		private void CodeModeEnabled_Checked(object sender, RoutedEventArgs e) {
-			_expectingCodeResponse = true;
-		}
+		private void CodeModeEnabled_Changed(object sender, RoutedEventArgs e) {
+			if (sender is not CheckBox checkBox) {
+				return;
+			}
 
-		private void CodeModeEnabled_Unchecked(object sender, RoutedEventArgs e) {
-			_expectingCodeResponse = false;
+			_expectingCodeResponse = checkBox.IsChecked ?? false;
 		}
 		#endregion
 		#endregion
