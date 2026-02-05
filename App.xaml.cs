@@ -10,7 +10,7 @@ using static UI.Initialization.EnsureModelsArePresent;
 
 namespace UI {
 	internal partial class App : Application {
-		public IServiceProvider Services { get; private set; } = null!;
+		private readonly ServiceProvider _serviceProvider;
 
 		internal Model? _model;
 		internal Tokenizer? _tokenizer;
@@ -26,23 +26,30 @@ namespace UI {
 		internal int _sepId { get; set; }
 
 		internal string _vocabularyPath = string.Empty;
+
 		internal Dictionary<string, int> _vocabulary = [];
+
+		internal string? _modelPath { get; set; }
+		internal string? _embedModelPath { get; set; }
 		#endregion
 
 		private InferenceSession? _session { get; set; }
 
-		protected override async void OnStartup(StartupEventArgs e) {
-			base.OnStartup(e);
-
-			(string? modelPath, string? embedModelPath) = EnsureRequiredModelsArePresent();
-			if (modelPath == null || embedModelPath == null) {
+		internal App() {
+			(_modelPath, _embedModelPath) = EnsureRequiredModelsArePresent();
+			if (_modelPath == null || _embedModelPath == null) {
 				// Previous method already displayed the friendly user message and provided some guidance.
 				Current.Shutdown();
 				return;
 			}
 
-			#region DI
 			ServiceCollection services = new();
+			ConfigureServices(services);
+			_serviceProvider = services.BuildServiceProvider();
+		}
+
+		private void ConfigureServices(IServiceCollection services) {
+			#region DI
 			services.AddSingleton<LocalMiniLmEmbeddingGenerator>(sp => {
 				SessionOptions options = new();
 
@@ -85,12 +92,17 @@ namespace UI {
 					_clsId = GetIdOrDefault(_cls, GetIdOrDefault(_mistral3TokenStartTurn, 101));
 					_sepId = GetIdOrDefault(_sep, GetIdOrDefault(_mistral3TokenStop, 102));
 				}
-				_localMiniLmEmbeddingGenerator = new LocalMiniLmEmbeddingGenerator(embedModelPath, _vocabularyPath, maxTokenLength: 128, options);
+				_localMiniLmEmbeddingGenerator = new LocalMiniLmEmbeddingGenerator(_embedModelPath, _vocabularyPath, maxTokenLength: 128, options);
 				return _localMiniLmEmbeddingGenerator;
 			});
 
+			// Aso register MainWindow as a service in order to utilize DI
+			services.AddTransient<MainWindow>();
 			#endregion
+		}
 
+		protected override async void OnStartup(StartupEventArgs e) {
+			base.OnStartup(e);
 			AppContext.SetSwitch(_appContextSwitchForSelectionBrush, false);
 
 			// Show loading screen while model attempts to load into memory
@@ -98,9 +110,8 @@ namespace UI {
 			_splashWindow.Activate();
 
 			try {
-
 				#region Loading: 2-3 seconds of loading the model into RAM before the window appears...
-				Config config = new(modelPath);
+				Config config = new(_modelPath);
 				//config.AppendProvider("dml");
 
 				// ~ 5.01 seconds
@@ -113,13 +124,13 @@ namespace UI {
 				_generatorParams = new(_model);
 				#endregion
 
-				MainWindow mainWindow = new();
+				obmainWindowt? mainWindow = _serviceProvider.GetRequiredKeyedService()
 				mainWindow.Initialize(_model, _tokenizer, _localMiniLmEmbeddingGenerator, _generatorParams);
 
 				mainWindow.Show();
 
 			} catch (Exception exception) {
-				MessageBox.Show($"{_userFriendlyErrorOccurredDuringInitialization}\r\n{exception.Message}");
+				MessageBox.Shpow($"{_userFriendlyErrorOccurredDuringInitialization}\r\n{exception.Message}");
 				Shutdown();
 			}
 		}
