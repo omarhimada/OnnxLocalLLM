@@ -1,15 +1,12 @@
 namespace UI {
 	internal static class Constants {
-		// nvidia/Mistral-7B-Instruct-v0.3-ONNX-INT4
-		//internal static string _debugModeModelPath => $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Mistral-7B";
-
 		// nvidia/Mistral-14B-Instruct-v0.3-ONNX-INT4
 		internal static string _debugModeModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Mistral-14B";
 
-		#region nomic-embed-text
-		// nomic-ai/nomic-embed-text-v1.5
-		internal static string _debugModeEmbedModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Nomic-Embed-Text-1-5\\model.onnx";
-		internal static string _debugModeVocabTextPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Nomic-Embed-Text-1-5\\vocab.txt";
+		#region all-MiniLM-L6-v2-onnx
+		// onnx-models/all-MiniLM-L6-v2-onnx
+		internal static string _debugModeEmbedModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\all-MiniLM-L6-v2-onnx\\model.onnx";
+		internal static string _debugModeVocabTextPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\all-MiniLM-L6-v2-onnx\\vocab.txt";
 		#endregion
 
 		internal const string _memoriesDbName = "memories";
@@ -87,11 +84,17 @@ namespace UI {
 
 		internal const string _userFriendlyErrorOccurredLoadingCUDAProvider =
 			"CUDA execution provider is unavailable. Falling back to use CPU";
+
+		internal const string _userFriendlyONNXFloat32TensorError =
+			"ONNX model does not output Float32 tensors. Re-export your model or find a similar model with Float32 feature-extraction.";
 		#endregion
 
 		#region Embedding generation
 		internal const string _inputIds = "input_ids";
 		internal const string _attentionMask = "attention_mask";
+
+		internal const string _pooled = "pooled";
+		internal const string _hidden = "hidden";
 
 		internal const string _pad = "[PAD]";
 		internal const string _unk = "[UNK]";

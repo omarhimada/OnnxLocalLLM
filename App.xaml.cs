@@ -1,20 +1,95 @@
-﻿using Microsoft.ML.OnnxRuntimeGenAI;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.ML.OnnxRuntime;
+using Microsoft.ML.OnnxRuntimeGenAI;
+using System.IO;
 using System.Windows;
+using UI.Initialization;
 using UI.Memory;
 using static UI.Constants;
 using static UI.Initialization.EnsureModelsArePresent;
 
 namespace UI {
 	internal partial class App : Application {
+		public IServiceProvider Services { get; private set; } = null!;
+
 		internal Model? _model;
 		internal Tokenizer? _tokenizer;
 		internal GeneratorParams? _generatorParams;
-		internal LocalEmbeddingGenerator? _localEmbeddingGenerator;
 
 		internal static readonly LoadingWindow _splashWindow = new();
+		internal LocalMiniLmEmbeddingGenerator? _localMiniLmEmbeddingGenerator;
+
+		#region Initialize these once
+		internal int _padId { get; set; }
+		internal int _clsId { get; set; }
+		internal int _unkId { get; set; }
+		internal int _sepId { get; set; }
+
+		internal string _vocabularyPath = string.Empty;
+		internal Dictionary<string, int> _vocabulary = [];
+		#endregion
+
+		private InferenceSession? _session { get; set; }
 
 		protected override async void OnStartup(StartupEventArgs e) {
 			base.OnStartup(e);
+
+			(string? modelPath, string? embedModelPath) = EnsureRequiredModelsArePresent();
+			if (modelPath == null || embedModelPath == null) {
+				// Previous method already displayed the friendly user message and provided some guidance.
+				Current.Shutdown();
+				return;
+			}
+
+			#region DI
+			ServiceCollection services = new();
+			services.AddSingleton<LocalMiniLmEmbeddingGenerator>(sp => {
+				SessionOptions options = new();
+
+				#region Try DML, then CUDA, and finally fallback to CPU
+				try {
+					options.AppendExecutionProvider_DML();
+				} catch (NotSupportedException) {
+					MessageBox.Show(_userFriendlyErrorOccurredLoadingDMLProvider);
+					try {
+						options.AppendExecutionProvider_CUDA();
+					} catch (Exception) {
+						MessageBox.Show(_userFriendlyErrorOccurredLoadingCUDAProvider);
+						options.AppendExecutionProvider_CPU();
+					}
+				} catch (Exception) {
+					options.AppendExecutionProvider_CPU();
+				}
+				#endregion
+
+				_session = new InferenceSession(_debugModeEmbedModelPath, options);
+				_vocabularyPath = Vocabulary.GetRequiredTextDocument(_debugModeVocabTextPath) ?? string.Empty;
+
+				if (!string.IsNullOrEmpty(_vocabularyPath)) {
+					_vocabulary = new(StringComparer.Ordinal);
+					IEnumerable<(string?, int i)> allLines =
+						File.ReadLines(_vocabularyPath).Select((l, i) => (l?.Trim(), i));
+
+					foreach ((string? line, int index) in allLines) {
+						if (string.IsNullOrEmpty(line)) {
+							continue;
+						}
+
+						_vocabulary.TryAdd(line, index);
+					}
+
+					int GetIdOrDefault(string token, int fallback) => _vocabulary.GetValueOrDefault(token, fallback);
+
+					_padId = GetIdOrDefault(_pad, 0);
+					_unkId = GetIdOrDefault(_unk, 100);
+					_clsId = GetIdOrDefault(_cls, GetIdOrDefault(_mistral3TokenStartTurn, 101));
+					_sepId = GetIdOrDefault(_sep, GetIdOrDefault(_mistral3TokenStop, 102));
+				}
+				_localMiniLmEmbeddingGenerator = new LocalMiniLmEmbeddingGenerator(embedModelPath, _vocabularyPath, maxTokenLength: 128, options);
+				return _localMiniLmEmbeddingGenerator;
+			});
+
+			#endregion
 
 			AppContext.SetSwitch(_appContextSwitchForSelectionBrush, false);
 
@@ -23,17 +98,6 @@ namespace UI {
 			_splashWindow.Activate();
 
 			try {
-				// (Mistral-7B or Mistral-14B) and nomic-embed-text-1-5
-				(string? modelPath, string? embedModelPath) = EnsureRequiredModelsArePresent();
-
-				if (modelPath == null || embedModelPath == null) {
-					// Previous method already displayed the friendly user message and provided some guidance.
-					Current.Shutdown();
-					return;
-				}
-
-				// Initialize embedding generator locally
-				_localEmbeddingGenerator = new(embedModelPath);
 
 				#region Loading: 2-3 seconds of loading the model into RAM before the window appears...
 				Config config = new(modelPath);
@@ -50,7 +114,7 @@ namespace UI {
 				#endregion
 
 				MainWindow mainWindow = new();
-				mainWindow.Initialize(_model, _localEmbeddingGenerator, _tokenizer, _generatorParams);
+				mainWindow.Initialize(_model, _tokenizer, _localMiniLmEmbeddingGenerator, _generatorParams);
 
 				mainWindow.Show();
 

@@ -8,7 +8,7 @@ using static UI.Constants;
 namespace UI {
 	internal partial class MainWindow : Window {
 		internal Model? _model;
-		internal LocalEmbeddingGenerator? _localEmbeddingGenerator;
+		internal LocalMiniLmEmbeddingGenerator? _localMiniLmEmbeddingGenerator;
 		internal Tokenizer? _tokenizer;
 
 		internal Generator? _generator;
@@ -27,13 +27,12 @@ namespace UI {
 		}
 
 		internal void Initialize(Model model,
-			LocalEmbeddingGenerator localEmbeddingGenerator,
 			Tokenizer tokenizer,
+			LocalMiniLmEmbeddingGenerator localMiniLmEmbeddingGenerator,
 			GeneratorParams generatorParams,
 			bool? codeMode = true) {
 
 			_model = model;
-			_localEmbeddingGenerator = localEmbeddingGenerator;
 
 			_tokenizer = tokenizer!;
 			_generatorParams = generatorParams;
@@ -42,9 +41,11 @@ namespace UI {
 				_expectingCodeResponse = false;
 			}
 
+			_localMiniLmEmbeddingGenerator = localMiniLmEmbeddingGenerator;
+
 			// Load memories. They should remember what we spoke about yesterday, a week ago, maybe even years.
 			// This should initialize their memories.db if it does not already exist
-			_remember = new Remember(_localEmbeddingGenerator);
+			_remember = new Remember(_localMiniLmEmbeddingGenerator);
 
 			ToggleInterruptButton();
 		}
