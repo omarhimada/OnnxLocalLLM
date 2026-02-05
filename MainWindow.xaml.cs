@@ -28,7 +28,6 @@ namespace UI {
 
 		internal void Initialize(Model model,
 			Tokenizer tokenizer,
-			LocalMiniLmEmbeddingGenerator localMiniLmEmbeddingGenerator,
 			GeneratorParams generatorParams,
 			bool? codeMode = true) {
 
@@ -41,13 +40,15 @@ namespace UI {
 				_expectingCodeResponse = false;
 			}
 
+			ToggleInterruptButton();
+		}
+
+		internal void PostInitialize(LocalMiniLmEmbeddingGenerator localMiniLmEmbeddingGenerator) {
 			_localMiniLmEmbeddingGenerator = localMiniLmEmbeddingGenerator;
 
 			// Load memories. They should remember what we spoke about yesterday, a week ago, maybe even years.
 			// This should initialize their memories.db if it does not already exist
 			_remember = new Remember(_localMiniLmEmbeddingGenerator);
-
-			ToggleInterruptButton();
 		}
 
 		internal MainWindow() {

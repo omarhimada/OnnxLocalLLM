@@ -92,7 +92,7 @@ namespace UI {
 					_clsId = GetIdOrDefault(_cls, GetIdOrDefault(_mistral3TokenStartTurn, 101));
 					_sepId = GetIdOrDefault(_sep, GetIdOrDefault(_mistral3TokenStop, 102));
 				}
-				_localMiniLmEmbeddingGenerator = new LocalMiniLmEmbeddingGenerator(_embedModelPath, _vocabularyPath, maxTokenLength: 128, options);
+				_localMiniLmEmbeddingGenerator = new LocalMiniLmEmbeddingGenerator(_embedModelPath!, _vocabularyPath, maxTokenLength: 4096, options);
 				return _localMiniLmEmbeddingGenerator;
 			});
 
@@ -124,13 +124,14 @@ namespace UI {
 				_generatorParams = new(_model);
 				#endregion
 
-				obmainWindowt? mainWindow = _serviceProvider.GetRequiredKeyedService()
-				mainWindow.Initialize(_model, _tokenizer, _localMiniLmEmbeddingGenerator, _generatorParams);
+				MainWindow mainWindow = new();
+				mainWindow.Initialize(_model, _tokenizer, _generatorParams);
+				mainWindow.PostInitialize(_serviceProvider.GetRequiredService<LocalMiniLmEmbeddingGenerator>());
 
 				mainWindow.Show();
 
 			} catch (Exception exception) {
-				MessageBox.Shpow($"{_userFriendlyErrorOccurredDuringInitialization}\r\n{exception.Message}");
+				MessageBox.Show($"{_userFriendlyErrorOccurredDuringInitialization}\r\n{exception.Message}");
 				Shutdown();
 			}
 		}
