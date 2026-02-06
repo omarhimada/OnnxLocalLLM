@@ -1,14 +1,17 @@
 ﻿using Microsoft.ML.OnnxRuntimeGenAI;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using UI.Memory;
 using UI.Utility;
 using static UI.Constants;
 
 namespace UI {
 	internal partial class MainWindow : Window {
+		private readonly DispatcherTimer _timer;
+
 		internal Model? _model;
-		internal LocalEmbeddingGenerator? _localEmbeddingGenerator;
+		internal LocalMiniLmEmbeddingGenerator? _localMiniLmEmbeddingGenerator;
 		internal Tokenizer? _tokenizer;
 
 		internal Generator? _generator;
@@ -27,13 +30,11 @@ namespace UI {
 		}
 
 		internal void Initialize(Model model,
-			LocalEmbeddingGenerator localEmbeddingGenerator,
 			Tokenizer tokenizer,
 			GeneratorParams generatorParams,
 			bool? codeMode = true) {
 
 			_model = model;
-			_localEmbeddingGenerator = localEmbeddingGenerator;
 
 			_tokenizer = tokenizer!;
 			_generatorParams = generatorParams;
@@ -42,18 +43,43 @@ namespace UI {
 				_expectingCodeResponse = false;
 			}
 
+			ToggleInterruptButton();
+
+			_timer.Start();
+		}
+
+		internal void PostInitialize(LocalMiniLmEmbeddingGenerator localMiniLmEmbeddingGenerator) {
+			_localMiniLmEmbeddingGenerator = localMiniLmEmbeddingGenerator;
+
 			// Load memories. They should remember what we spoke about yesterday, a week ago, maybe even years.
 			// This should initialize their memories.db if it does not already exist
-			_remember = new Remember(_localEmbeddingGenerator);
-
-			ToggleInterruptButton();
+			_remember = new Remember(_localMiniLmEmbeddingGenerator);
 		}
 
 		internal MainWindow() {
 			InitializeComponent();
 
-			// Make sure the 'x' button in the top right actually closes the process.
+			_timer = new DispatcherTimer {
+				Interval = TimeSpan.FromSeconds(12)
+			};
+
+			_timer.Tick += _talkTok!;
+
 			Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
+		}
+
+		private void _talkTok(object sender, EventArgs e) {
+			const char _qm = '?';
+			if (UserInputText.Text.Contains(_qm)) {
+				_interact();
+				UserInputText.Text = string.Empty;
+			}
+		}
+
+		// Stop the timer when the window is closed
+		protected override void OnClosed(EventArgs e) {
+			base.OnClosed(e);
+			_timer.Stop();
 		}
 		#endregion
 
@@ -81,18 +107,7 @@ namespace UI {
 
 		#region Component Interactions
 		internal async void ChatButtonClick(object sender, RoutedEventArgs e) {
-			try {
-				TheirResponse.Text = string.Empty;
-				ToggleInterruptButton();
-				ChatButton.IsEnabled = false;
-
-				await SendMessage(UserInputText.Text);
-
-			} catch (Exception) {
-				SomethingWentWrong();
-			} finally {
-				AllowUserInputEntry();
-			}
+			await _interact();
 		}
 
 		/// <summary>
@@ -132,7 +147,6 @@ namespace UI {
 		}
 		#endregion
 		#endregion
-
 		internal async Task ChatWithModelAsync(string systemAndUserMessage) {
 			CancellationToken ct = _cts.Token;
 
@@ -165,19 +179,29 @@ namespace UI {
 
 			await Remember.MemorizeDiscussionAsync(TheirResponse.Text, ct);
 		}
-
 		private void AllowUserInputEntry() {
 			ToggleInterruptButton();
 			ChatButton.IsEnabled = true;
 		}
-
 		private float _getTemperature() => _expectingCodeResponse ? 0.225f : 0.7f;
-
 		private bool InterruptButtonEnabled { get; set; } = true;
-
 		internal void CloseButton_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
 		#region Interact
+		private async Task _interact() {
+			try {
+				TheirResponse.Text = string.Empty;
+				ToggleInterruptButton();
+				ChatButton.IsEnabled = false;
+
+				await SendMessage(UserInputText.Text);
+
+			} catch (Exception) {
+				SomethingWentWrong();
+			} finally {
+				AllowUserInputEntry();
+			}
+		}
 		internal async Task SendMessage(string userInputText) {
 			string systemAndUserMessage = string.Empty;
 			try {

@@ -2,16 +2,8 @@
 bin/
 obj/
 .vs/
-/known-issues.txt
 /temp**
-/.images/temp*.png
-/ONNX/Nomic-Embed-Text-1-5/model.onnx
 /ONNX/Mistral-14B/model.onnx_data
 /ONNX/Mistral-7B/model.onnx_data
-/ONNX/Nomic-Embed-Text-1-5/model.onnx
-/ONNX/Nomic-Embed-Text-1-5/model.onnx
-/.Images/1002x720_sc_example.png
-/.Images/da-c_NAaohtsks.png
-/Favorites/show_me_something_beautiful_written_in_c++.txt
 /Utility/DnsLogger.cs
 /Favorites

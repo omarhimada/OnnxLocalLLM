@@ -31,19 +31,23 @@
 
 	<ItemGroup>
 	  <Compile Remove="Mistral-14B\**" />
+	  <Compile Remove="ONNX\Nomic-Embed-Text-1-5\**" />
 	  <EmbeddedResource Remove="Mistral-14B\**" />
+	  <EmbeddedResource Remove="ONNX\Nomic-Embed-Text-1-5\**" />
 	  <None Remove="Mistral-14B\**" />
+	  <None Remove="ONNX\Nomic-Embed-Text-1-5\**" />
 	  <Page Remove="Mistral-14B\**" />
+	  <Page Remove="ONNX\Nomic-Embed-Text-1-5\**" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Memory\LocalEmbeddingGenerator.cs" />
 	  <Compile Remove="Utility\DnsLogger.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <None Remove="ONNX\Mistral-14B\model.onnx_data" />
 	  <None Remove="ONNX\Mistral-7B\model.onnx_data" />
-	  <None Remove="ONNX\Nomic-Embed-Text-1-5\model.onnx" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -75,30 +79,6 @@
 		<Content Include="ONNX\Mistral-7B\tokenizer_config.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
-		<Content Include="ONNX\Nomic-Embed-Text-1-5\config.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-		<Content Include="ONNX\Nomic-Embed-Text-1-5\config_sentence_transformers.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-		<Content Include="ONNX\Nomic-Embed-Text-1-5\modules.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-		<Content Include="ONNX\Nomic-Embed-Text-1-5\sentence_bert_config.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-		<Content Include="ONNX\Nomic-Embed-Text-1-5\special_tokens_map.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-		<Content Include="ONNX\Nomic-Embed-Text-1-5\tokenizer.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-		<Content Include="ONNX\Nomic-Embed-Text-1-5\tokenizer_config.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-		<Content Include="ONNX\Nomic-Embed-Text-1-5\vocab.txt">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -108,6 +88,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="10.0.2" />
 		<PackageReference Include="Microsoft.Extensions.AI" Version="10.2.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
 		<PackageReference Include="Microsoft.Extensions.VectorData.Abstractions" Version="9.7.0" />
 		<!--<PackageReference Include="Microsoft.KernelMemory" Version="0.98.250508.3" />
 		<PackageReference Include="Microsoft.KernelMemory.AI.Onnx" Version="0.98.250508.3" />-->

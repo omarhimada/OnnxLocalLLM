@@ -1,7 +1,10 @@
-﻿namespace UI.Memory {
-	using Microsoft.Extensions.AI;
+﻿using Microsoft.Extensions.AI;
+
+namespace UI.Memory {
+
 	using Microsoft.Extensions.VectorData;
 	using Microsoft.SemanticKernel.Connectors.SqliteVec;
+	using UI.Utility;
 	using static Constants;
 
 	internal class Remember : IDisposable {
@@ -18,7 +21,7 @@
 		protected static SqliteVectorStore? _vectorStore;
 
 		protected static SqliteCollection<long, Discussion>? _memories;
-		protected static LocalEmbeddingGenerator? _embedder;
+		protected static LocalMiniLmEmbeddingGenerator? _embedder;
 
 		private readonly CancellationTokenSource _cts = new();
 
@@ -34,7 +37,7 @@
 		/// fails, an exception may be thrown. Use this constructor only when synchronous initialization is
 		/// required.</remarks>
 		/// <param name="embeddingGenerator">The embedding generator to use for initializing memory. Cannot be null.</param>
-		internal Remember(LocalEmbeddingGenerator embeddingGenerator) {
+		internal Remember(LocalMiniLmEmbeddingGenerator embeddingGenerator) {
 			CancellationToken ct = _cts.Token;
 			_memories = new(_db, _memoriesDbName, _sqliteOptions);
 
@@ -46,7 +49,7 @@
 		}
 
 		internal static async Task StartAsync(
-			LocalEmbeddingGenerator embedder,
+			LocalMiniLmEmbeddingGenerator embedder,
 			CancellationToken ct = default) {
 
 			_embedder = embedder;
@@ -64,13 +67,19 @@
 		internal static async Task MemorizeDiscussionAsync(string text, CancellationToken ct = default) {
 			if (_memories is not null && _embedder is not null && !string.IsNullOrEmpty(_embedder._vocabularyPath)) {
 				try {
-					ReadOnlyMemory<float> vec = await _embedder.GenerateVectorAsync(text, cancellationToken: ct);
+					string cleanedString = StringCleaner.Md(text);
+
+					GeneratedEmbeddings<Embedding<float>> vector =
+						await _embedder.GenerateAsync(
+							[cleanedString],
+							null,
+							cancellationToken: ct);
 
 					long id = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 					Discussion turn = new() {
 						Id = id,
 						Text = text,
-						Vector = vec,
+						Vector = vector,
 						UnixTimeMilliseconds = id
 					};
 
