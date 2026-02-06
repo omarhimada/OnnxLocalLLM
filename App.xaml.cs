@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntimeGenAI;
 using System.IO;
@@ -96,6 +97,9 @@ namespace UI {
 				return _localMiniLmEmbeddingGenerator;
 			});
 
+			services.AddSingleton<IEmbeddingGenerator<string, Embedding<float>>>(sp =>
+				sp.GetRequiredService<LocalMiniLmEmbeddingGenerator>());
+
 			// Aso register MainWindow as a service in order to utilize DI
 			services.AddTransient<MainWindow>();
 			#endregion
@@ -126,7 +130,11 @@ namespace UI {
 
 				MainWindow mainWindow = new();
 				mainWindow.Initialize(_model, _tokenizer, _generatorParams);
-				mainWindow.PostInitialize(_serviceProvider.GetRequiredService<LocalMiniLmEmbeddingGenerator>());
+				try {
+					mainWindow.PostInitialize(_serviceProvider.GetRequiredService<LocalMiniLmEmbeddingGenerator>());
+				} catch (Exception) {
+					// Continue;
+				}
 
 				mainWindow.Show();
 
