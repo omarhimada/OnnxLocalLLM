@@ -8,19 +8,19 @@ using static UI.Constants;
 
 namespace UI {
 	internal partial class MainWindow : Window {
-		private readonly DispatcherTimer _timer;
-
+		#region Fields & Properties
 		internal Model? _model;
 		internal LocalMiniLmEmbeddingGenerator? _localMiniLmEmbeddingGenerator;
 		internal Tokenizer? _tokenizer;
-
 		internal Generator? _generator;
 		internal GeneratorParams? _generatorParams;
-
-		internal bool _expectingCodeResponse = true;
 		internal CancellationTokenSource _cts = new();
-
 		internal Remember? _remember;
+		internal bool _expectingCodeResponse = true;
+		private bool InterruptButtonEnabled { get; set; } = true;
+		private float _getTemperature() => _expectingCodeResponse ? 0.225f : 0.7f;
+		private readonly DispatcherTimer _timer;
+		#endregion
 
 		#region Initialization
 		protected override void OnInitialized(EventArgs e) {
@@ -29,7 +29,8 @@ namespace UI {
 			App.FinishedInitializing();
 		}
 
-		internal void Initialize(Model model,
+		internal void Initialize(
+			Model model,
 			Tokenizer tokenizer,
 			GeneratorParams generatorParams,
 			bool? codeMode = true) {
@@ -132,7 +133,7 @@ namespace UI {
 				ChatButton.IsEnabled = true;
 			}
 		}
-
+		internal void CloseButton_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 		internal void ToggleInterruptButton() {
 			InterruptButtonEnabled = !InterruptButtonEnabled;
 		}
@@ -147,6 +148,8 @@ namespace UI {
 		}
 		#endregion
 		#endregion
+
+		#region Interact
 		internal async Task ChatWithModelAsync(string systemAndUserMessage) {
 			CancellationToken ct = _cts.Token;
 
@@ -179,15 +182,7 @@ namespace UI {
 
 			await Remember.MemorizeDiscussionAsync(TheirResponse.Text, ct);
 		}
-		private void AllowUserInputEntry() {
-			ToggleInterruptButton();
-			ChatButton.IsEnabled = true;
-		}
-		private float _getTemperature() => _expectingCodeResponse ? 0.225f : 0.7f;
-		private bool InterruptButtonEnabled { get; set; } = true;
-		internal void CloseButton_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
-		#region Interact
 		private async Task _interact() {
 			try {
 				TheirResponse.Text = string.Empty;
@@ -220,6 +215,10 @@ namespace UI {
 			if (couldNotParseUserInput) {
 				TheirResponse.Text += $"{_userFriendlyParsingUserInputToMessageException}\n";
 			}
+		}
+		private void AllowUserInputEntry() {
+			ToggleInterruptButton();
+			ChatButton.IsEnabled = true;
 		}
 		#endregion
 	}

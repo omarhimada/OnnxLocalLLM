@@ -121,6 +121,7 @@
                          Grid.Row="0"
                          Text=""
                          AcceptsReturn="True" 
+                         AcceptsTab="True"
                          FocusVisualStyle="{x:Null}" 
                          Style="{StaticResource TextBoxStyle}" />
 

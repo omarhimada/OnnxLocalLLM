@@ -21,7 +21,7 @@ namespace UI.Utility {
 				// For Mistral3 assume the instruction [INST] is the 'system' prompt.
 
 				if (msg.Role == ChatRole.System) {
-					prompt.Append($"{_mistral3TokenStartTurn}{_mistral3InstructStart}{_ws}{msg.Text}{_ws}");
+					prompt.Append($"{_mistral3TokenStartTurn}{_mistral3InstructStart}{_ws}{msg.Text}{_ws}{_ws}{_onlyThisLanguagePlease}");
 				}
 
 				if (msg.Role == ChatRole.User) {
