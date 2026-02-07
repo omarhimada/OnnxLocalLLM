@@ -62,7 +62,7 @@ namespace OLLM {
 		}
 		#endregion
 
-		internal async void ChatButtonClick(object sender, RoutedEventArgs e) => await LinearCommunication!._interact(UserInputText, TheirResponse, ChatButton);
+		internal async void ChatButtonClick(object sender, RoutedEventArgs e) => await LinearCommunication!._interact(UserInputText, TheirResponse, ChatButton, CodeModeEnabled);
 
 		internal async void InterruptButtonClick(object sender, RoutedEventArgs e) => await LinearCommunication!._interrupt(TheirResponse, ChatButton);
 

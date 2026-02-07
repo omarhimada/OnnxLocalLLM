@@ -35,11 +35,11 @@ namespace OLLM.Interact {
 		/// Represents the user's interaction with the model. Currently, it is only text, the plan is to eventually
 		/// create accessibility-enhanced interaction features involving text-speech, etc.
 		/// </summary>
-		internal async Task _interact(TextBox userInputText, TextBox theirResponse, Button chatButton) {
+		internal async Task _interact(TextBox userInputText, TextBox theirResponse, Button chatButton, CheckBox codeModeEnabled) {
 			await _preInteractThinking(theirResponse);
 			try {
 				ToggleInterruptButton();
-				await SendMessage(userInputText.Text, theirResponse);
+				await SendMessage(userInputText.Text, theirResponse, codeModeEnabled.IsChecked ?? false);
 			} catch (Exception) {
 				SomethingWentWrong(theirResponse);
 			} finally {
@@ -47,10 +47,10 @@ namespace OLLM.Interact {
 			}
 		}
 
-		private async Task SendMessage(string userInputText, TextBox theirResponse) {
+		private async Task SendMessage(string userInputText, TextBox theirResponse, bool codeMode) {
 			string systemAndUserMessage = string.Empty;
 			try {
-				systemAndUserMessage = ConstructMessages.AsFormattedString(userInputText);
+				systemAndUserMessage = ConstructMessages.AsFormattedString(userInputText, codeMode, null);
 			} catch (Exception) {
 				SomethingWentWrong(theirResponse, true);
 			}

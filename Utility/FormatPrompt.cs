@@ -10,7 +10,7 @@ namespace OLLM.Utility {
 		/// </summary>
 		/// <param name="messages">The list of chat messages to include in the prompt.</param>
 		/// <returns>A string containing the formatted prompt for the Mistral V3 model.</returns>
-		public static string Mistral3(List<ChatMessage>? messages = null) {
+		public static string Mistral3(List<ChatMessage>? messages = null, bool codeMode = false) {
 			if (messages == null || messages.Count == 0) {
 				return string.Empty;
 			}
@@ -21,12 +21,11 @@ namespace OLLM.Utility {
 				// For Mistral3 assume the instruction [INST] is the 'system' prompt.
 
 				if (msg.Role == ChatRole.System) {
-					prompt.Append($"{_mistral3TokenStartTurn}{_mistral3InstructStart}{_ws}{msg.Text}{_ws}{_ws}{_onlyThisLanguagePlease}");
+					string specificity = codeMode ? _onlyThisLanguagePlease : string.Empty;
+					prompt.Append($"{_mistral3TokenStartTurn}{_mistral3InstructStart}{_ws}{msg.Text}{_ws}{_ws}{specificity}");
 				}
 
 				if (msg.Role == ChatRole.User) {
-					/* tokenizer_config.json
-					 * includes chat_template that expects two newlines between instruction and user query */
 					prompt.Append(_twoNewLinesVerbatimNoReturn);
 					prompt.Append($"{msg.Text}{_ws}{_mistral3InstructEnd}");
 				}
