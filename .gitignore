@@ -8,3 +8,4 @@ obj/
 /Utility/DnsLogger.cs
 /Favorites
 /Properties/PublishProfiles/FolderProfile.pubxml
+/ONNX/Devstral/model.onnx.data
