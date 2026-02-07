@@ -10,7 +10,6 @@ namespace OLLM {
 		internal ModelState? ModelState;
 		internal EmbedderState? EmbedderState;
 		internal MiniEmbedder? MiniEmbedder;
-		internal LinearCommunication? LinearCommunication;
 
 		internal static readonly LoadingWindow SplashWindow = new();
 
@@ -38,9 +37,8 @@ namespace OLLM {
 				ModelState = new(modelPath);
 				EmbedderState = new(embedModelPath);
 				MiniEmbedder = new(ModelState, EmbedderState);
-				LinearCommunication = new(ModelState);
 
-				mainWindow.Initialize(ModelState, EmbedderState, MiniEmbedder, LinearCommunication);
+				mainWindow.Initialize(ModelState, EmbedderState, MiniEmbedder);
 
 				MainWindow = mainWindow;
 				mainWindow.Show();

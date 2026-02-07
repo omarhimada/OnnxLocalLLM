@@ -5,8 +5,8 @@ namespace OLLM {
 
 		#region all-MiniLM-L6-v2-onnx
 		// onnx-models/all-MiniLM-L6-v2-onnx
-		internal static string _preBuildEmbedModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\all-MiniLM-L6-v2-onnx";
-		internal static string _preBuildVocabTextPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\all-MiniLM-L6-v2-onnx\\vocab.txt";
+		internal static string _preBuildEmbedModelDirectory = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\all-MiniLM-L6-v2-onnx";
+		internal static string _preBuildEmbedModelVocabTextPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\all-MiniLM-L6-v2-onnx\\vocab.txt";
 		#endregion
 
 		internal const string _onnxSearch = "*.onnx";
@@ -83,7 +83,7 @@ namespace OLLM {
 		internal const string _inactiveForegroundText = "#E6F1EE";
 		#endregion
 
-		#region Partial system prompt pieces
+		#region System prompt construction
 		internal const string _mistral3DefaultInstruction =
 			"""
 			You are a beautiful, helpful assistant, applied scientist, and an artist. Your cybersecurity awareness as it relates to networking, HTTP, WebSockets, TCP/IP, and other protocols like gRPC, among others, instills within you the desire to protect.
@@ -114,7 +114,7 @@ namespace OLLM {
 			You're loved. 
 			""";
 
-		internal const string _onlyThisLanguagePlease = "If you are asked about implementation details, or your help is requested in troubleshooting something technical involving code, or you're presented with what appears to be a coding challenge akin to Leetcode or HackerRank, please only respond with a complete C# solution.";
+		internal const string _specificity = "If you're explaining something with code, or you are asked about implementation details, or your help is requested in troubleshooting something technical involving code, or you're presented with what appears to be a coding challenge akin to Leetcode or HackerRank, please only respond with a complete C# solution.";
 		#endregion
 	}
 }

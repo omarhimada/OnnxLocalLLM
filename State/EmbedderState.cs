@@ -42,7 +42,7 @@ namespace OLLM.State {
 			Session = new InferenceSession(embedModelFilePath, options);
 
 			#region Initialize vocabulary
-			VocabularyPath = Initialization.Vocabulary.GetRequiredTextDocument(_preBuildVocabTextPath) ?? string.Empty;
+			VocabularyPath = Initialization.Vocabulary.GetRequiredTextDocument(_preBuildEmbedModelVocabTextPath) ?? string.Empty;
 
 			if (string.IsNullOrEmpty(VocabularyPath)) {
 				// User was already shown a friendly error message, shut down the app.

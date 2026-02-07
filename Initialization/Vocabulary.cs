@@ -6,7 +6,7 @@ namespace OLLM.Initialization {
 	internal static class Vocabulary {
 		internal static string? GetRequiredTextDocument(string debugPath) {
 			string? pathToUse = null;
-			if (debugPath == _preBuildVocabTextPath) {
+			if (debugPath == _preBuildEmbedModelVocabTextPath) {
 				#region Verify embed vocab.txt is present (check for debug mode first, then assume release/published)
 				if (!File.Exists(debugPath)) {
 					// Try the embed vocab.txt from the published directory instead of the debugging directory:

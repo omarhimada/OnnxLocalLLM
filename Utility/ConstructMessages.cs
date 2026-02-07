@@ -2,7 +2,7 @@ using Microsoft.Extensions.AI;
 
 namespace OLLM.Utility {
 	internal static class ConstructMessages {
-		public static string AsFormattedString(string? userPrompt, bool codeMode, string? instruction = $"{Constants._mistral3DefaultInstruction}{Constants._art}{Constants._algorithms}") {
+		public static string AsFormattedString(string? userPrompt, string? instruction = $"{Constants._mistral3DefaultInstruction}{Constants._art}{Constants._algorithms}") {
 			if (string.IsNullOrEmpty(userPrompt)) {
 				return string.Empty;
 			}
@@ -12,7 +12,7 @@ namespace OLLM.Utility {
 				new(ChatRole.User, userPrompt.Trim())
 			];
 
-			return FormatPrompt.Mistral3(messages, codeMode);
+			return FormatPrompt.Mistral3(messages);
 		}
 	}
 }

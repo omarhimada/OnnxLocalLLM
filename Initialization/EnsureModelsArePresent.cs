@@ -22,7 +22,7 @@ namespace OLLM.Initialization {
 			}
 
 			// Attempt to retrieve the embedding model ONNX
-			if (!TryRequiredModelIsPresent(_preBuildEmbedModelPath, out string? embedModelPathToUse) ||
+			if (!TryRequiredModelIsPresent(_preBuildEmbedModelDirectory, out string? embedModelPathToUse) ||
 				embedModelPathToUse == null) {
 				potentialFriendlyUserErrorMessage.AppendLine(
 					$"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{embedModelPathToUse}");
@@ -41,7 +41,7 @@ namespace OLLM.Initialization {
 		/// </summary>
 		internal static bool TryRequiredModelIsPresent(string debugPath, out string? pathToUse) {
 			pathToUse = null;
-			if (debugPath == _preBuildEmbedModelPath) {
+			if (debugPath == _preBuildEmbedModelDirectory) {
 				#region Verify embed model is present (check for debug mode first, then assume release/published)
 				if (!Directory.Exists(debugPath)) {
 					// Try the embed model from the published directory instead of the debugging directory:

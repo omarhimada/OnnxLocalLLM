@@ -9,48 +9,43 @@ using static OLLM.Constants;
 namespace OLLM.Interact {
 	internal class LinearCommunication(ModelState modelState) {
 		private readonly CancellationTokenSource _cts = new();
-
 		private bool InterruptButtonEnabled { get; set; } = true;
-
-		internal async Task _interrupt(TextBox theirResponse, Button chatButton) {
-			if (!InterruptButtonEnabled) {
-				return;
-			}
-
-			try {
-				await _cts.CancelAsync();
-				theirResponse.Text = _userFriendlyStoppedResponse;
-
-				chatButton.IsEnabled = true;
-				ToggleInterruptButton();
-
-			} catch (Exception) {
-				SomethingWentWrong(theirResponse);
-			} finally {
-				chatButton.IsEnabled = true;
-			}
-		}
 
 		/// <summary>
 		/// Represents the user's interaction with the model. Currently, it is only text, the plan is to eventually
 		/// create accessibility-enhanced interaction features involving text-speech, etc.
 		/// </summary>
-		internal async Task _interact(TextBox userInputText, TextBox theirResponse, Button chatButton, CheckBox codeModeEnabled) {
-			await _preInteractThinking(theirResponse);
+		internal async Task _interact(TextBox userInputText, TextBox theirResponse, Button chatButton) {
 			try {
 				ToggleInterruptButton();
-				await SendMessage(userInputText.Text, theirResponse, codeModeEnabled.IsChecked ?? false);
-			} catch (Exception) {
-				SomethingWentWrong(theirResponse);
+				await SendMessage(userInputText.Text, theirResponse);
+			} catch (Exception exception) {
+				SomethingWentWrong(theirResponse, false, exception.Message);
 			} finally {
 				AllowUserInputEntry(chatButton);
 			}
 		}
 
-		private async Task SendMessage(string userInputText, TextBox theirResponse, bool codeMode) {
+		internal async Task _interrupt(TextBox theirResponse, Button chatButton) {
+			if (!InterruptButtonEnabled) {
+				return;
+			}
+			try {
+				await _cts.CancelAsync();
+				theirResponse.Text = _userFriendlyStoppedResponse;
+				chatButton.IsEnabled = true;
+				ToggleInterruptButton();
+			} catch (Exception) {
+				SomethingWentWrong(theirResponse, false);
+			} finally {
+				chatButton.IsEnabled = true;
+			}
+		}
+
+		private async Task SendMessage(string userInputText, TextBox theirResponse) {
 			string systemAndUserMessage = string.Empty;
 			try {
-				systemAndUserMessage = ConstructMessages.AsFormattedString(userInputText, codeMode, null);
+				systemAndUserMessage = ConstructMessages.AsFormattedString(userInputText, null);
 			} catch (Exception) {
 				SomethingWentWrong(theirResponse, true);
 			}
@@ -60,16 +55,15 @@ namespace OLLM.Interact {
 		private async Task ChatWithModelAsync(string systemAndUserMessage, TextBox theirResponse) {
 			CancellationToken ct = _cts.Token;
 
-			Sequences sequences = modelState.Tokenizer!.Encode(systemAndUserMessage);
-
-			modelState.SetGeneratorParameterSearchOptions();
-			modelState.RefreshGenerator();
-			modelState.Generator!.AppendTokenSequences(sequences);
-
-			// Clear the "..." thinking text before the actual response
 			theirResponse.Text = string.Empty;
 
 			await Task.Run(() => {
+				Sequences sequences = modelState.Tokenizer!.Encode(systemAndUserMessage);
+
+				modelState.SetGeneratorParameterSearchOptions();
+				modelState.RefreshGenerator();
+				modelState.Generator!.AppendTokenSequences(sequences);
+
 				while (!modelState.Generator.IsDone()) {
 					modelState.Generator.GenerateNextToken();
 
@@ -90,24 +84,15 @@ namespace OLLM.Interact {
 			await Remember.MemorizeDiscussionAsync(theirResponse.Text, ct);
 		}
 
-		/// <summary>
-		/// Small 'thinking' animation with ellipsis 
-		/// </summary>
-		/// <returns></returns>
-		private async Task _preInteractThinking(TextBox theirResponse) {
-			const char _d = '.';
-			theirResponse.Text = string.Empty;
-			for (int i = 0; i < 3; i++) {
-				theirResponse.Text += _d;
-				await Task.Delay(15);
-			}
-		}
-
-		private void SomethingWentWrong(TextBox theirResponse, bool couldNotParseUserInput = false) {
+		private void SomethingWentWrong(TextBox theirResponse, bool? couldNotParseUserInput = false, string? exceptionMessage = null) {
 			theirResponse.Text += $"{_userFriendlyErrorResponse}\n";
 
-			if (couldNotParseUserInput) {
+			if (couldNotParseUserInput!.Value) {
 				theirResponse.Text += $"{_userFriendlyParsingUserInputToMessageException}\n";
+			}
+
+			if (exceptionMessage != null) {
+				MessageBox.Show(exceptionMessage);
 			}
 		}
 

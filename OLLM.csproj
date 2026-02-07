@@ -84,6 +84,7 @@
 	<ItemGroup>
 		<None Include=".Images\iconv1.ico" />
 		<None Include="C:\Users\adosi\source\repos\0_OnnxLocalLLM\.editorconfig" />
+		<None Include="Interact\LinearCommunication.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

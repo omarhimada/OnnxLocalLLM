@@ -128,8 +128,9 @@
 
                 <StackPanel x:Name="ButtonsPanel" 
                             Grid.Row="1"
-                            Orientation="Horizontal" HorizontalAlignment="Center">
+                            Orientation="Horizontal" HorizontalAlignment="Center" Margin="-100,0,0,0">
 
+	                <ProgressBar x:Name="Thinking" HorizontalAlignment="Left" Height="10" Grid.Row="1" VerticalAlignment="Center" Width="100" Foreground="#FFA4FFCE" Background="{x:Null}" BorderThickness="0,0,0,0" FlowDirection="RightToLeft" IsEnabled="False" Visibility="Hidden" IsIndeterminate="True" IsHitTestVisible="False"/>
                     <Button x:Name="ChatButton" Content=" chat " IsDefault="True"
 		                    HorizontalAlignment="Left" Width="Auto" Height="25" 
 		                    Background="#171717" Foreground="#2FFFD0" FontFamily="Cascadia Mono ExtraLight" FontSize="14"
