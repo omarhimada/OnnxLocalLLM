@@ -1,8 +1,8 @@
 using Microsoft.Extensions.AI;
 using System.Text;
-using static UI.Constants;
+using static OLLM.Constants;
 
-namespace UI.Utility {
+namespace OLLM.Utility {
 	internal static class FormatPrompt {
 		/// <summary>
 		/// Formats a list of chat messages into a prompt string compatible with the Mistral V3 model input format.

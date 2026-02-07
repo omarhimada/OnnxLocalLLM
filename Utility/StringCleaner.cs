@@ -1,6 +1,6 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
-namespace UI.Utility {
+namespace OLLM.Utility {
 	/// <summary>
 	/// This class does not preserve formatting; it removes images, headings, lists, blockquotes, and
 	/// horizontal lines, and simplifies bold and italic text.

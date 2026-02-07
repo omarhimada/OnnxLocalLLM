@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.AI;
+using Microsoft.Extensions.AI;
 
-namespace UI.Utility {
+namespace OLLM.Utility {
 	internal static class ConstructMessages {
 		public static string AsFormattedString(string? userPrompt, string? instruction = $"{Constants._mistral3DefaultInstruction}{Constants._art}{Constants._algorithms}") {
 			if (string.IsNullOrEmpty(userPrompt)) {

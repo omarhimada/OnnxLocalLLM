@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.AI;
+using Microsoft.Extensions.AI;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
+using OLLM.State;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
 
-namespace UI.Memory {
+namespace OLLM.Memory {
 	/// <summary>
 	/// Provides functionality to generate text embeddings using a locally hosted MiniLM ONNX model and vocabulary file.
 	/// </summary>
@@ -14,80 +15,23 @@ namespace UI.Memory {
 	/// and running inference through the ONNX model. The class supports asynchronous embedding generation and ensures that
 	/// output vectors are L2-normalized for consistency. Instances of this class are disposable and should be disposed to
 	/// release model resources when no longer needed.</remarks>
-	public sealed partial class LocalMiniLmEmbeddingGenerator : IEmbeddingGenerator<string, Embedding<float>>, IDisposable {
-		internal readonly InferenceSession _session;
-		internal readonly string _inputIdsName;
-		internal readonly string _attentionMaskName;
-		internal readonly string _preferredOutputName;
-		internal readonly int _maxTokenLength;
-
-		internal readonly Dictionary<string, int> _vocab;
-		internal readonly string _vocabularyPath;
-
-		private readonly int _padId, _clsId, _sepId, _unkId;
-		private static readonly Regex TokenRegex = WhitespaceRegex();
+	internal sealed partial class MiniEmbedder : IEmbeddingGenerator<string, Embedding<float>> {
+		internal ModelState ModelState;
+		internal EmbedderState EmbedderState;
+		internal static readonly Regex TokenRegex = WhitespaceRegex();
 
 		[GeneratedRegex(@"\w+|[^\s\w]", RegexOptions.Compiled)]
-		private static partial Regex WhitespaceRegex();
+		internal static partial Regex WhitespaceRegex();
 
 		/// <summary>
 		/// Retrieves the identifier associated with the specified token, or returns the fallback value if the token is not
 		/// found.
 		/// </summary>
-		private int GetIdOrDefault(string token, int fallback) => _vocab.GetValueOrDefault(token, fallback);
 
-		public LocalMiniLmEmbeddingGenerator(string onnxPath, string vocabularyPath, int maxTokenLength = 128, SessionOptions? options = null) {
-			options ??= new SessionOptions();
 
-			_session = new InferenceSession(onnxPath, options);
-			_vocabularyPath = vocabularyPath;
-
-			List<string> outputs = _session.OutputMetadata.Keys.ToList();
-			_preferredOutputName = outputs.FirstOrDefault(n => n.Contains(Constants._pooled, StringComparison.OrdinalIgnoreCase))
-								 ?? outputs.FirstOrDefault(n => n.Contains(Constants._hidden, StringComparison.OrdinalIgnoreCase))
-								 ?? outputs.First();
-
-			_inputIdsName =
-				_session.InputMetadata.Keys
-					.FirstOrDefault(key =>
-						key.Contains(Constants._inputIds, StringComparison.OrdinalIgnoreCase))
-								?? _session.InputMetadata.Keys.First();
-
-			_attentionMaskName =
-				_session.InputMetadata.Keys
-					.FirstOrDefault(key =>
-						key.Contains(Constants._attentionMask, StringComparison.OrdinalIgnoreCase))
-								?? _session.InputMetadata.Keys.Skip(1).FirstOrDefault()
-							?? _inputIdsName;
-
-			_maxTokenLength = maxTokenLength;
-
-			_vocab = LoadVocab(vocabularyPath);
-			_padId = GetIdOrDefault(Constants._pad, 0);
-			_clsId = GetIdOrDefault(Constants._cls, 1);
-			_sepId = GetIdOrDefault(Constants._sep, 2);
-			_unkId = GetIdOrDefault(Constants._unk, 3);
-		}
-
-		/// <summary>
-		/// Loads a vocabulary from a text file, mapping each non-empty line to a unique integer index.
-		/// </summary>
-		/// <remarks>Empty or whitespace-only lines in the file are ignored. Token comparison is case-sensitive and
-		/// uses ordinal string comparison.</remarks>
-		/// <param name="path">The path to the text file containing the vocabulary. Each line in the file should represent a distinct token.</param>
-		/// <returns>A dictionary that maps each token from the file to its corresponding zero-based index. Tokens are assigned indices
-		/// in the order they appear in the file.</returns>
-		private static Dictionary<string, int> LoadVocab(string path) {
-			Dictionary<string, int> dict = new(StringComparer.Ordinal);
-			int i = 0;
-			foreach (string line in File.ReadLines(path)) {
-				string? token = line?.Trim();
-				if (string.IsNullOrEmpty(token)) {
-					continue;
-				}
-				dict[token] = i++;
-			}
-			return dict;
+		internal MiniEmbedder(ModelState modelState, EmbedderState embedderState) {
+			ModelState = modelState;
+			EmbedderState = embedderState;
 		}
 
 		/// <summary>
@@ -113,14 +57,19 @@ namespace UI.Memory {
 				(DenseTensor<long>? inputIds, DenseTensor<long>? attentionMask) = TokenizeToTensors(text);
 
 				List<NamedOnnxValue> inputs = [
-					NamedOnnxValue.CreateFromTensor(_inputIdsName, inputIds),
-				NamedOnnxValue.CreateFromTensor(_attentionMaskName, attentionMask)
+					NamedOnnxValue.CreateFromTensor(EmbedderState.InputIdsName, inputIds),
+				NamedOnnxValue.CreateFromTensor(EmbedderState.AttentionMaskName, attentionMask)
 				];
 
-				using IDisposableReadOnlyCollection<DisposableNamedOnnxValue> outputs = _session.Run(inputs);
+				using IDisposableReadOnlyCollection<DisposableNamedOnnxValue> outputs = EmbedderState.Session.Run(inputs);
 
 				// pick the output we detected earlier
-				DisposableNamedOnnxValue named = outputs.FirstOrDefault(o => string.Equals(o.Name, _preferredOutputName, StringComparison.OrdinalIgnoreCase)) ?? outputs.First();
+				DisposableNamedOnnxValue named =
+					outputs.FirstOrDefault(o =>
+						string.Equals(o.Name,
+							EmbedderState.PreferredOutputName,
+							StringComparison.OrdinalIgnoreCase)) ?? outputs[0];
+
 				if (named.Value is DenseTensor<float> tensor) {
 					float[] vector = ExtractVectorFromTensor(tensor, attentionMask);
 					NormalizeL2(vector);
@@ -148,7 +97,7 @@ namespace UI.Memory {
 			string normalized = text.Normalize(System.Text.NormalizationForm.FormKC).ToLowerInvariant();
 			List<string> words = TokenRegex.Matches(normalized).Select(m => m.Value).ToList();
 
-			List<int> tokenIds = [_clsId];
+			List<int> tokenIds = [EmbedderState.ClsId];
 
 			foreach (string word in words) {
 				int start = 0;
@@ -162,7 +111,7 @@ namespace UI.Memory {
 						string piece = word.Substring(start, end - start);
 						if (start > 0)
 							piece = Constants._poundItTwice + piece; // wordpiece continuation marker
-						if (_vocab.TryGetValue(piece, out foundId)) {
+						if (EmbedderState.Vocabulary.TryGetValue(piece, out foundId)) {
 							found = piece;
 							break;
 						}
@@ -177,23 +126,23 @@ namespace UI.Memory {
 				}
 
 				if (bad) {
-					tokenIds.Add(_unkId);
+					tokenIds.Add(EmbedderState.UnkId);
 				} else {
 					tokenIds.AddRange(subTokens);
 				}
 			}
 
-			tokenIds.Add(_sepId);
+			tokenIds.Add(EmbedderState.SepId);
 
-			if (tokenIds.Count > _maxTokenLength) {
-				tokenIds = tokenIds.Take(_maxTokenLength - 1).Concat([_sepId]).ToList();
+			if (tokenIds.Count > EmbedderState._maxTokenLength) {
+				tokenIds = tokenIds.Take(EmbedderState._maxTokenLength - 1).Concat([EmbedderState.SepId]).ToList();
 			}
 
-			DenseTensor<long> inputIds = new(new[] { 1, _maxTokenLength });
-			DenseTensor<long> mask = new(new[] { 1, _maxTokenLength });
+			DenseTensor<long> inputIds = new(new[] { 1, EmbedderState._maxTokenLength });
+			DenseTensor<long> mask = new(new[] { 1, EmbedderState._maxTokenLength });
 
-			for (int i = 0; i < _maxTokenLength; i++) {
-				inputIds[0, i] = i < tokenIds.Count ? tokenIds[i] : _padId;
+			for (int i = 0; i < EmbedderState._maxTokenLength; i++) {
+				inputIds[0, i] = i < tokenIds.Count ? tokenIds[i] : EmbedderState.PadId;
 				mask[0, i] = i < tokenIds.Count ? 1L : 0L;
 			}
 			return (inputIds, mask);
@@ -273,7 +222,7 @@ namespace UI.Memory {
 			}
 		}
 
-		public void Dispose() => _session?.Dispose();
 		public object? GetService(Type serviceType, object? serviceKey = null) => throw new NotImplementedException();
+		public void Dispose() => throw new NotImplementedException();
 	}
 }

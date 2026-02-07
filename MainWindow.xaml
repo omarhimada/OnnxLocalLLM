@@ -1,13 +1,14 @@
-﻿<Window x:Class="UI.MainWindow"
+<Window x:Class="OLLM.MainWindow"
         x:ClassModifier="internal"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:UI"
+        xmlns:local="clr-namespace:OLLM"
         mc:Ignorable="d"
         Title="OLLM" Width="800" MinHeight="512"
         Background="Black"
+        ResizeMode="CanMinimize"
         AllowsTransparency="False"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen">
@@ -91,7 +92,7 @@
                     <TextBlock x:Name="TitleBarText" Text="" Foreground="Gray" FontFamily="Cascadia Mono ExtraLight" FontSize="12"/>
                 </StackPanel>
                 <StackPanel x:Name="CloseButtonPanel" Orientation="Horizontal" HorizontalAlignment="Right" WindowChrome.IsHitTestVisibleInChrome="True">
-                    <Button x:Name="CloseButton" Content="✕" Width="45" Background="Transparent" Foreground="#FFFFAECB" BorderThickness="0" Click="CloseButton_Click"/>
+                    <Button x:Name="CloseButton" Content="✕" Width="45" Background="Transparent" Foreground="#FFFFAECB" BorderThickness="0" Click="CloseButtonClick"/>
                 </StackPanel>
                 <CheckBox 
                     x:Name="CodeModeEnabled" 
@@ -103,12 +104,12 @@
                     FontFamily="Cascadia Mono ExtraLight" 
                     ToolTip="Lowers the temperature hyperparameter. Useful for producing code." 
                     Background="Black" 
-                    IsChecked="True" 
+                    IsChecked="False" 
                     BorderBrush="#FF414141" 
                     Padding="5,0,0,0" 
                     WindowChrome.IsHitTestVisibleInChrome="True"
-                    Checked="CodeModeEnabled_Changed"
-                    Unchecked="CodeModeEnabled_Changed" />
+                    Checked="CodeModeToggled"
+                    Unchecked="CodeModeToggled" />
             </Grid>
             <Grid x:Name="MainWindowContent" Grid.Row="1">
                 <Grid.RowDefinitions>
@@ -131,11 +132,11 @@
 
                     <Button x:Name="ChatButton" Content=" chat " IsDefault="True"
 		                    HorizontalAlignment="Left" Width="Auto" Height="25" 
-		                    Background="#FF111111" Foreground="White" FontFamily="Cascadia Mono ExtraLight" FontSize="14"
+		                    Background="#171717" Foreground="#2FFFD0" FontFamily="Cascadia Mono ExtraLight" FontSize="14"
 		                    Click="ChatButtonClick" AutomationProperties.Name="ChatButton" />
                     <Button x:Name="InterruptButton" Content=" interrupt " 
 		                    HorizontalAlignment="Right" Width="Auto" Height="25"
-		                    Background="#FF111111" Foreground="White" FontFamily="Cascadia Mono ExtraLight" FontSize="14" 
+		                    Background="#171717" Foreground="#2FFFD0" FontFamily="Cascadia Mono ExtraLight" FontSize="14" 
 		                    Click="InterruptButtonClick" AutomationProperties.Name="InterruptButton" HorizontalContentAlignment="Center" />
                 </StackPanel>
 

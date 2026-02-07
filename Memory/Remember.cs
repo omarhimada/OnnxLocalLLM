@@ -1,12 +1,10 @@
-﻿using Microsoft.Extensions.AI;
+using Microsoft.Extensions.AI;
+using Microsoft.Extensions.VectorData;
+using Microsoft.SemanticKernel.Connectors.SqliteVec;
+using OLLM.Utility;
+using static OLLM.Constants;
 
-namespace UI.Memory {
-
-	using Microsoft.Extensions.VectorData;
-	using Microsoft.SemanticKernel.Connectors.SqliteVec;
-	using UI.Utility;
-	using static Constants;
-
+namespace OLLM.Memory {
 	internal class Remember : IDisposable {
 #if DEBUG
 		// If debugging you will continuously erase the memories.db due to rebuilding the solution erasing the /bin/Debug/
@@ -20,8 +18,9 @@ namespace UI.Memory {
 
 		protected static SqliteVectorStore? _vectorStore;
 
+		//protected static SqliteCollection<string, Discussion>? _memories;
 		protected static SqliteCollection<long, Discussion>? _memories;
-		protected static LocalMiniLmEmbeddingGenerator? _embedder;
+		protected static MiniEmbedder? _embedder;
 
 		private readonly CancellationTokenSource _cts = new();
 
@@ -37,7 +36,7 @@ namespace UI.Memory {
 		/// fails, an exception may be thrown. Use this constructor only when synchronous initialization is
 		/// required.</remarks>
 		/// <param name="embeddingGenerator">The embedding generator to use for initializing memory. Cannot be null.</param>
-		internal Remember(LocalMiniLmEmbeddingGenerator embeddingGenerator) {
+		internal Remember(MiniEmbedder embeddingGenerator) {
 			CancellationToken ct = _cts.Token;
 			_memories = new(_db, _memoriesDbName, _sqliteOptions);
 
@@ -49,7 +48,7 @@ namespace UI.Memory {
 		}
 
 		internal static async Task StartAsync(
-			LocalMiniLmEmbeddingGenerator embedder,
+			MiniEmbedder embedder,
 			CancellationToken ct = default) {
 
 			_embedder = embedder;
@@ -65,7 +64,7 @@ namespace UI.Memory {
 		/// Store a discussion that had occurred.
 		/// </summary>
 		internal static async Task MemorizeDiscussionAsync(string text, CancellationToken ct = default) {
-			if (_memories is not null && _embedder is not null && !string.IsNullOrEmpty(_embedder._vocabularyPath)) {
+			if (_memories is not null && _embedder is not null && !string.IsNullOrEmpty(_embedder.EmbedderState.VocabularyPath)) {
 				try {
 					string cleanedString = StringCleaner.Md(text);
 

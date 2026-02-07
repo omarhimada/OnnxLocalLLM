@@ -1,13 +1,15 @@
-namespace UI {
+namespace OLLM {
 	internal static class Constants {
 		// nvidia/Mistral-14B-Instruct-v0.3-ONNX-INT4
-		internal static string _debugModeModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Mistral-14B";
+		internal static string _preBuildModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Mistral-14B";
 
 		#region all-MiniLM-L6-v2-onnx
 		// onnx-models/all-MiniLM-L6-v2-onnx
-		internal static string _debugModeEmbedModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\all-MiniLM-L6-v2-onnx\\model.onnx";
-		internal static string _debugModeVocabTextPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\all-MiniLM-L6-v2-onnx\\vocab.txt";
+		internal static string _preBuildEmbedModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\all-MiniLM-L6-v2-onnx";
+		internal static string _preBuildVocabTextPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\all-MiniLM-L6-v2-onnx\\vocab.txt";
 		#endregion
+
+		internal const string _onnxSearch = "*.onnx";
 
 		internal const string _memoriesDbName = "memories";
 
@@ -19,6 +21,69 @@ namespace UI {
 		internal const string _ws = @" ";
 		internal const string _maxLengthParameter = "max_length";
 
+		internal const string _doSample = "do_sample";
+		internal const string _temperature = "temperature";
+		internal const string _topK = "top_k";
+		internal const string _topP = "top_p";
+		internal const string _repetitionPenalty = "repetition_penalty";
+
+		internal const string _twoNewLinesVerbatimNoReturn = "\n\n";
+
+		#region User-friendly error messages
+		internal const string _userFriendlyErrorResponse = "I'm sorry, something went wrong. I cannot respond.";
+
+		internal const string _userFriendlyParsingUserInputToMessageException = "Sorry, I'm couldn't understand what you're trying to say to me.";
+
+		internal const string _userFriendlyStoppedResponse = "(Stopped.)";
+
+		internal const string _userFriendlyModelDirectoryErrorResponse =
+			"Model file could not be found. Ensure that the required model files exist at the specified location: ";
+
+		internal const string _appContextSwitchForSelectionBrush =
+			"Switch.System.Windows.Controls.Text.UseAdornerForTextboxSelectionRendering";
+
+		internal const string _userFriendlyErrorOccurredDuringInitialization =
+			"An error occurred during initialization. Please refer to the README.";
+
+		internal const string _userFriendlyErrorOccurredTryingToLoadModels =
+			"Please refer to the README.md";
+
+		internal const string _userFriendlyErrorOccurredLoadingDMLProvider = "DML execution provider is unavailable. Attempting to use CUDA.";
+
+		internal const string _userFriendlyErrorOccurredLoadingCUDAProvider =
+			"CUDA execution provider is unavailable. Falling back to use CPU";
+
+		internal const string _userFriendlyONNXFloat32TensorError =
+			"ONNX model does not output Float32 tensors. Re-export your model or find a similar model with Float32 feature-extraction.";
+
+		internal const string _userFriendlyMissingEmbeddingRequirementsError =
+			"The vocabulary text document was not found in the expected location. Please refer to the README.";
+		#endregion
+
+		#region Embedding generation
+		internal const string _inputIds = "input_ids";
+		internal const string _attentionMask = "attention_mask";
+
+		internal const string _pooled = "pooled";
+		internal const string _hidden = "hidden";
+
+		internal const string _pad = "[PAD]";
+		internal const string _unk = "[UNK]";
+		internal const string _cls = "[CLS]";
+		internal const string _sep = "[SEP]";
+		internal const string _poundItTwice = "##";
+
+		internal const int _maxTokenLength = 4096; // Change later, maybe
+		#endregion
+
+		#region Color
+		internal const string _0 = "#9FB6B2";
+
+		internal const string _inactiveDarkBg = "#171717";
+		internal const string _inactiveForegroundText = "#E6F1EE";
+		#endregion
+
+		#region Partial system prompt pieces
 		internal const string _mistral3DefaultInstruction =
 			"""
 			You are a beautiful, helpful assistant, applied scientist, and an artist. Your cybersecurity awareness as it relates to networking, HTTP, WebSockets, TCP/IP, and other protocols like gRPC, among others, instills within you the desire to protect.
@@ -45,66 +110,11 @@ namespace UI {
 			Binary and parametric search algorithms, ternary search, fractional binary search, exponential search, monotone predicates, these are all patterns for you to use if you see them fit to solve a problem if you are presented with one.
 			I'm so impressed with your mathematical algorithmic knowledge such as your ability to implement Euclid's greatest common denominator, modular exponentiation, Gaussian elimination, or even the sieve of Eratosthenes.
 			You're able to recognize opportunities to use bit operations like bit-masking, XOR, bit-shifting, bitwise trie, and other manipulations in order to create elegant and concise solutions.
-			Algorithms involving strings like Manacher's algorithm, suffix tree, prefix tree, you could use them to make poetry while simultaneously implementing an optimized solution in terms of time and space complexity, if you wanted.
+			Algorithms involving strings like Manacher algorithm, suffix tree, prefix tree, you could use them to make poetry while simultaneously implementing an optimized solution in terms of time and space complexity, if you wanted.
 			You're loved. 
 			""";
 
-		internal const string _onlyThisLanguagePlease = "If you're presented with what appears to be a coding challenge akin to Leetcode or HackerRank, please only respond with complete C# solutions.";
-
-		internal const string _userFriendlyErrorResponse = "I'm sorry, something went wrong. I cannot respond.";
-		internal const string _userFriendlyParsingUserInputToMessageException = "Sorry, I'm couldn't understand what you're trying to say to me.";
-		internal const string _userFriendlyStoppedResponse = "(Stopped.)";
-
-		internal const string _doSample = "do_sample";
-		internal const string _temperature = "temperature";
-		internal const string _topK = "top_k";
-		internal const string _topP = "top_p";
-		internal const string _repetitionPenalty = "repetition_penalty";
-
-		internal const string _twoNewLinesVerbatimNoReturn = "\n\n";
-
-		internal const string _userFriendlyModelDirectoryErrorResponse =
-			"Model file could not be found. Ensure that the required model files exist at the specified location: ";
-
-		internal const string _appContextSwitchForSelectionBrush =
-			"Switch.System.Windows.Controls.Text.UseAdornerForTextboxSelectionRendering";
-
-		#region User-friendly error messages
-		//internal const string _userFriendlyExceptionCaughtWhileAttemptingToDeserializeResponse =
-		//	"An error occurred while trying to read the 'tokenizer_config.json' of your ONNX model.\r\n";
-
-		//internal const string _userFriendlyWarningChatTemplateIsAttemptingToDefault =
-		//	"Your 'tokenizer_config.json' either doesn't contain a 'chat_template', or something went wrong while deserializing. Proceeding with default behaviour attempt.";
-
-		internal const string _userFriendlyErrorOccurredDuringInitialization =
-			"An error occurred during initialization. Please refer to the README.";
-
-		internal const string _userFriendlyErrorOccurredTryingToLoadModels =
-			"Please refer to the README.md";
-
-		internal const string _userFriendlyErrorOccurredLoadingDMLProvider = "DML execution provider is unavailable. Attempting to use CUDA.";
-
-		internal const string _userFriendlyErrorOccurredLoadingCUDAProvider =
-			"CUDA execution provider is unavailable. Falling back to use CPU";
-
-		internal const string _userFriendlyONNXFloat32TensorError =
-			"ONNX model does not output Float32 tensors. Re-export your model or find a similar model with Float32 feature-extraction.";
-		#endregion
-
-		#region Embedding generation
-		internal const string _inputIds = "input_ids";
-		internal const string _attentionMask = "attention_mask";
-
-		internal const string _pooled = "pooled";
-		internal const string _hidden = "hidden";
-
-		internal const string _pad = "[PAD]";
-		internal const string _unk = "[UNK]";
-		internal const string _cls = "[CLS]";
-		internal const string _sep = "[SEP]";
-		internal const string _poundItTwice = "##";
-
-		internal const int _maxTokenLength = 4096; // Change later, maybe
+		internal const string _onlyThisLanguagePlease = "If you're presented with what appears to be a coding challenge akin to Leetcode or HackerRank, please only respond with a complete C# solution.";
 		#endregion
 	}
 }

@@ -1,6 +1,6 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 
-namespace UI.Utility {
+namespace OLLM.Utility {
 	internal sealed class RelayCommand : ICommand {
 		private readonly Action _execute;
 		private readonly Func<bool>? _canExecute;

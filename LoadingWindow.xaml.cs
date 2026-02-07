@@ -1,6 +1,6 @@
-﻿using System.Windows;
+using System.Windows;
 
-namespace UI {
+namespace OLLM {
 	/// <summary>
 	/// Interaction logic for Loading.xaml
 	/// </summary>

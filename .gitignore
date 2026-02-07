@@ -7,3 +7,4 @@ obj/
 /ONNX/Mistral-7B/model.onnx_data
 /Utility/DnsLogger.cs
 /Favorites
+/Properties/PublishProfiles/FolderProfile.pubxml

@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.AI;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.VectorData;
 
-namespace UI.Memory {
+namespace OLLM.Memory {
 	public class Discussion {
 		[VectorStoreKey] public long Id { get; set; }
 		[VectorStoreData] public required string Text { get; set; }

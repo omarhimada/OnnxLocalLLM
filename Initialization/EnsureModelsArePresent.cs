@@ -1,9 +1,9 @@
-﻿using System.IO;
+using System.IO;
 using System.Text;
 using System.Windows;
-using static UI.Constants;
+using static OLLM.Constants;
 
-namespace UI.Initialization {
+namespace OLLM.Initialization {
 	public static class EnsureModelsArePresent {
 
 		/// <summary>
@@ -16,13 +16,13 @@ namespace UI.Initialization {
 			StringBuilder potentialFriendlyUserErrorMessage = new();
 
 			// Attempt to retrieve the Mistral model ONNX
-			if (!TryRequiredModelIsPresent(_debugModeModelPath, out string? modelPathToUse) && modelPathToUse == null) {
+			if (!TryRequiredModelIsPresent(_preBuildModelPath, out string? modelPathToUse) && modelPathToUse == null) {
 				potentialFriendlyUserErrorMessage.AppendLine(
 					$"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{modelPathToUse}");
 			}
 
 			// Attempt to retrieve the embedding model ONNX
-			if (!TryRequiredModelIsPresent(_debugModeEmbedModelPath, out string? embedModelPathToUse) ||
+			if (!TryRequiredModelIsPresent(_preBuildEmbedModelPath, out string? embedModelPathToUse) ||
 				embedModelPathToUse == null) {
 				potentialFriendlyUserErrorMessage.AppendLine(
 					$"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{embedModelPathToUse}");
@@ -41,12 +41,12 @@ namespace UI.Initialization {
 		/// </summary>
 		internal static bool TryRequiredModelIsPresent(string debugPath, out string? pathToUse) {
 			pathToUse = null;
-			if (debugPath == _debugModeEmbedModelPath) {
+			if (debugPath == _preBuildEmbedModelPath) {
 				#region Verify embed model is present (check for debug mode first, then assume release/published)
-				if (!File.Exists(debugPath)) {
+				if (!Directory.Exists(debugPath)) {
 					// Try the embed model from the published directory instead of the debugging directory:
 					pathToUse = debugPath.TrimStart($"{AppContext.BaseDirectory}..\\..\\..").ToString();
-					if (!File.Exists(pathToUse)) {
+					if (!Directory.Exists(pathToUse)) {
 						// If we still cannot find the required model(s) then show the user a friendly message and return false.
 						MessageBox.Show($"{_userFriendlyModelDirectoryErrorResponse}{pathToUse}");
 						return false;

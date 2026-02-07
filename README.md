@@ -5,7 +5,7 @@
 
 ![Example Interation](/.Images/20260202-Mistral-3-14B-local-ONNX.gif)
 
-## Roadmap
+## Roadmap 
 - **High Priority**
     1. Contextual memory/conversation state management **90% complete**
         - ~~Initializes a local SQLite database if it does not exist~~
