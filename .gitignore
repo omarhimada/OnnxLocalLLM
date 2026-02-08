@@ -9,3 +9,5 @@ obj/
 /Favorites
 /Properties/PublishProfiles/FolderProfile.pubxml
 /ONNX/Devstral/model.onnx.data
+/ONNX/Ministral-3-14B-2512/model.onnx_data
+/.Images/_notes.txt
