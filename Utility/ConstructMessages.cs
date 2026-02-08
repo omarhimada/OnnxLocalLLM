@@ -1,18 +1,21 @@
 using Microsoft.Extensions.AI;
+using System.Text;
+using static OLLM.Constants;
 
 namespace OLLM.Utility {
 	internal static class ConstructMessages {
-		public static string AsFormattedString(string? userPrompt, string? instruction = $"{Constants._mistral3DefaultInstruction}{Constants._art}{Constants._algorithms}") {
+		public static string AsFormattedString(string? userPrompt) {
 			if (string.IsNullOrEmpty(userPrompt)) {
 				return string.Empty;
 			}
 
+			// (old until new one finishes downloading) mistral format
 			List<ChatMessage> messages = [
-				new(ChatRole.System, instruction),
-				new(ChatRole.User, userPrompt.Trim())
+				new(ChatRole.System, $"{_mistral3TokenStartTurn}{_mistral3InstructStart}{_ws}{_mistral3DefaultInstruction}{_art}{_algorithms}{_mistral3InstructEnd}"),
+				new(ChatRole.User, $"{_twoNewLinesVerbatimNoReturn}{userPrompt.Trim()}")
 			];
 
-			return FormatPrompt.Mistral3(messages);
+			return string.Join(string.Empty, messages);
 		}
 	}
 }

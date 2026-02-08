@@ -1,9 +1,12 @@
 namespace OLLM {
 	internal static class Constants {
-		// onnx-community/Devstral-Small-2507
-		internal static string _preBuildDevstralModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Devstral";
+		// onnx-community/Devstral-Small-2507 (WARNING: ~47 GB)
+		//internal static string _preBuildDevstralModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Devstral";
 
-		// nvidia/Mistral-14B-Instruct-v0.3-ONNX-INT4
+		// mistralai/Ministral-3-14B-2512 (WARNING ~27 GB)
+		internal static string _preBuildMinistralModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Ministral-3-14B-2512";
+
+		// nvidia/Mistral-14B-Instruct-v0.3-ONNX-INT4 (seems to be no longer available, 404)
 		internal static string _preBuildModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Mistral-14B";
 
 		#region all-MiniLM-L6-v2-onnx
