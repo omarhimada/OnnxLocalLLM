@@ -21,8 +21,12 @@ namespace OLLM {
 
 		internal const string _mistral3TokenStartTurn = @"<s>";
 		internal const string _mistral3TokenStop = @"</s>";
+
 		internal const string _mistral3InstructStart = @"[INST]";
 		internal const string _mistral3InstructEnd = @"[/INST]";
+
+		internal const string _ministral314SystemPromptStart = @"[SYSTEM_PROMPT]";
+		internal const string _ministral314SystemPromptEnd = @"[/SYSTEM_PROMPT]";
 
 		internal const string _ws = @" ";
 		internal const string _maxLengthParameter = "max_length";

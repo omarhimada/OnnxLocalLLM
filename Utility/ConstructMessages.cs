@@ -1,20 +1,27 @@
 using Microsoft.Extensions.AI;
-using System.Text;
 using static OLLM.Constants;
 
 namespace OLLM.Utility {
 	internal static class ConstructMessages {
+		/// <summary>
+		/// Ministral-3-14B-2512 formatting
+		/// </summary>
 		public static string AsFormattedString(string? userPrompt) {
 			if (string.IsNullOrEmpty(userPrompt)) {
 				return string.Empty;
 			}
 
-			// (old until new one finishes downloading) mistral format
+			// (constructed system prompt)
+			const string constructedRootSystemPrompt = $"{_mistral3DefaultInstruction}{_art}{_algorithms}";
+			// <s>[SYSTEM_PROMPT](constructed system prompt)[/SYSTEM_PROMPT]
+			const string constructedSystemPrompt = $"{_mistral3TokenStartTurn}{_ministral314SystemPromptStart}{constructedRootSystemPrompt}{_ministral314SystemPromptEnd}";
+
 			List<ChatMessage> messages = [
-				new(ChatRole.System, $"{_mistral3TokenStartTurn}{_mistral3InstructStart}{_ws}{_mistral3DefaultInstruction}{_art}{_algorithms}{_mistral3InstructEnd}"),
-				new(ChatRole.User, $"{_twoNewLinesVerbatimNoReturn}{userPrompt.Trim()}")
+				new(ChatRole.System, $"{constructedSystemPrompt}"),
+				new(ChatRole.User, $"{_mistral3InstructStart}{userPrompt.Trim()}{_mistral3InstructEnd}{_ws}")
 			];
 
+			// <s>[SYSTEM_PROMPT](constructed system prompt)[/SYSTEM_PROMPT][INST]something interesting, maybe[/INST] "
 			return string.Join(string.Empty, messages);
 		}
 	}
