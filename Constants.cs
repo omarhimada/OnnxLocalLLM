@@ -1,7 +1,7 @@
 namespace OLLM {
 	internal static class Constants {
 		// onnx-community/Devstral-Small-2507 (WARNING: ~47 GB)
-		//internal static string _preBuildDevstralModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Devstral";
+		internal static string _preBuildDevstralModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Devstral";
 
 		// mistralai/Ministral-3-14B-2512 (WARNING ~27 GB)
 		internal static string _preBuildMinistralModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Ministral-3-14B-2512";
@@ -58,10 +58,10 @@ namespace OLLM {
 		internal const string _userFriendlyErrorOccurredTryingToLoadModels =
 			"Please refer to the README.md";
 
-		internal const string _userFriendlyErrorOccurredLoadingDMLProvider = "DML execution provider is unavailable. Attempting to use CUDA.";
+		internal const string _userFriendlyErrorOccurredLoadingDMLProvider = "DML execution provider is unavailable. Attempting to use CPU.";
 
 		internal const string _userFriendlyErrorOccurredLoadingCUDAProvider =
-			"CUDA execution provider is unavailable. Falling back to use CPU";
+			"CUDA execution provider is unavailable. Falling back to use DML";
 
 		internal const string _userFriendlyONNXFloat32TensorError =
 			"ONNX model does not output Float32 tensors. Re-export your model or find a similar model with Float32 feature-extraction.";

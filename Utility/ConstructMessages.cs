@@ -5,6 +5,7 @@ namespace OLLM.Utility {
 	internal static class ConstructMessages {
 		/// <summary>
 		/// Ministral-3-14B-2512 formatting
+		/// TODO Attempt Devstral
 		/// </summary>
 		public static string AsFormattedString(string? userPrompt) {
 			if (string.IsNullOrEmpty(userPrompt)) {

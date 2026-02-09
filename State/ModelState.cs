@@ -22,21 +22,24 @@ namespace OLLM.State {
 
 		internal ModelState(string modelDirectory) {
 			ModelDirectory = modelDirectory;
-			SessionOptions modelInferenceSessionOptions = new();
+			SessionOptions modelInferenceSessionOptions = new() {
+				// * 
+				EnableCpuMemArena = false,
+				EnableMemoryPattern = false
+			};
 
-			#region Try DML, then CUDA, and finally fallback to CPU
+
+			#region Try CUDA first (nVidia), then DML, and finally fallback to CPU
 			try {
-				modelInferenceSessionOptions.AppendExecutionProvider_DML();
+				modelInferenceSessionOptions.AppendExecutionProvider_CUDA();
 			} catch (NotSupportedException) {
-				MessageBox.Show(_userFriendlyErrorOccurredLoadingDMLProvider);
 				try {
-					modelInferenceSessionOptions.AppendExecutionProvider_CUDA();
-				} catch (Exception) {
 					MessageBox.Show(_userFriendlyErrorOccurredLoadingCUDAProvider);
+					modelInferenceSessionOptions.AppendExecutionProvider_DML();
+				} catch (Exception) {
+					MessageBox.Show(_userFriendlyErrorOccurredLoadingDMLProvider);
 					modelInferenceSessionOptions.AppendExecutionProvider_CPU();
 				}
-			} catch (Exception) {
-				modelInferenceSessionOptions.AppendExecutionProvider_CPU();
 			}
 			#endregion
 
