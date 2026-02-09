@@ -29,15 +29,15 @@ namespace OLLM.State {
 			};
 
 
-			#region Try CUDA first (nVidia), then DML, and finally fallback to CPU
+			#region Try DML firstm then CUDA, and finally fallback to CPU
 			try {
-				modelInferenceSessionOptions.AppendExecutionProvider_CUDA();
+				modelInferenceSessionOptions.AppendExecutionProvider_DML();
 			} catch (NotSupportedException) {
 				try {
-					MessageBox.Show(_userFriendlyErrorOccurredLoadingCUDAProvider);
-					modelInferenceSessionOptions.AppendExecutionProvider_DML();
-				} catch (Exception) {
 					MessageBox.Show(_userFriendlyErrorOccurredLoadingDMLProvider);
+					modelInferenceSessionOptions.AppendExecutionProvider_CUDA();
+				} catch (Exception) {
+					MessageBox.Show(_userFriendlyErrorOccurredLoadingCUDAProvider);
 					modelInferenceSessionOptions.AppendExecutionProvider_CPU();
 				}
 			}
