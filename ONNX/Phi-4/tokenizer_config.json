@@ -771,6 +771,7 @@
     }
   },
   "bos_token": "<|endoftext|>",
+  "chat_template": "{% for message in messages %}{% if (message['role'] == 'system') %}{{'<|im_start|>system<|im_sep|>' + message['content'] + '<|im_end|>'}}{% elif (message['role'] == 'user') %}{{'<|im_start|>user<|im_sep|>' + message['content'] + '<|im_end|><|im_start|>assistant<|im_sep|>'}}{% elif (message['role'] == 'assistant') %}{{message['content'] + '<|im_end|>'}}{% endif %}{% endfor %}",
   "clean_up_tokenization_spaces": false,
   "eos_token": "<|im_end|>",
   "extra_special_tokens": {},
