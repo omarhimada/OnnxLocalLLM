@@ -1,4 +1,4 @@
-namespace JinjaToCSharp {
+namespace OLLM.Utility.J2CS {
 	internal class Constants {
 		#region Common
 		public const char _sc = ' ';
@@ -14,7 +14,7 @@ namespace JinjaToCSharp {
 		public const string _tools = "tools";
 		public const string _using = "using ";
 		public const string _return = "return ";
-		public const string _emptyBrackets = "{_emptyBrackets}";
+		public const string _emptyBrackets = "();";
 		public const string _generatedTemplate = "GeneratedTemplate";
 		#endregion
 
@@ -117,6 +117,9 @@ namespace JinjaToCSharp {
 		public const string _templateContextComment = "// You may have to add more fields if your template references more than what is included.";
 		#endregion
 		#endregion
+
+		internal const string _tokenizerConfigJson = "tokenizer_config.json";
+		internal const string _chatTemplateKey = "chat_template";
 
 		internal const string _exceptionHelpLinkString = "https://github.com/omarhimada/JinjaToCSharp";
 	}
