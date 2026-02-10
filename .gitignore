@@ -11,3 +11,7 @@ obj/
 /ONNX/Devstral/model.onnx.data
 /ONNX/Ministral-3-14B-2512/model.onnx_data
 /.Images/_notes.txt
+/ONNX/Qwen2-5-Coder-3B-Instruct/onnx
+/ONNX/Qwen2-5-Coder-3B-Instruct/model_fp16.onnx_data
+/ONNX/Qwen2-5-Coder-3B-Instruct/model.onnx_data
+/ONNX/Phi-4/model.onnx.data

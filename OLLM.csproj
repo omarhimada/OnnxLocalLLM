@@ -32,12 +32,16 @@
 	<ItemGroup>
 	  <Compile Remove="Mistral-14B\**" />
 	  <Compile Remove="ONNX\Nomic-Embed-Text-1-5\**" />
+	  <Compile Remove="ONNX\Qwen2-5-Coder-3B-Instruct\onnx\**" />
 	  <EmbeddedResource Remove="Mistral-14B\**" />
 	  <EmbeddedResource Remove="ONNX\Nomic-Embed-Text-1-5\**" />
+	  <EmbeddedResource Remove="ONNX\Qwen2-5-Coder-3B-Instruct\onnx\**" />
 	  <None Remove="Mistral-14B\**" />
 	  <None Remove="ONNX\Nomic-Embed-Text-1-5\**" />
+	  <None Remove="ONNX\Qwen2-5-Coder-3B-Instruct\onnx\**" />
 	  <Page Remove="Mistral-14B\**" />
 	  <Page Remove="ONNX\Nomic-Embed-Text-1-5\**" />
+	  <Page Remove="ONNX\Qwen2-5-Coder-3B-Instruct\onnx\**" />
 	</ItemGroup>
 
 	<ItemGroup>
