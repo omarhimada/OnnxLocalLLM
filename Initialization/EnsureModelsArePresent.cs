@@ -16,7 +16,7 @@ namespace OLLM.Initialization {
 			StringBuilder potentialFriendlyUserErrorMessage = new();
 
 			// Attempt to retrieve the Mistral model ONNX
-			if (!TryRequiredModelIsPresent(_preBuildDevstralModelPath, out string? modelPathToUse) && modelPathToUse == null) {
+			if (!TryRequiredModelIsPresent(_preBuildModelPath, out string? modelPathToUse) && modelPathToUse == null) {
 				potentialFriendlyUserErrorMessage.AppendLine(
 					$"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{modelPathToUse}");
 			}
