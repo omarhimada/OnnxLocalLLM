@@ -1,4 +1,4 @@
-namespace JinjaToCSharp.AbstractSyntaxTree.Models;
+namespace OLLM.Utility.J2CS.AbstractSyntaxTree.Models;
 
 /// <summary>
 /// Condition node in the AST. (e.g.: if, else, etc.)

@@ -1,12 +1,12 @@
-namespace JinjaToCSharp;
-
-using AbstractSyntaxTree;
-using LexicalAndParsingModels.Jinja;
-using System;
+using OLLM.Utility.J2CS.AbstractSyntaxTree;
+using OLLM.Utility.J2CS.LexicalAndParsingModels.Jinja;
 using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+
+namespace OLLM.Utility.J2CS;
+
 using static Constants;
 
 /// <summary>
@@ -17,8 +17,6 @@ using static Constants;
 /// The intention is to programmatically dictate the flow of communication with LLM models.
 /// </remarks>
 public static partial class Converter {
-	const string _tokenizerConfigJson = "tokenizer_config.json";
-	const string _chatTemplateKey = "chat_template";
 
 	/// <summary>
 	/// Generates C# source code from the Jinja 'chat_template' from a model's tokenizer_config JSON.
@@ -29,7 +27,7 @@ public static partial class Converter {
 	/// <param name="tokenizerConfigJsonPath">
 	/// The full path to the tokenizer configuration JSON file containing the chat template. Cannot be null or empty.
 	/// </param>
-	public static void WriteOutput(string tokenizerConfigJsonPath) {
+	public static string WriteOutput(string tokenizerConfigJsonPath) {
 		if (string.IsNullOrEmpty(tokenizerConfigJsonPath)) {
 			ArgumentNullException ane = new(nameof(tokenizerConfigJsonPath),
 				$"Missing path to {_tokenizerConfigJson}") {
@@ -42,7 +40,8 @@ public static partial class Converter {
 		}
 
 		// Get the 'chat_template' from the provided 'tokenizer_config.json' and the name of the directory that it is in
-		(string jinjaStringFromChatTemplate, string directoryName) = ReadChatTemplateFromTokenizerConfig(tokenizerConfigJsonPath);
+		(string jinjaStringFromChatTemplate, string directoryName) =
+			ReadChatTemplateFromTokenizerConfig(tokenizerConfigJsonPath);
 
 		// e.g.: "/Ministral-3-14B-2512/tokenizer_config.json"
 		// the output will be Ministral314B2512.cs (you should probably rename it afterward)
@@ -58,12 +57,21 @@ public static partial class Converter {
 		string cs = codeGenerator.Generate(abstractSyntaxTree, className: className);
 		string outPath = Path.Combine(Environment.CurrentDirectory, outputName);
 
-		CreateCSharpDocument(cs, outPath);
-	}
+		const RegexOptions options = RegexOptions.Multiline;
+		const string pattern = @"^\s*sb\.Append\(@""";
+		const string pattern2 = @"^\s*""\);";
 
-	private static void CreateCSharpDocument(string cs, string outPath) {
-		File.WriteAllText(outPath, cs, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-		Console.Error.WriteLine($"Wrote: {outPath}");
+		Regex regex1 = new(pattern, options);
+		Regex regex2 = new(pattern2, options);
+		cs = regex1.Replace(cs, string.Empty);
+		cs = regex2.Replace(cs, string.Empty);
+
+		CreateCSharpDocument(cs, outPath);
+
+		return !File.Exists(outPath)
+			? throw new FileNotFoundException(
+				$"An error occurred while trying to generate the C# chat flow dynamically. Output C# code could not be located.")
+			: outPath;
 	}
 
 	/// <summary>
@@ -75,8 +83,9 @@ public static partial class Converter {
 	/// </param>
 	/// <returns>The value of the 'chat_template' property as a string.</returns>
 	/// <exception cref="FileNotFoundException">Thrown if the file specified by tokenizerConfigPath does not exist.</exception>
-	/// <exception cref="InvalidOperationException">Thrown if the configuration file does not contain a 'chat_template' property, or if the 'chat_template' property is not a string. </exception>
-	private static (string, string) ReadChatTemplateFromTokenizerConfig(string tokenizerConfigPath) {
+	/// <exception cref="InvalidOperationException">Thrown if the configuration file does not contain a 'chat_template' property.</exception>
+	/// <exception cref="InvalidCastException">Thrown 'chat_template' property is not a string. </exception>
+	internal static (string, string) ReadChatTemplateFromTokenizerConfig(string tokenizerConfigPath) {
 		if (!File.Exists(tokenizerConfigPath)) {
 			throw new FileNotFoundException($"{_tokenizerConfigJson} not found at the specified location");
 		}
@@ -85,14 +94,41 @@ public static partial class Converter {
 		using JsonDocument doc = JsonDocument.Parse(stream);
 
 		// e.g.: 'Phi-4', 'Ministral-3-14B-2512', 'Qwen2.5-Coder-3B-Instruct', etc.
-		string parentDirectoryName = Directory.GetParent(tokenizerConfigPath.TrimEnd(_tokenizerConfigJson).ToString())?.Name ?? "GeneratedTemplate";
+		string parentDirectoryName =
+			Directory.GetParent(tokenizerConfigPath.TrimEnd(_tokenizerConfigJson).ToString())?.Name ??
+			"GeneratedTemplate";
 
 		return
 			!doc.RootElement.TryGetProperty(_chatTemplateKey, out JsonElement chatTemplateProp)
-				? throw new InvalidOperationException($"{_tokenizerConfigJson} does not contain a '{_chatTemplateKey}' property")
-					: chatTemplateProp.ValueKind != JsonValueKind.String
-						? throw new InvalidOperationException($"'{_chatTemplateKey}' exists but it is not a string. Unable to parse it.")
-							: (chatTemplateProp.GetString()!, parentDirectoryName);
+				? throw new InvalidOperationException(
+					$"{_tokenizerConfigJson} does not contain a '{_chatTemplateKey}' property")
+				: chatTemplateProp.ValueKind != JsonValueKind.String
+					? throw new InvalidCastException(
+						$"'{_chatTemplateKey}' exists but it is not a string. Unable to parse it.")
+					: (chatTemplateProp.GetString()!, parentDirectoryName);
+	}
+
+	private static void CreateCSharpDocument(string cs, string outPath) {
+		File.WriteAllText(outPath, cs, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+	}
+
+	/// <summary>
+	/// Searches the specified directory and its subdirectories for 'tokenizer_config.json' and returns the path to the first match found.
+	/// </summary>
+	internal static string? FindTokenizerConfig(string rootPath) {
+		if (string.IsNullOrWhiteSpace(rootPath) || !Directory.Exists(rootPath)) {
+			return null;
+		}
+
+		foreach (
+			string file in Directory.EnumerateFiles(
+				rootPath,
+				_tokenizerConfigJson,
+				SearchOption.AllDirectories)) {
+			return file;
+		}
+
+		return null;
 	}
 
 	[GeneratedRegex(@"[^a-zA-Z0-9_-]")]

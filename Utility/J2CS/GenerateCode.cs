@@ -1,9 +1,9 @@
-using JinjaToCSharp.AbstractSyntaxTree;
-using JinjaToCSharp.AbstractSyntaxTree.Models;
+using OLLM.Utility.J2CS.AbstractSyntaxTree;
+using OLLM.Utility.J2CS.AbstractSyntaxTree.Models;
 using System.Text;
-using static JinjaToCSharp.Constants;
+using static OLLM.Utility.J2CS.Constants;
 
-namespace JinjaToCSharp;
+namespace OLLM.Utility.J2CS;
 
 /// <summary>
 /// Provides functionality to generate the C# source code that mimics the Jinja chat template, using an abstract syntax tree (AST).
@@ -74,11 +74,22 @@ internal sealed class GenerateCode {
 		foreach (Node n in nodes) {
 			switch (n) {
 				case TextNode t:
+					//if (t.Text == "\n    ");
 					AppendText(t.Text);
 					break;
 
 				case OutputNode o:
-					Line($"sb.Append(ToStringSafe({ConvertExpression(o.Expr)}));");
+					string singleQuotedMisconversion = ConvertExpression(o.Expr);
+					string corrected = singleQuotedMisconversion;
+
+					if (corrected.Length > 1) {
+						// Length is greater than 1, and it is wrapped in single quotes then clearly it isn't a char
+						if (corrected[0] == '\'' && corrected[^1] == '\'') {
+							corrected = corrected.Replace('\'', '\"');
+						}
+					}
+
+					Line($"sb.Append(ToStringSafe({corrected}));");
 					break;
 
 				case SetNode s:
@@ -166,14 +177,20 @@ internal sealed class GenerateCode {
 	private string ConvertExpression(string jinjaExpr) {
 		string e = jinjaExpr.Trim();
 
+		//Get rid of the single quotes at the edges
+		// '<|im_start|>system\n' ==> <| im_start |> system\n
+		//if (e[0] == '\'' && e[^1] == '\'') {
+		//	e = e.Substring(1, e.Length - 2);
+		//}
+
 		// Handle filters: a | tojson
 		// TODO only a single filter chain is assumed, this could cause issues for certain chat_templates
 		// Example: tool | tojson  => ToJson(tool)
 		// Example: tool_call.arguments | tojson => ToJson(...)
-		int pipe = FindTopLevelVerticalBar(e);
-		if (pipe >= 0) {
-			string left = e[..pipe].Trim();
-			string filter = e[(pipe + 1)..].Trim();
+		int verticalBar = FindTopLevelVerticalBar(e);
+		if (verticalBar >= 0) {
+			string left = e[..verticalBar].Trim();
+			string filter = e[(verticalBar + 1)..].Trim();
 			return filter == "tojson" ? $"ToJson({ConvertExpression(left)})" :
 				// TODO perhaps a better way to notify the user that the transpilation did not go as expected
 				$"/* unsupported_filter */ToStringSafe({ConvertExpression(left)})";
@@ -198,7 +215,7 @@ internal sealed class GenerateCode {
 
 	private static int FindTopLevelVerticalBar(string s) {
 		int depth = 0;
-		bool inS = false, inD = false;
+		bool isInsideSingleQuote = false, isInsideDoubleQuote = false;
 		for (int i = 0; i < s.Length; i++) {
 			char c = s[i];
 			if (c == '\\') {
@@ -206,13 +223,13 @@ internal sealed class GenerateCode {
 				continue;
 			}
 
-			if (!inD && c == '\'') {
-				inS = !inS;
-			} else if (!inS && c == '"') {
-				inD = !inD;
+			if (!isInsideDoubleQuote && c == '\'') {
+				isInsideSingleQuote = !isInsideSingleQuote;
+			} else if (!isInsideSingleQuote && c == '"') {
+				isInsideDoubleQuote = !isInsideDoubleQuote;
 			}
 
-			if (inS || inD) {
+			if (isInsideSingleQuote || isInsideDoubleQuote) {
 				continue;
 			}
 

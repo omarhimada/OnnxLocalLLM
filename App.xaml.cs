@@ -1,6 +1,7 @@
 using OLLM.Interact;
 using OLLM.Memory;
 using OLLM.State;
+using OLLM.Utility.J2CS;
 using System.Windows;
 using static OLLM.Constants;
 using static OLLM.Initialization.EnsureModelsArePresent;
@@ -23,7 +24,7 @@ namespace OLLM {
 			SplashWindow.Activate();
 
 			try {
-				// (Mistral-7B or Mistral-14B) and nomic-embed-text-1-5
+
 				(string? modelPath, string? embedModelPath) = EnsureRequiredModelsArePresent();
 
 				if (modelPath == null || embedModelPath == null) {

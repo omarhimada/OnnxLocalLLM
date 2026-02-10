@@ -1,4 +1,5 @@
-namespace JinjaToCSharp.AbstractSyntaxTree.Models;
+namespace OLLM.Utility.J2CS.AbstractSyntaxTree.Models;
+
 // For-loop node.
 internal sealed class ForNode(string varName, string iterableExpr, List<Node> body) : Node {
 	public string VarName { get; } = varName;

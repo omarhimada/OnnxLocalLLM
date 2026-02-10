@@ -1,4 +1,4 @@
-namespace JinjaToCSharp.LexicalAndParsingModels.Jinja;
+namespace OLLM.Utility.J2CS.LexicalAndParsingModels.Jinja;
 
 /// <summary>
 /// Provides lexical analysis for Jinja template strings, producing tokens representing text, output expressions, and

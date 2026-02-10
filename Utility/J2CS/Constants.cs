@@ -28,7 +28,7 @@ namespace OLLM.Utility.J2CS {
 
 		public const string _publicSealedClass = $"{_public} sealed class";
 		public const string _getVariableMethodSignature = $"{_private} static object? GetVar(TemplateContext context, Dictionary<string, object?> {_locals}, string name, object? fallback)";
-		public const string _renderMethodSignature = $"{_public} static string Render(TemplateContext context)";
+		public const string _renderMethodSignature = $"{_public}static string Render(TemplateContext context)";
 
 		public const string _stringBuilderInit = $"StringBuilder sb = new{_emptyBrackets}";
 		public const string _localsInit = $"Dictionary<string, object?> {_locals} = new{_emptyBrackets}";
@@ -89,7 +89,7 @@ namespace OLLM.Utility.J2CS {
 		public const string _getIndexIntNull = $"{_if_ws}(i is null) {_return}null;";
 
 		public const string _getIfObjectIsList = $"{_if_ws}(obj is IList list)";
-		public const string _getIndexListIi = "int {_indexInteger} = i.Value;";
+		public const string _getIndexListIi = $"int {_indexInteger} = i.Value;";
 		public const string _getIndexListBounds = $"if ({_indexInteger} < 0 || {_indexInteger} >= list.Count) {_return}null;";
 		public const string _getIndexListReturn = $"{_return}list[{_indexInteger}];";
 

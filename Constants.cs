@@ -1,18 +1,26 @@
 namespace OLLM {
 	internal static class Constants {
+		#region Unused
 		// onnx-community/Devstral-Small-2507 (WARNING: ~47 GB)
-		internal static string _preBuildDevstralModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Devstral";
+		//internal static string _preBuildDevstralModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Devstral";
 
 		// mistralai/Ministral-3-14B-2512 (WARNING ~27 GB)
-		internal static string _preBuildMinistralModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Ministral-3-14B-2512";
+		//internal static string _preBuildMinistralModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Ministral-3-14B-2512";
 
 		// nvidia/Mistral-14B-Instruct-v0.3-ONNX-INT4 (seems to be no longer available, 404)
-		internal static string _preBuildModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Mistral-14B";
+		//internal static string _preBuildModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Mistral-14B";
+		#endregion
 
-		#region all-MiniLM-L6-v2-onnx
+		// microsoft/Phi-4
+		internal static string _preBuildPhi4ModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Phi-4";
+
+		// onnx-community/Qwen2.5-Coder-3B-Instruct
+		internal static string _preBuildQwenModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\QwenCoder";
+
+		#region Embedder model(s)
 		// onnx-models/all-MiniLM-L6-v2-onnx
-		internal static string _preBuildEmbedModelDirectory = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\all-MiniLM-L6-v2-onnx";
-		internal static string _preBuildEmbedModelVocabTextPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\all-MiniLM-L6-v2-onnx\\vocab.txt";
+		internal static string _preBuildEmbedModelDirectory = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Embed\\all-MiniLM-L6-v2-onnx";
+		internal static string _preBuildEmbedModelVocabTextPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Embed\\all-MiniLM-L6-v2-onnx\\vocab.txt";
 		#endregion
 
 		internal const string _onnxSearch = "*.onnx";
@@ -68,6 +76,9 @@ namespace OLLM {
 
 		internal const string _userFriendlyMissingEmbeddingRequirementsError =
 			"The vocabulary text document was not found in the expected location. Please refer to the README.";
+
+		internal const string _userFriendlyMissingTokenizerConfigJson =
+			"The tokenizer_config JSON document was not found in the expected location. Please refer to the README.";
 		#endregion
 
 		#region Embedding generation

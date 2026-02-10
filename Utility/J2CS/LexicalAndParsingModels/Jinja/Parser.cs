@@ -1,7 +1,8 @@
-namespace JinjaToCSharp.LexicalAndParsingModels.Jinja;
+using OLLM.Utility.J2CS.AbstractSyntaxTree;
+using OLLM.Utility.J2CS.AbstractSyntaxTree.Models;
 
-using AbstractSyntaxTree;
-using AbstractSyntaxTree.Models;
+namespace OLLM.Utility.J2CS.LexicalAndParsingModels.Jinja;
+
 using static Constants;
 
 /// <summary>
