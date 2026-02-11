@@ -25,7 +25,7 @@ namespace OLLM.Initialization {
 			#region Grab the chat_template from the tokenizer_config.json, convert it to C#, then remove it and never call it again
 			if (_enableAutoTemplateConvert) {
 				// Find the tokenizer_config.json
-				string? tokenizerJsonPath = Converter.FindTokenizerConfig(_preBuildCodeGemmaModelPath);
+				string? tokenizerJsonPath = Converter.FindTokenizerConfig(_preBuildQwenModelPath);
 				if (tokenizerJsonPath == null) {
 					MessageBox.Show(potentialFriendlyUserErrorMessage.ToString(),
 						_userFriendlyMissingTokenizerConfigJson);
@@ -87,7 +87,7 @@ namespace OLLM.Initialization {
 			#endregion
 
 			// Attempt to retrieve the LLM ONNX
-			if (!TryRequiredModelIsPresent(_preBuildCodeGemmaModelPath, out string? modelPathToUse) && modelPathToUse == null) {
+			if (!TryRequiredModelIsPresent(_preBuildQwenModelPath, out string? modelPathToUse) && modelPathToUse == null) {
 				potentialFriendlyUserErrorMessage.AppendLine(
 					$"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{modelPathToUse}");
 			}

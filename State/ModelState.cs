@@ -65,17 +65,24 @@ namespace OLLM.State {
 		/// </summary>
 		internal void RefreshGenerator() {
 			Generator?.Dispose();
-			Generator = new(Model, GeneratorParams);
+			try {
+				Generator = new(Model, GeneratorParams);
+			} catch (Exception exception) {
+				if (exception.InnerException != null) {
+					Console.WriteLine(Environment.NewLine);
+					Console.WriteLine(exception.InnerException!.Message);
+				}
+			}
 		}
 
 		internal void SetGeneratorParameterSearchOptions() {
 			#region Set generator parameters
-			GeneratorParams!.SetSearchOption(_maxLengthParameter, 8192);
-			GeneratorParams!.SetSearchOption(_doSample, false);
-			GeneratorParams!.SetSearchOption(_temperature, _getTemperature());
-			GeneratorParams!.SetSearchOption(_topK, 51);
-			GeneratorParams!.SetSearchOption(_topP, 0.9f);
-			GeneratorParams!.SetSearchOption(_repetitionPenalty, 1.12f);
+			//GeneratorParams?.SetSearchOption(_maxLengthParameter, 8192);
+			//GeneratorParams?.SetSearchOption(_doSample, false);
+			GeneratorParams?.SetSearchOption(_temperature, _getTemperature());
+			GeneratorParams?.SetSearchOption(_topK, 51);
+			GeneratorParams?.SetSearchOption(_topP, 0.9f);
+			GeneratorParams?.SetSearchOption(_repetitionPenalty, 1.12f);
 			#endregion
 		}
 	}

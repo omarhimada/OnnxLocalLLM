@@ -45,8 +45,7 @@ namespace OLLM.Interact {
 		private async Task SendMessage(string userInputText, TextBox theirResponse) {
 			string systemAndUserMessage = string.Empty;
 			try {
-				systemAndUserMessage = CodeGemma.AsFormattedString(userInputText);
-				//systemAndUserMessage = Mistral.AsFormattedString(userInputText);
+				systemAndUserMessage = QwenCoder.AsFormattedString(userInputText);
 			} catch (Exception) {
 				SomethingWentWrong(theirResponse, true);
 			}
@@ -82,7 +81,8 @@ namespace OLLM.Interact {
 				}
 			}, ct);
 
-			await Remember.MemorizeDiscussionAsync(theirResponse.Text, ct);
+			// Debugging
+			//await Remember.MemorizeDiscussionAsync(theirResponse.Text, ct);
 		}
 
 		private void SomethingWentWrong(TextBox theirResponse, bool? couldNotParseUserInput = false, string? exceptionMessage = null) {

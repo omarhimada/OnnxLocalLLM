@@ -14,11 +14,11 @@ namespace OLLM {
 		// internal static string _preBuildPhi4ModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Phi-4";
 
 		// onnx-community/Qwen2.5-Coder-3B-Instruct
-		// internal static string _preBuildQwenModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\QwenCoder";
+		internal static string _preBuildQwenModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\QwenCoder";
 		#endregion
 
 		// CodeGemma-7B-IT-ONNX-FP16
-		internal static string _preBuildCodeGemmaModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\CodeGemma";
+		//internal static string _preBuildCodeGemmaModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\CodeGemma";
 
 		#region Embedder model(s)
 		// all-MiniLM-L6-v2-onnx
