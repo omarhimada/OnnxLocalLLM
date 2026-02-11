@@ -22,11 +22,7 @@ namespace OLLM.State {
 
 		internal ModelState(string modelDirectory) {
 			ModelDirectory = modelDirectory;
-			SessionOptions modelInferenceSessionOptions = new() {
-				// * 
-				EnableCpuMemArena = false,
-				EnableMemoryPattern = false
-			};
+			SessionOptions modelInferenceSessionOptions = new();
 
 
 			#region Try DML firstm then CUDA, and finally fallback to CPU

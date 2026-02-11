@@ -93,9 +93,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="10.0.2" />
-		<PackageReference Include="Microsoft.Extensions.AI" Version="10.2.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
+		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="11.0.0-preview.1.26104.118" />
+		<PackageReference Include="Microsoft.Extensions.AI" Version="10.3.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0-preview.1.26104.118" />
 		<PackageReference Include="Microsoft.Extensions.VectorData.Abstractions" Version="9.7.0" />
 		<!--<PackageReference Include="Microsoft.KernelMemory" Version="0.98.250508.3" />
 		<PackageReference Include="Microsoft.KernelMemory.AI.Onnx" Version="0.98.250508.3" />-->

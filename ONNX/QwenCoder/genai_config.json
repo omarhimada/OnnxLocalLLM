@@ -5,9 +5,16 @@
     "decoder": {
       "session_options": {
         "log_id": "onnxruntime-genai",
-        "provider_options": []
+        "provider_options": [
+          {
+            "cuda": {
+              "enable_cuda_graph": "0",
+              "enable_skip_layer_norm_strict_mode": "1"
+            }
+          }
+        ]
       },
-      "filename": "model_fp16.onnx",
+      "filename": "model.onnx",
       "head_size": 128,
       "hidden_size": 2048,
       "inputs": {
@@ -35,16 +42,16 @@
   },
   "search": {
     "diversity_penalty": 0.0,
-    "do_sample": false,
+    "do_sample": true,
     "early_stopping": true,
     "length_penalty": 1.0,
-    "max_length": 8192,
+    "max_length": 32768,
     "min_length": 0,
     "no_repeat_ngram_size": 0,
     "num_beams": 1,
     "num_return_sequences": 1,
     "past_present_share_buffer": true,
-    "repetition_penalty": 1.05,
+    "repetition_penalty": 1.0215,
     "temperature": 0.7,
     "top_k": 20,
     "top_p": 0.8

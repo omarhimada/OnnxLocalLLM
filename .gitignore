@@ -7,6 +7,7 @@ obj/
 /Properties/PublishProfiles/
 /.Images/_notes.txt
 *.bak
+*.onnx
 *.onnx_data
 *.onnx\.data
 /.Images/j2cs-images
