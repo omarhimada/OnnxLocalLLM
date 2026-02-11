@@ -10,4 +10,8 @@ obj/
 /ONNX/Mistral-14B/*.onnx_data
 /ONNX/Mistral-7B/*.onnx_data
 /ONNX/QwenCoder/*.onnx_data
-/ONNX/Phi-4/*.onnx.data
+/ONNX/Phi-4/*.onnx_data
+/ONNX/CodeGemma/*.onnx_data
+/ONNX/CodeGemma/rank_0_codegemma-7b-it_decoder_merged_model_fp16.onnx.data
+/ONNX/CodeGemma/jinja.bak
+/.Images/_notes.txt
