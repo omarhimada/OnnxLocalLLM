@@ -7,7 +7,7 @@
         "log_id": "onnxruntime-genai",
         "provider_options": []
       },
-      "filename": "model.onnx",
+      "filename": "model_fp16.onnx",
       "head_size": 128,
       "hidden_size": 2048,
       "inputs": {
