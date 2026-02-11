@@ -1,7 +1,7 @@
 using Microsoft.ML.OnnxRuntimeGenAI;
 using OLLM.Memory;
 using OLLM.State;
-using OLLM.Utility;
+using OLLM.Utility.ModelSpecific;
 using System.Windows;
 using System.Windows.Controls;
 using static OLLM.Constants;
@@ -45,7 +45,8 @@ namespace OLLM.Interact {
 		private async Task SendMessage(string userInputText, TextBox theirResponse) {
 			string systemAndUserMessage = string.Empty;
 			try {
-				systemAndUserMessage = ConstructMessages.AsFormattedString(userInputText);
+				systemAndUserMessage = CodeGemma.AsFormattedString(userInputText);
+				//systemAndUserMessage = Mistral.AsFormattedString(userInputText);
 			} catch (Exception) {
 				SomethingWentWrong(theirResponse, true);
 			}

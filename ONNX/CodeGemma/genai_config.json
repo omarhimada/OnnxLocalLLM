@@ -1,0 +1,38 @@
+{
+  "model": {
+    "type": "gemma",
+    "vocab_size": 256128,
+    "context_length": 256128,
+    "bos_token_id": 2,
+    "eos_token_id": 1,
+    "pad_token_id": 0,
+    "decoder": {
+      "session_options": {
+        "log_id": "onnxruntime-genai",
+        "provider_options": [
+          {
+            "dml": {}
+          }
+        ]
+      },
+      "filename": "rank_0_codegemma-7b-it_decoder_merged_model_fp16.onnx",
+      "hidden_size": 5120,
+      "inputs": {
+        "input_ids": "input_ids",
+        "attention_mask": "attention_mask",
+        "position_ids": "position_ids",
+        "past_key_names": "past_key_values.%d.key",
+        "past_value_names": "past_key_values.%d.value"
+      },
+      "outputs": {
+        "logits": "logits",
+        "present_key_names": "present.%d.key",
+        "present_value_names": "present.%d.value"
+      }
+    }
+  },
+  "search": {
+    "do_sample": false,
+    "max_length": 8192
+  }
+}

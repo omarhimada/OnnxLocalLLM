@@ -70,8 +70,8 @@ namespace OLLM.State {
 
 		internal void SetGeneratorParameterSearchOptions() {
 			#region Set generator parameters
-			GeneratorParams!.SetSearchOption(_maxLengthParameter, 8192); // 8192 // 16384
-			GeneratorParams!.SetSearchOption(_doSample, true);
+			GeneratorParams!.SetSearchOption(_maxLengthParameter, 8192);
+			GeneratorParams!.SetSearchOption(_doSample, false);
 			GeneratorParams!.SetSearchOption(_temperature, _getTemperature());
 			GeneratorParams!.SetSearchOption(_topK, 51);
 			GeneratorParams!.SetSearchOption(_topP, 0.9f);
