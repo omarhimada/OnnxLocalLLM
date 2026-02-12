@@ -4,7 +4,7 @@
 - Loads a local LLM model. 
 - The latest release utilizes **Phi-4** from Microsoft. I'll keep adding support for other models, as experimentation continues.
 
-![Example Interation](/.Images/20260202-Mistral-3-14B-local-ONNX.gif)
+![Example](/.Images/20260212_Example.gif)
 
 ## Roadmap 
 - **High Priority**
