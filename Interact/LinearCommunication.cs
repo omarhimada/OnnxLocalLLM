@@ -1,9 +1,9 @@
 using Microsoft.ML.OnnxRuntimeGenAI;
-using OLLM.Memory;
 using OLLM.State;
 using OLLM.Utility.ModelSpecific;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using static OLLM.Constants;
 
 namespace OLLM.Interact {
@@ -55,32 +55,33 @@ namespace OLLM.Interact {
 		private async Task ChatWithModelAsync(string systemAndUserMessage, TextBox theirResponse) {
 			CancellationToken ct = _cts.Token;
 
-			theirResponse.Text = string.Empty;
-
 			await Task.Run(() => {
-				Sequences sequences = modelState.Tokenizer!.Encode(systemAndUserMessage);
+				// Clear UI on the correct thread
+				Application.Current.Dispatcher.Invoke(() => theirResponse.Text = string.Empty);
+
+				using OgaHandle ogaHandle = new();
+				using Sequences sequences = modelState.Tokenizer!.Encode(systemAndUserMessage);
 
 				modelState.SetGeneratorParameterSearchOptions();
 				modelState.RefreshGenerator();
 				modelState.Generator!.AppendTokenSequences(sequences);
 
-				while (!modelState.Generator.IsDone()) {
+				// Create one stream for the entire response
+				using TokenizerStream ts = modelState.Tokenizer!.CreateStream();
+
+				while (!modelState.Generator.IsDone() && !ct.IsCancellationRequested) {
 					modelState.Generator.GenerateNextToken();
 
-					// Get the newly generated token and decode it
-					int nextToken = modelState.Generator.GetSequence(0)[^1];
-					IEnumerable<char> outputPiece = modelState.Tokenizer.Decode(new[] { nextToken });
+					// Decode on the background thread to a string
+					string piece = ts.Decode(modelState.Generator.GetSequence(0)[^1]);
 
-					if (outputPiece != null) {
-						Application.Current.Dispatcher.Invoke(() => {
-							foreach (char c in outputPiece) {
-								theirResponse.Text += c;
-							}
-						});
-					}
+					// Append the words as they're generated on the UI thread
+					Application.Current.Dispatcher.InvokeAsync(() => {
+						theirResponse.AppendText(piece);
+						theirResponse.ScrollToEnd();
+					}, DispatcherPriority.Normal, ct);
 				}
 			}, ct);
-
 			// Debugging
 			//await Remember.MemorizeDiscussionAsync(theirResponse.Text, ct);
 		}

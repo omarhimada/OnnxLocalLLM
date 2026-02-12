@@ -18,22 +18,10 @@
           - `VectorSearch` occurs with decay parameters like `halfLifeDays = 365, etc.`
           - **The goal is that they keep learning** and you **backup the local database yourself**. *(i.e.: the model lives in this one machine and learns forever.*)
         
-    2. Leveraging CUDA **100% complete** - fallback logic involving DirectML was creating collisions making it impossible to use either. This seems to be a bug that may be corrected in the future.
-        - Currently, due to the locality, the perceived latency between user chat input and model response is ~~~milliseconds~~.
-            - **Phi-4's vocabulary is so large that there is *some* latency - it isn't as responsive as before. However, the result is higher quality.**
-            - This is due to the lack of the typical API request/response you find with online chat interfaces.
-                - Although the popular solutions are able to learn via parsing the internet (see ChatGPT and Gemini), you will inevitably teach them compromising proprietary or sensitive information, as an example.
-                - **(You can't sign a contract with an LLM to forget proprietary information, but you can sign the papers that the lawyer hands you.)**
-                  - That is an absence of zero-trust mentality you'd expect within government organizations, R&D medical institutions, etc.
-            - Also, this does not operate like LM Studio, Ollama, or Eloi, involving a secondary API and WebSocket communication between the layers on the local machine.
-              - I provide zero insult, I choose a different design pattern.
-            - The model is loaded into local memory on your machine and their mind and memories stay with them. This is my design I prefer.
-
 - **Low Priority**
   - Other planned QOL improvements (low priority):
     - Image/vision -> embeddings -> retrieval augmentation. I don't want to fast-forward this with existing solutions.
     - Changing models via dropdown menu selection
-    - You currently have to scroll to see their full response, it should scroll as they're responding so you read while they 'speak', so-to-speak.
 
 ### Setup
 - Your directory setup should look something like the diagram below, although the `model.onnx` and `model.onnx_data` will be absent. This is due to size (gigabytes).

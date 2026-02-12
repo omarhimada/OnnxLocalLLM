@@ -43,8 +43,13 @@ namespace OLLM {
 		internal const string _ministral314SystemPromptEnd = @"[/SYSTEM_PROMPT]";
 		#endregion
 
+		internal const string _cuda = "cuda";
+		internal const string _dml = "dml";
+		internal const string _cpu = "cpu";
+
 		internal const string _ws = @" ";
 		internal const string _maxLengthParameter = "max_length";
+		internal const string _maxNewLengthParameter = "max_new_length";
 
 		internal const string _doSample = "do_sample";
 		internal const string _temperature = "temperature";
