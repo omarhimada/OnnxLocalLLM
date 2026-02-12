@@ -6,11 +6,6 @@ namespace OLLM.Utility.ModelSpecific {
 	internal static class CodeGemma {
 		// Not included in current Microsoft.Extensions.AI - CodeGemma specific ('model', not 'assistant')
 		internal static readonly ChatRole _modelChatRole = new(_model);
-		internal const string _model = "model";
-		internal const string _bos = "<bos>";
-		internal const string _startOfTurn = "<start_of_turn>";
-		internal const string _endOfTurn = "<end_of_turn>";
-
 		private const bool _addGenerationPrompt = true;
 
 		/// <summary>

@@ -110,8 +110,4 @@
 	<ItemGroup>
 	  <EditorConfigFiles Remove="C:\Users\adosi\source\repos\0_OnnxLocalLLM\.editorconfig" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Utility\ModelSpecific\" />
-	</ItemGroup>
 </Project>

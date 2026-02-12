@@ -45,7 +45,7 @@ namespace OLLM.Interact {
 		private async Task SendMessage(string userInputText, TextBox theirResponse) {
 			string systemAndUserMessage = string.Empty;
 			try {
-				systemAndUserMessage = QwenCoder.AsFormattedString(userInputText);
+				systemAndUserMessage = Phi4.AsFormattedString(userInputText);
 			} catch (Exception) {
 				SomethingWentWrong(theirResponse, true);
 			}
