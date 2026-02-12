@@ -9,8 +9,11 @@ using static OLLM.Utility.J2CS.Constants;
 
 namespace OLLM.Initialization {
 	internal static class EnsureModelsArePresent {
-		// Disabled - debugging only
+		// TODO disabled auto Jinja to C#
 		internal const bool _enableAutoTemplateConvert = false;
+
+		// TODO embed model is not required
+		internal const bool _embedModelIsRequired = false;
 
 		/// <summary>
 		/// Checks whether all required model sare present and accessible.
@@ -94,16 +97,18 @@ namespace OLLM.Initialization {
 			// Attempt to retrieve the embedding model ONNX
 			if (!TryRequiredModelIsPresent(_preBuildEmbedModelDirectory, out string? embedModelPathToUse) ||
 				embedModelPathToUse == null) {
-				potentialFriendlyUserErrorMessage.AppendLine(
-					$"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{embedModelPathToUse}");
+				if (_embedModelIsRequired) {
+					potentialFriendlyUserErrorMessage.AppendLine(
+						$"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{embedModelPathToUse}");
+				}
 			}
 
-			if (modelPathToReturn == null && embedModelPathToUse == null) {
+			if (modelPathToReturn == null && (_embedModelIsRequired && embedModelPathToUse == null)) {
 				MessageBox.Show(potentialFriendlyUserErrorMessage.ToString(),
 					_userFriendlyErrorOccurredTryingToLoadModels);
 			}
 
-			return (modelPathToUse!, embedModelPathToUse!);
+			return (modelPathToUse!, embedModelPathToUse);
 		}
 
 		/// <summary>

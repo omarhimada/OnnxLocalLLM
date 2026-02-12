@@ -19,13 +19,13 @@ namespace OLLM {
 		//internal static string _preBuildCodeGemmaModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\CodeGemma";
 		#endregion
 
-		// microsoft/Phi-4
+		// Microsoft/Phi-4
 		internal static string _preBuildPhi4ModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Phi-4";
 
 		#region Embedder model(s)
-		// all-MiniLM-L6-v2-onnx
-		internal static string _preBuildEmbedModelDirectory = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Embed\\all-MiniLM-L6-v2-onnx";
-		internal static string _preBuildEmbedModelVocabTextPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Embed\\all-MiniLM-L6-v2-onnx\\vocab.txt";
+		// All-MiniLM-L6-v2-ONNX
+		internal static string _preBuildEmbedModelDirectory = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Embed\\All-MiniLM-L6-v2-ONNX";
+		internal static string _preBuildEmbedModelVocabTextPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Embed\\All-MiniLM-L6-v2-ONNX\\vocab.txt";
 		#endregion
 
 		internal const string _onnxSearch = "*.onnx";

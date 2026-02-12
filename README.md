@@ -1,7 +1,8 @@
 # OLLM
 - LLM local chat desktop application that uses the *ONNX Runtime Generative AI*. **Does not make any networking requests outside of the local machine.**
 - Virtually zero latency due to a lack of networking communication whether it be HTTP (e.g.: API calls to OpenAI) or WebSocket middle-layer (Ollama, LM Studio, etc.).
-- Loads `Mistral-3-7B` (or `Mistral-3-14B` if you can handle it with your hardware). Proceeeding with `nomic-embed-text-1-5` although exploring alternatives.
+
+- Loads a local LLM model, in the latest release it is Phi-4 from Microsoft. I'll keep adding support for other models. 
 
 ![Example Interation](/.Images/20260202-Mistral-3-14B-local-ONNX.gif)
 
@@ -18,8 +19,8 @@
           - **The goal is that they keep learning** and you **backup the local database yourself**. *(i.e.: the model lives in this one machine and learns forever.*)
           - The model should remember what you spoke about yesterday, for example. 
         
-    2. Leveraging CUDA **90% complete**
-        - The suggested `DML` provided from Microsoft seems like the best route forward for utilizing CUDA in the project.
+    2. Currently using DirectML - leverage instead CUDA **90% complete**
+        - There is fallback logic where the program attempts to load CUDA first, if it fails it then tries DirectML, then if that fails it will use your CPU.
    		- ~~`Microsoft.AI.OnnxRuntime.SessionOptions` to attempt to enable GPU if available.~~
             - ~~This is expected to function easily, although yet untested. I've had no issues with other tech stacks.~~
         - Currently, due to the locality, the perceived latency between user chat input and model response is ~milliseconds.

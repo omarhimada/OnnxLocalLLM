@@ -1,6 +1,8 @@
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntimeGenAI;
 using System.IO;
+using System.Linq.Expressions;
+using System.Management;
 using System.Windows;
 using static OLLM.Constants;
 
@@ -24,18 +26,31 @@ namespace OLLM.State {
 			ModelDirectory = modelDirectory;
 			SessionOptions modelInferenceSessionOptions = new();
 
-
-			#region Try DML firstm then CUDA, and finally fallback to CPU
-			try {
-				modelInferenceSessionOptions.AppendExecutionProvider_DML();
-			} catch (NotSupportedException) {
-				try {
-					MessageBox.Show(_userFriendlyErrorOccurredLoadingDMLProvider);
-					modelInferenceSessionOptions.AppendExecutionProvider_CUDA();
-				} catch (Exception) {
-					MessageBox.Show(_userFriendlyErrorOccurredLoadingCUDAProvider);
-					modelInferenceSessionOptions.AppendExecutionProvider_CPU();
+			#region Try CUDA first, then DML, and finally fallback to CPU
+			// Query the Win32_VideoController WMI class
+			//const string _findAny = "SELECT * FROM Win32_VideoController"; // This will likely find your integrated graphics only
+			const string _findNvidia = "SELECT * FROM Win32_PnPEntity WHERE Service='nvlddmkm'";
+			bool isNvidia = false;
+			ManagementObjectSearcher searcher = new(_findNvidia);
+			foreach (ManagementBaseObject? obj in searcher.Get()) {
+				if (obj is null) {
+					continue;
 				}
+
+				string? pnpId = obj["PNPDeviceID"]?.ToString();
+
+				// 0x10DE is the registered PCI Vendor ID for NVIDIA
+				isNvidia = pnpId?.Contains("VEN_10DE", StringComparison.OrdinalIgnoreCase) ?? false;
+			}
+
+			try {
+				modelInferenceSessionOptions.AppendExecutionProvider_CUDA();
+				//} else {
+				//	modelInferenceSessionOptions.AppendExecutionProvider_DML();
+				//}
+			} catch (Exception) {
+				modelInferenceSessionOptions.AppendExecutionProvider_CPU();
+				//modelInferenceSessionOptions.AppendExecutionProvider_DML();
 			}
 			#endregion
 
@@ -61,20 +76,13 @@ namespace OLLM.State {
 		/// </summary>
 		internal void RefreshGenerator() {
 			Generator?.Dispose();
-			try {
-				Generator = new(Model, GeneratorParams);
-			} catch (Exception exception) {
-				if (exception.InnerException != null) {
-					Console.WriteLine(Environment.NewLine);
-					Console.WriteLine(exception.InnerException!.Message);
-				}
-			}
+			Generator = new(Model, GeneratorParams);
 		}
 
 		internal void SetGeneratorParameterSearchOptions() {
 			#region Set generator parameters
-			//GeneratorParams?.SetSearchOption(_maxLengthParameter, 8192);
-			//GeneratorParams?.SetSearchOption(_doSample, false);
+			GeneratorParams?.SetSearchOption(_maxLengthParameter, 8192);
+			GeneratorParams?.SetSearchOption(_doSample, false);
 			GeneratorParams?.SetSearchOption(_temperature, _getTemperature());
 			GeneratorParams?.SetSearchOption(_topK, 51);
 			GeneratorParams?.SetSearchOption(_topP, 0.9f);

@@ -27,7 +27,7 @@ namespace OLLM {
 
 				(string? modelPath, string? embedModelPath) = EnsureRequiredModelsArePresent();
 
-				if (modelPath == null || embedModelPath == null) {
+				if (modelPath == null) {
 					// Previous method already displayed the friendly user message and provided some guidance.
 					Current.Shutdown();
 					return;

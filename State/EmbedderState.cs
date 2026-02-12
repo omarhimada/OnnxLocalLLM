@@ -19,20 +19,20 @@ namespace OLLM.State {
 		internal int UnkId { get; set; }
 		internal int SepId { get; set; }
 
-		internal readonly string EmbedModelDirectory;
+		internal readonly string? EmbedModelDirectory;
 
 		internal readonly string VocabularyPath;
 
 		internal const int _maxTokenLength = 4096;
 		#endregion
 
-		internal EmbedderState(string embedModelDirectory) {
+		internal EmbedderState(string? embedModelDirectory) {
 			EmbedModelDirectory = embedModelDirectory;
 
 			SessionOptions options = new();
 
 			#region Point to the direct ONNX model itself to instantiate the inference session
-			string? embedModelFilePath = Directory.GetFiles(embedModelDirectory, _onnxSearch).FirstOrDefault();
+			string? embedModelFilePath = Directory.GetFiles(embedModelDirectory ?? _ws, _onnxSearch).FirstOrDefault();
 			if (string.IsNullOrEmpty(embedModelFilePath)) {
 				MessageBox.Show(_userFriendlyErrorOccurredDuringInitialization);
 				Application.Current.Shutdown();

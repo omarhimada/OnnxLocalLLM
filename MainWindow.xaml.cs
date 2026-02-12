@@ -13,31 +13,6 @@ namespace OLLM {
 		internal EmbedderState? EmbedderState;
 		internal MiniEmbedder? MiniEmbedder;
 		internal LinearCommunication? LinearCommunication;
-
-		#region Disabled until text-to-speech implementation
-		//private readonly DispatcherTimer _timer;
-		//private void _talkTok(object sender, EventArgs e) {
-		//	const char _qm = '?';
-		//	if (UserInputText.Text.Contains(_qm)) {
-		//		_interact();
-		//		UserInputText.Text = string.Empty;
-		//	}
-		//}
-		//protected override void OnInitialized(EventArgs e) {
-		//	base.OnInitialized(e);
-		//	_timer.Start();
-		// ...
-		//_timer = new DispatcherTimer {
-		//	Interval = TimeSpan.FromSeconds(12)
-		//};
-		// ...
-		//_timer.Tick += _talkTok!;
-		//}
-		//protected override void OnClosed(EventArgs e) {
-		//	base.OnClosed(e);
-		//	_timer.Stop();
-		//}
-		#endregion
 		#endregion
 
 		#region Initialization

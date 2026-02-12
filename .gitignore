@@ -12,3 +12,6 @@ obj/
 *.onnx\.data
 /.Images/j2cs-images
 /секретна-техніка.wav
+/ONNX/Phi-4/config.json
+/ONNX/Phi-4/_phi-4_chat_template.bak
+/ONNX/Phi-4/merges.txt
