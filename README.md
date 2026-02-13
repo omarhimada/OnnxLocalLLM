@@ -4,9 +4,10 @@
 - Loads a local LLM model. 
 - The latest release utilizes **Phi-4** from Microsoft. I'll keep adding support for other models, as experimentation continues.
 
-<div style="justif-content: center; align-items: center;">
-    <img src="https://github.com/omarhimada/Local-LLM-ONNX/blob/master/.Images/20260212_Example.gif?raw=true" alt="Example usage of the desktop chat application." style="width: 70%; height: 70%;" />
-</div>
+
+<p align="center">
+    <img src="https://github.com/omarhimada/Local-LLM-ONNX/blob/master/.Images/20260212_Example.gif?raw=true" alt="Example usage of the desktop chat application." style="width: 72%; height: 72%;" />
+</p>
 
 ## Roadmap 
 - **High Priority**
