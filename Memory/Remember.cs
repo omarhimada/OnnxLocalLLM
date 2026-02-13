@@ -93,7 +93,7 @@ namespace OLLM.Memory {
 		/// <summary>
 		/// Try to remember before responding. It is possible to forget, so this method can return null.
 		/// </summary>
-		internal static async Task<IReadOnlyList<Discussion>?> RememberDiscussionAsync(
+		internal static async Task<IReadOnlyList<Discussion>?> RememberDiscussionsAsync(
 			string query,
 			int topK = 8,
 			int candidates = 33,

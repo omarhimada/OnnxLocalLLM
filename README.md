@@ -14,7 +14,7 @@
       		- Microsoft is sort of developing solutions in parallel regarding native SQL Vector storage *(i.e.: `Microsoft.SemanticKernel.Connectors.SqliteVec` pre-release)*
       	-  Implemented two methods:
             1. `MemorizeDiscussion(...) // Store a discussion that had occurred.`
-            2. `RememberDiscussion(...) // Try to remember before responding`
+            2. `RememberDiscussions(...) // Try to remember before responding`
           - `VectorSearch` occurs with decay parameters like `halfLifeDays = 365, etc.`
           - **The goal is that they keep learning** and you **backup the local database yourself**. *(i.e.: the model lives in this one machine and learns forever.*)
         
