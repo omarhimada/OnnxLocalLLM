@@ -3,11 +3,14 @@ using OLLM.State;
 using OLLM.Utility.ModelSpecific;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Threading;
 using static OLLM.Constants;
 
 namespace OLLM.Interact {
 	internal class LinearCommunication(ModelState modelState) {
+		private readonly OgaHandle _ogaHandle = new();
+
 		private readonly CancellationTokenSource _cts = new();
 		private bool InterruptButtonEnabled { get; set; } = true;
 
@@ -15,7 +18,7 @@ namespace OLLM.Interact {
 		/// Represents the user's interaction with the model. Currently, it is only text, the plan is to eventually
 		/// create accessibility-enhanced interaction features involving text-speech, etc.
 		/// </summary>
-		internal async Task _interact(TextBox userInputText, TextBox theirResponse, Button chatButton) {
+		internal async Task _interact(TextBox userInputText, RichTextBox theirResponse, Button chatButton) {
 			try {
 				ToggleInterruptButton();
 				await SendMessage(userInputText.Text, theirResponse);
@@ -26,13 +29,13 @@ namespace OLLM.Interact {
 			}
 		}
 
-		internal async Task _interrupt(TextBox theirResponse, Button chatButton) {
+		internal async Task _interrupt(RichTextBox theirResponse, Button chatButton) {
 			if (!InterruptButtonEnabled) {
 				return;
 			}
 			try {
 				await _cts.CancelAsync();
-				theirResponse.Text = _userFriendlyStoppedResponse;
+				theirResponse.Document = new FlowDocument(); //.Text = _userFriendlyStoppedResponse;
 				chatButton.IsEnabled = true;
 				ToggleInterruptButton();
 			} catch (Exception) {
@@ -42,7 +45,7 @@ namespace OLLM.Interact {
 			}
 		}
 
-		private async Task SendMessage(string userInputText, TextBox theirResponse) {
+		private async Task SendMessage(string userInputText, RichTextBox theirResponse) {
 			string systemAndUserMessage = string.Empty;
 			try {
 				systemAndUserMessage = Phi4.AsFormattedString(userInputText);
@@ -52,14 +55,18 @@ namespace OLLM.Interact {
 			await ChatWithModelAsync(systemAndUserMessage, theirResponse);
 		}
 
-		private async Task ChatWithModelAsync(string systemAndUserMessage, TextBox theirResponse) {
+		private async Task ChatWithModelAsync(string systemAndUserMessage, RichTextBox theirResponse) {
 			CancellationToken ct = _cts.Token;
 
 			await Task.Run(() => {
 				// Clear UI on the correct thread
-				Application.Current.Dispatcher.Invoke(() => theirResponse.Text = string.Empty);
 
-				using OgaHandle ogaHandle = new();
+				FlowDocument fd = new();
+				Application.Current.Dispatcher.Invoke(() => {
+					fd = new FlowDocument();
+					return theirResponse.Document = new FlowDocument();
+				});
+
 				using Sequences sequences = modelState.Tokenizer!.Encode(systemAndUserMessage);
 
 				modelState.SetGeneratorParameterSearchOptions();
@@ -86,12 +93,12 @@ namespace OLLM.Interact {
 			//await Remember.MemorizeDiscussionAsync(theirResponse.Text, ct);
 		}
 
-		private void SomethingWentWrong(TextBox theirResponse, bool? couldNotParseUserInput = false, string? exceptionMessage = null) {
-			theirResponse.Text += $"{_userFriendlyErrorResponse}\n";
+		private void SomethingWentWrong(RichTextBox theirResponse, bool? couldNotParseUserInput = false, string? exceptionMessage = null) {
+			//theirResponse.Document += $"{_userFriendlyErrorResponse}\n";
 
-			if (couldNotParseUserInput!.Value) {
-				theirResponse.Text += $"{_userFriendlyParsingUserInputToMessageException}\n";
-			}
+			//if (couldNotParseUserInput!.Value) {
+			//	theirResponse.Text += $"{_userFriendlyParsingUserInputToMessageException}\n";
+			//}
 
 			if (exceptionMessage != null) {
 				MessageBox.Show(exceptionMessage);

@@ -73,7 +73,56 @@
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="Width" Value="800" />
         </Style>
-    </Window.Resources>
+		<Style x:Key="RichTextBoxStyle" TargetType="{x:Type RichTextBox}">
+			<Setter Property="CaretBrush" Value="White"/>
+			<Setter Property="Background" Value="Black"/>
+			<Setter Property="Foreground" Value="White"/>
+			<Setter Property="FontFamily" Value="Cascadia Mono ExtraLight" />
+			<Setter Property="FontSize" Value="14" />
+			<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+			<Setter Property="BorderBrush" Value="{StaticResource GraySolidColorBrush}"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="Padding" Value="0,0,0,0"/>
+			<Setter Property="Margin" Value="0,0,0,0"/>
+			<Setter Property="MinHeight" Value="256" />
+			<Setter Property="SelectionBrush" Value="#FF474747" />
+			<Setter Property="SelectionTextBrush" Value="#FF89FFD9" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
+			<Setter Property="VerticalAlignment" Value="Top" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type RichTextBox}">
+						<Border x:Name="BorderTemplate"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    SnapsToDevicePixels="True">
+							<ScrollViewer x:Name="PART_ContentHost" Width="798" />
+						</Border>
+
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsKeyboardFocused" Value="True">
+								<Setter TargetName="BorderTemplate"
+                            Property="BorderBrush"
+                            Value="{StaticResource GraySolidColorBrush}"/>
+							</Trigger>
+
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="BorderTemplate"
+                            Property="BorderBrush"
+                            Value="{StaticResource GraySolidColorBrush}"/>
+							</Trigger>
+
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter TargetName="BorderTemplate" Property="Opacity" Value="0.55"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+			<Setter Property="Width" Value="800" />
+		</Style>
+	</Window.Resources>
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="30" 
 	                  ResizeBorderThickness="5" 
@@ -141,12 +190,11 @@
 		                    Click="InterruptButtonClick" AutomationProperties.Name="InterruptButton" HorizontalContentAlignment="Center" />
                 </StackPanel>
 
-                <TextBox x:Name="TheirResponse" 
-                         Grid.Row="2"
-                         Text="" 
-                         IsReadOnly="True" 
-                         FocusVisualStyle="{x:Null}" 
-                         Style="{StaticResource TextBoxStyle}" />
+				<RichTextBox x:Name="TheirResponse" 
+				             Grid.Row="2"
+				             IsReadOnly="True"
+				             FocusVisualStyle="{x:Null}" 
+				             Style="{StaticResource RichTextBoxStyle}"  />
             </Grid>
         </Grid>
     </Border>

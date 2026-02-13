@@ -3,6 +3,8 @@ using OLLM.Memory;
 using OLLM.State;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace OLLM {
 	internal partial class MainWindow : Window {
