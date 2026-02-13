@@ -4,7 +4,7 @@
 - Loads a local LLM model. 
 - The latest release utilizes **Phi-4** from Microsoft. I'll keep adding support for other models, as experimentation continues.
 
-![Example](/.Images/20260212_Example.gif)
+<img src="https://github.com/omarhimada/Local-LLM-ONNX/.Images/20260212_Example.gif" alt="Example usage of the desktop chat application." style="width: 50%; height: 50%;" />
 
 ## Roadmap 
 - **High Priority**
