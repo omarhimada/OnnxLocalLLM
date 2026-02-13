@@ -40,3 +40,13 @@
         | vocab.json
         |____________________________________________________
 ```
+
+### Licensing and Data Sovereignty
+
+This project is licensed under the GNU Lesser General Public License (LGPL) v2.1 to provide a transparent, high-integrity foundation for local artificial intelligence. 
+Because this LLM is designed to operate entirely offline, it offers a secure alternative to centralized, cloud-based models that inadvertently require the transmission of sensitive data to third-party providers. 
+The LGPL supports this "Local-First" mission by ensuring the core engine remains a public resource; any distributed improvements to the engine itself must remain open, while allowing the tool to be seamlessly integrated into private or proprietary environments without legal friction.
+
+The choice of the LGPL is a commitment to Data Sovereignty. By ensuring the source code remains as portable as the hardware it runs on, we eliminate the "centralization risk" inherent in networked AI. 
+This legal framework guarantees that the core technology cannot be revoked or turned into a "black box," providing a permanent, airgapped utility for those who require total autonomy over their information. 
+Our goal is to provide a tool that is fully owned and operated by the user, ensuring that intelligence remains a private asset rather than a remote service.
