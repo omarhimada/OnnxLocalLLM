@@ -4,7 +4,10 @@
 - Loads a local LLM model. 
 - The latest release utilizes **Phi-4** from Microsoft. I'll keep adding support for other models, as experimentation continues.
 
-![Example](/.Images/20260212_Example.gif)
+
+<p align="center">
+    <img src="https://github.com/omarhimada/Local-LLM-ONNX/blob/master/.Images/20260212_Example.gif?raw=true" alt="Example usage of the desktop chat application." style="width: 72%; height: 72%;" />
+</p>
 
 ## Roadmap 
 - **High Priority**
@@ -40,12 +43,13 @@
         | vocab.json
         |____________________________________________________
 ```
-#### Licensing Philosophy
 
-This project is licensed under the GNU General Public License (GPL) to ensure that the software remains a transparent and permanent resource for the public. 
-Because this LLM is designed to operate entirely offline and adapt to its user’s needs, it represents a fundamental shift toward individual digital autonomy. 
-The GPL supports this by requiring that any distributed improvements or modifications to the core engine are shared with the same level of transparency. 
-This creates a "continuous audit" environment where the safety and logic of the system can be verified by anyone, preventing the core technology from being obscured or restricted.
-The choice of a copyleft license is a commitment to the long-term accessibility of local AI. By ensuring that the source code remains as portable and open as the hardware it runs on, 
-we prevent the "centralization risk" that occurs when critical tools are moved behind closed, networked barriers. Our goal is to provide a tool that is fully owned by the person operating it; the GPL acts as the legal framework that guarantees this local-first architecture cannot be revoked or turned into a "black box" by subsequent distributors.
-Would you like me to help you draft the "Safety & Usage" section to address the risks of teaching the model exploits?
+### Licensing and Data Sovereignty
+
+This project is licensed under the GNU Lesser General Public License (LGPL) v2.1 to provide a transparent, high-integrity foundation for local artificial intelligence. 
+Because this LLM is designed to operate entirely offline, it offers a secure alternative to centralized, cloud-based models that inadvertently require the transmission of sensitive data to third-party providers. 
+The LGPL supports this "Local-First" mission by ensuring the core engine remains a public resource; any distributed improvements to the engine itself must remain open, while allowing the tool to be seamlessly integrated into private or proprietary environments without legal friction.
+
+The choice of the LGPL is a commitment to Data Sovereignty. By ensuring the source code remains as portable as the hardware it runs on, we eliminate the "centralization risk" inherent in networked AI. 
+This legal framework guarantees that the core technology cannot be revoked or turned into a "black box," providing a permanent, airgapped utility for those who require total autonomy over their information. 
+Our goal is to provide a tool that is fully owned and operated by the user, ensuring that intelligence remains a private asset rather than a remote service.
