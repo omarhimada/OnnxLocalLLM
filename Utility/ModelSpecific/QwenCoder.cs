@@ -1,25 +1,19 @@
 using Microsoft.Extensions.AI;
-
 namespace OLLM.Utility.ModelSpecific {
 	using System.Text;
 	using static Constants;
-
 	internal static class QwenCoder {
 		private const bool _add_generation_prompt = true;
-
 		public static string AsFormattedString(string? userPrompt) {
 			if (string.IsNullOrEmpty(userPrompt)) {
 				return string.Empty;
 			}
 			const string constructedRootSystemPrompt = $"{_defaultInstruction}{_art}{_algorithms}{_specificity}";
-
 			List<ChatMessage> messages = [
 				new (ChatRole.System, constructedRootSystemPrompt),
 				new (ChatRole.User, userPrompt)
 			];
-
 			StringBuilder sb = new();
-
 			foreach (ChatMessage message in messages) {
 				if (messages[0].Role == ChatRole.System) {
 					sb.Append($"{_imStart}{_system}");
@@ -31,7 +25,6 @@ namespace OLLM.Utility.ModelSpecific {
 				sb.AppendLine(_imEnd);
 				sb.AppendLine();
 			}
-
 			#region TODO Unused
 			//int index = 0;
 			//int messagesCount = messages.Count;
@@ -46,7 +39,6 @@ namespace OLLM.Utility.ModelSpecific {
 			//		if (!string.IsNullOrEmpty(message.content)) {
 			//			sb.AppendLine(message.content);
 			//		}
-
 			//		foreach (dynamic? toolCall in message.tool_calls) {
 			//			if (toolCall.function != null) {
 			//				// {%- if tool_call.function is defined %}
@@ -58,13 +50,11 @@ namespace OLLM.Utility.ModelSpecific {
 			//				// {{- tool_call.arguments | tojson }}{{- '}\n</tool_call>' }}
 			//			}
 			//		}
-
 			//		sb.AppendLine(_imEnd);
 			//	} else if (message.role == _tool) {
 			//		if (index == 0 || messages[index - 1].Role != ChatRole.Tool) {
 			//			sb.AppendLine($"{_imStart}{_user}");
 			//		}
-
 			//		sb.AppendLine(_toolResponseStart);
 			//		sb.AppendLine();
 			//		sb.AppendLine(message.content);
@@ -74,15 +64,12 @@ namespace OLLM.Utility.ModelSpecific {
 			//			sb.AppendLine(_imEnd);
 			//		}
 			//	}
-
 			//	index++;
 			//}
 			#endregion
-
 			if (_add_generation_prompt) {
 				sb.AppendLine($"{_imStart}{_assistant}");
 			}
-
 			return sb.ToString();
 		}
 	}

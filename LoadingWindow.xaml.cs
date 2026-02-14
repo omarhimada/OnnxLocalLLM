@@ -1,5 +1,4 @@
 using System.Windows;
-
 namespace OLLM {
 	/// <summary>
 	/// Interaction logic for Loading.xaml

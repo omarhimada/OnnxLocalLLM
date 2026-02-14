@@ -1,6 +1,5 @@
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.VectorData;
-
 namespace OLLM.Memory {
 	public class Discussion {
 		[VectorStoreKey] public long Id { get; set; }

@@ -3,24 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using static OLLM.Constants;
-
 namespace OLLM.Utility.ModelSpecific {
 	internal static class Phi4 {
 		private const bool _addGenerationPrompt = true;
-
 		public static string AsFormattedString(string? userPrompt) {
 			if (string.IsNullOrEmpty(userPrompt)) {
 				return string.Empty;
 			}
-
 			const string constructedRootSystemPrompt = $"{_defaultInstruction}{_art}{_algorithms}{_specificity}";
-
 			List<ChatMessage> messages = [
 				new (ChatRole.System, constructedRootSystemPrompt),
 				new (ChatRole.User, userPrompt)
 			];
 			StringBuilder sb = new();
-
 			foreach (ChatMessage message in messages) {
 				switch (message.Role.ToString()) {
 					case _system:
@@ -34,7 +29,6 @@ namespace OLLM.Utility.ModelSpecific {
 						break;
 				}
 			}
-
 			return sb.ToString();
 		}
 	}

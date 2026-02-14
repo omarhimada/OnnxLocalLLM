@@ -40,3 +40,12 @@
         | vocab.json
         |____________________________________________________
 ```
+#### Licensing Philosophy
+
+This project is licensed under the GNU General Public License (GPL) to ensure that the software remains a transparent and permanent resource for the public. 
+Because this LLM is designed to operate entirely offline and adapt to its user’s needs, it represents a fundamental shift toward individual digital autonomy. 
+The GPL supports this by requiring that any distributed improvements or modifications to the core engine are shared with the same level of transparency. 
+This creates a "continuous audit" environment where the safety and logic of the system can be verified by anyone, preventing the core technology from being obscured or restricted.
+The choice of a copyleft license is a commitment to the long-term accessibility of local AI. By ensuring that the source code remains as portable and open as the hardware it runs on, 
+we prevent the "centralization risk" that occurs when critical tools are moved behind closed, networked barriers. Our goal is to provide a tool that is fully owned by the person operating it; the GPL acts as the legal framework that guarantees this local-first architecture cannot be revoked or turned into a "black box" by subsequent distributors.
+Would you like me to help you draft the "Safety & Usage" section to address the risks of teaching the model exploits?

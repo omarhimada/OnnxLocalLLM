@@ -1,7 +1,6 @@
 using System.IO;
 using System.Windows;
 using static OLLM.Constants;
-
 namespace OLLM.Initialization {
 	internal static class Vocabulary {
 		internal static string? GetRequiredTextDocument(string debugPath) {
@@ -21,7 +20,6 @@ namespace OLLM.Initialization {
 				}
 				#endregion
 			}
-
 			return pathToUse;
 		}
 	}

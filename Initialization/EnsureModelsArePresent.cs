@@ -6,24 +6,19 @@ using System.Text.Json.Nodes;
 using System.Windows;
 using static OLLM.Constants;
 using static OLLM.Utility.J2CS.Constants;
-
 namespace OLLM.Initialization {
 	internal static class EnsureModelsArePresent {
 		// TODO disabled auto Jinja to C#
 		internal const bool _enableAutoTemplateConvert = false;
-
 		// TODO embed model is not required
 		internal const bool _embedModelIsRequired = false;
-
 		/// <summary>
 		/// Checks whether all required model sare present and accessible.
 		/// </summary>
 		internal static (string? modelPath, string? embedModelPath) EnsureRequiredModelsArePresent() {
 			string? modelPathToReturn = null;
-
 			// Construct a detailed message to show the user if neither of the required models could be found.
 			StringBuilder potentialFriendlyUserErrorMessage = new();
-
 			#region Grab the chat_template from the tokenizer_config.json, convert it to C#, then remove it and never call it again
 			if (_enableAutoTemplateConvert) {
 				// Find the tokenizer_config.json
@@ -33,18 +28,14 @@ namespace OLLM.Initialization {
 						_userFriendlyMissingTokenizerConfigJson);
 					return (null, null);
 				}
-
-				(string? chatTemplate, string? csName) = (null, null);
+				(string chatTemplate, string csName) = (null, null);
 				try {
 					// Check if it has a chat_template
 					(chatTemplate, csName) = Converter.ReadChatTemplateFromTokenizerConfig(tokenizerJsonPath);
-
 					const string verbatimNewLineAndFourSpaces = @"\n    ";
 					const string nonVerbatimNewLineWithArbitraryWhitespace = "\n        ";
 					const string nonVerbatimReturnNewline = "\r\n    ";
 					const char tab = '\t';
-
-
 					// "\n    "			verbatim new line and then four whitespaces <== remove.
 					// "\n        "		actual new line and whitespace <== remove.
 					// "\r\n    "		actual return and new line <== remove.
@@ -53,30 +44,23 @@ namespace OLLM.Initialization {
 					chatTemplate = chatTemplate.Replace(nonVerbatimNewLineWithArbitraryWhitespace, string.Empty);
 					chatTemplate = chatTemplate.Replace(nonVerbatimReturnNewline, string.Empty);
 					chatTemplate = chatTemplate.Replace($"{tab}", string.Empty);
-
 				} catch (InvalidOperationException) {
 					// It is possible we already converted the chat_template to C# dynamically. 
 				} finally {
 					if (chatTemplate != null && csName != null) {
 						// We haven't done this yet, there is a chat_template in the tokenizer_config.json. Remove it.
-
 						string csharpOutputPath = Converter.WriteOutput(tokenizerJsonPath!);
 						if (!string.IsNullOrEmpty(csharpOutputPath)) {
 							// Made the C# chat dynamically, remove the chat_template from the tokenizer_config.json
-
 							using FileStream stream = File.OpenRead(tokenizerJsonPath);
 							using JsonDocument doc = JsonDocument.Parse(stream);
-
 							JsonObject? jsonRoot = JsonObject.Create(doc.RootElement);
-
 							// jsonRoot has the chat_template removed - now overwrite the tokenizer_config.json
 							if (jsonRoot != null) {
 								jsonRoot.Remove(_chatTemplateKey);
-
 								string updatedJson = jsonRoot.ToJsonString(new JsonSerializerOptions {
 									WriteIndented = true
 								});
-
 								File.WriteAllText(tokenizerJsonPath, updatedJson);
 							}
 						}
@@ -87,13 +71,11 @@ namespace OLLM.Initialization {
 				}
 			}
 			#endregion
-
 			// Attempt to retrieve the LLM ONNX
 			if (!TryRequiredModelIsPresent(_preBuildPhi4ModelPath, out string? modelPathToUse) && modelPathToUse == null) {
 				potentialFriendlyUserErrorMessage.AppendLine(
 					$"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{modelPathToUse}");
 			}
-
 			// Attempt to retrieve the embedding model ONNX
 			if (!TryRequiredModelIsPresent(_preBuildEmbedModelDirectory, out string? embedModelPathToUse) ||
 				embedModelPathToUse == null) {
@@ -102,15 +84,12 @@ namespace OLLM.Initialization {
 						$"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{embedModelPathToUse}");
 				}
 			}
-
 			if (modelPathToReturn == null && (_embedModelIsRequired && embedModelPathToUse == null)) {
 				MessageBox.Show(potentialFriendlyUserErrorMessage.ToString(),
 					_userFriendlyErrorOccurredTryingToLoadModels);
 			}
-
 			return (modelPathToUse!, embedModelPathToUse);
 		}
-
 		/// <summary>
 		/// Checks whether the required model directories are present at either the specified debug path or its published location.
 		/// </summary>
@@ -135,7 +114,6 @@ namespace OLLM.Initialization {
 				if (!Directory.Exists(debugPath)) {
 					// Assume the program is published and the directory is close to the executable.
 					string publishedLocation = debugPath.TrimStart($"{AppContext.BaseDirectory}..\\..\\..").ToString();
-
 					if (!Directory.Exists(publishedLocation)) {
 						// If we still cannot find the required model(s) then show the user a friendly message and return false.
 						MessageBox.Show($"{_userFriendlyModelDirectoryErrorResponse}{publishedLocation}");
@@ -146,7 +124,6 @@ namespace OLLM.Initialization {
 				}
 				#endregion
 			}
-
 			return pathToUse != null;
 		}
 	}

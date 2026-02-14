@@ -5,7 +5,6 @@ using OLLM.State;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
-
 namespace OLLM.Memory {
 	/// <summary>
 	/// Provides functionality to generate text embeddings using a locally hosted MiniLM ONNX model and vocabulary file.
@@ -19,21 +18,16 @@ namespace OLLM.Memory {
 		internal ModelState ModelState;
 		internal EmbedderState EmbedderState;
 		internal static readonly Regex TokenRegex = WhitespaceRegex();
-
 		[GeneratedRegex(@"\w+|[^\s\w]", RegexOptions.Compiled)]
 		internal static partial Regex WhitespaceRegex();
-
 		/// <summary>
 		/// Retrieves the identifier associated with the specified token, or returns the fallback value if the token is not
 		/// found.
 		/// </summary>
-
-
 		internal MiniEmbedder(ModelState modelState, EmbedderState embedderState) {
 			ModelState = modelState;
 			EmbedderState = embedderState;
 		}
-
 		/// <summary>
 		/// Generates embeddings for the specified collection of input text(s) asynchronously.
 		/// </summary>
@@ -50,26 +44,20 @@ namespace OLLM.Memory {
 		public async Task<GeneratedEmbeddings<Embedding<float>>> GenerateAsync(IEnumerable<string> values, EmbeddingGenerationOptions? options = null, CancellationToken cancellationToken = default) {
 			// We'll process sequentially here; you can batch by building larger tensors.
 			GeneratedEmbeddings<Embedding<float>> result = [];
-
 			foreach (string text in values) {
 				cancellationToken.ThrowIfCancellationRequested();
-
-				(DenseTensor<long>? inputIds, DenseTensor<long>? attentionMask) = TokenizeToTensors(text);
-
+				(DenseTensor<long> inputIds, DenseTensor<long> attentionMask) = TokenizeToTensors(text);
 				List<NamedOnnxValue> inputs = [
 					NamedOnnxValue.CreateFromTensor(EmbedderState.InputIdsName, inputIds),
 				NamedOnnxValue.CreateFromTensor(EmbedderState.AttentionMaskName, attentionMask)
 				];
-
 				using IDisposableReadOnlyCollection<DisposableNamedOnnxValue> outputs = EmbedderState.Session.Run(inputs);
-
 				// pick the output we detected earlier
 				DisposableNamedOnnxValue named =
 					outputs.FirstOrDefault(o =>
 						string.Equals(o.Name,
 							EmbedderState.PreferredOutputName,
 							StringComparison.OrdinalIgnoreCase)) ?? outputs[0];
-
 				if (named.Value is DenseTensor<float> tensor) {
 					float[] vector = ExtractVectorFromTensor(tensor, attentionMask);
 					NormalizeL2(vector);
@@ -78,10 +66,8 @@ namespace OLLM.Memory {
 					MessageBox.Show(Constants._userFriendlyONNXFloat32TensorError);
 				}
 			}
-
 			return await Task.FromResult(result);
 		}
-
 		/// <summary>
 		/// Converts the specified input text into token ID and attention mask tensors suitable for model inference.
 		/// </summary>
@@ -96,9 +82,7 @@ namespace OLLM.Memory {
 			// Mini word piece tokenizer: split into tokens and greedily match vocabulary pieces.
 			string normalized = text.Normalize(System.Text.NormalizationForm.FormKC).ToLowerInvariant();
 			List<string> words = TokenRegex.Matches(normalized).Select(m => m.Value).ToList();
-
 			List<int> tokenIds = [EmbedderState.ClsId];
-
 			foreach (string word in words) {
 				int start = 0;
 				List<int> subTokens = [];
@@ -109,8 +93,9 @@ namespace OLLM.Memory {
 					int foundId = -1;
 					while (end > start) {
 						string piece = word.Substring(start, end - start);
-						if (start > 0)
+						if (start > 0) {
 							piece = Constants._poundItTwice + piece; // wordpiece continuation marker
+						}
 						if (EmbedderState.Vocabulary.TryGetValue(piece, out foundId)) {
 							found = piece;
 							break;
@@ -124,30 +109,24 @@ namespace OLLM.Memory {
 					subTokens.Add(foundId);
 					start = end;
 				}
-
 				if (bad) {
 					tokenIds.Add(EmbedderState.UnkId);
 				} else {
 					tokenIds.AddRange(subTokens);
 				}
 			}
-
 			tokenIds.Add(EmbedderState.SepId);
-
 			if (tokenIds.Count > EmbedderState._maxTokenLength) {
 				tokenIds = tokenIds.Take(EmbedderState._maxTokenLength - 1).Concat([EmbedderState.SepId]).ToList();
 			}
-
-			DenseTensor<long> inputIds = new(new[] { 1, EmbedderState._maxTokenLength });
-			DenseTensor<long> mask = new(new[] { 1, EmbedderState._maxTokenLength });
-
+			DenseTensor<long> inputIds = new([1, EmbedderState._maxTokenLength]);
+			DenseTensor<long> mask = new([1, EmbedderState._maxTokenLength]);
 			for (int i = 0; i < EmbedderState._maxTokenLength; i++) {
 				inputIds[0, i] = i < tokenIds.Count ? tokenIds[i] : EmbedderState.PadId;
 				mask[0, i] = i < tokenIds.Count ? 1L : 0L;
 			}
 			return (inputIds, mask);
 		}
-
 		/// <summary>
 		/// Extracts a feature vector from the specified tensor, optionally applying mean pooling over a sequence dimension
 		/// using the provided attention mask.
@@ -200,7 +179,6 @@ namespace OLLM.Memory {
 					throw new InvalidOperationException($"Unexpected tensor rank {tensor.Rank} for embedding extraction.");
 			}
 		}
-
 		/// <summary>
 		/// Normalizes the specified vector in place using the L2 (Euclidean) norm.
 		/// </summary>
@@ -221,7 +199,6 @@ namespace OLLM.Memory {
 				vector[i] = (float)(vector[i] / norm);
 			}
 		}
-
 		public object? GetService(Type serviceType, object? serviceKey = null) => throw new NotImplementedException();
 		public void Dispose() => throw new NotImplementedException();
 	}

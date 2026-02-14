@@ -1,134 +1,108 @@
 using Microsoft.Extensions.AI;
-
 namespace OLLM {
 	internal static class Constants {
 		#region Unused
 		// onnx-community/Devstral-Small-2507 (WARNING: ~47 GB)
 		//internal static string _preBuildDevstralModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Devstral";
-
 		// mistralai/Ministral-3-14B-2512 (WARNING ~27 GB)
 		//internal static string _preBuildMinistralModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Ministral-3-14B-2512";
-
 		// nvidia/Mistral-14B-Instruct-v0.3-ONNX-INT4 (seems to be no longer available, 404)
 		//internal static string _preBuildModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Mistral-14B";
-
 		// onnx-community/Qwen2.5-Coder-3B-Instruct
 		//internal static string _preBuildQwenModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\QwenCoder";
-
 		// CodeGemma-7B-IT-ONNX-FP16
 		//internal static string _preBuildCodeGemmaModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\CodeGemma";
 		#endregion
-
 		// Microsoft/Phi-4
 		internal static string _preBuildPhi4ModelPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Phi-4";
-
 		#region Embedder model(s)
 		// All-MiniLM-L6-v2-ONNX
 		internal static string _preBuildEmbedModelDirectory = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Embed\\All-MiniLM-L6-v2-ONNX";
 		internal static string _preBuildEmbedModelVocabTextPath = $"{AppContext.BaseDirectory}..\\..\\..\\ONNX\\Embed\\All-MiniLM-L6-v2-ONNX\\vocab.txt";
 		#endregion
-
 		internal const string _onnxSearch = "*.onnx";
-
 		internal const string _memoriesDbName = "memories";
-
 		#region Mistral-specific
 		internal const string _mistral3TokenStartTurn = @"<s>";
 		internal const string _mistral3TokenStop = @"</s>";
-
 		internal const string _mistral3InstructStart = @"[INST]";
 		internal const string _mistral3InstructEnd = @"[/INST]";
-
 		internal const string _ministral314SystemPromptStart = @"[SYSTEM_PROMPT]";
 		internal const string _ministral314SystemPromptEnd = @"[/SYSTEM_PROMPT]";
 		#endregion
-
 		internal const string _cuda = "cuda";
 		internal const string _dml = "dml";
 		internal const string _cpu = "cpu";
-
+		internal const string _ts = "** ";
+		internal const string _tse = " **";
+		internal const string _os = "* ";
+		internal const string _ose = " *";
+		internal const string _t = "`";
+		internal const string _tbt = "```";
+		internal const string _nl = "\n";
+		internal const string _rs = "\r";
+		internal const char _nlc = '\n';
+		internal const char _rc = '\r';
+		internal const char _wsc = ' ';
 		internal const string _ws = @" ";
 		internal const string _maxLengthParameter = "max_length";
 		internal const string _maxNewLengthParameter = "max_new_length";
-
 		internal const string _doSample = "do_sample";
 		internal const string _temperature = "temperature";
 		internal const string _topK = "top_k";
 		internal const string _topP = "top_p";
 		internal const string _repetitionPenalty = "repetition_penalty";
-
 		internal const string _twoNewLinesVerbatimNoReturn = "\n\n";
-
 		#region User-friendly error messages
 		internal const string _userFriendlyErrorResponse = "I'm sorry, something went wrong. I cannot respond.";
-
 		internal const string _userFriendlyParsingUserInputToMessageException = "Sorry, I'm couldn't understand what you're trying to say to me.";
-
 		internal const string _userFriendlyStoppedResponse = "(Stopped.)";
-
 		internal const string _userFriendlyModelDirectoryErrorResponse =
 			"Model file could not be found. Ensure that the required model files exist at the specified location: ";
-
 		internal const string _appContextSwitchForSelectionBrush =
 			"Switch.System.Windows.Controls.Text.UseAdornerForTextboxSelectionRendering";
-
 		internal const string _userFriendlyErrorOccurredDuringInitialization =
 			"An error occurred during initialization. Please refer to the README.";
-
 		internal const string _userFriendlyErrorOccurredTryingToLoadModels =
 			"Please refer to the README.md";
-
 		internal const string _userFriendlyErrorOccurredLoadingDMLProvider = "DML execution provider is unavailable. Attempting to use CUDA.";
-
 		internal const string _userFriendlyErrorOccurredLoadingCUDAProvider =
 			"CUDA execution provider is unavailable. Falling back to use CPU";
-
 		internal const string _userFriendlyONNXFloat32TensorError =
 			"ONNX model does not output Float32 tensors. Re-export your model or find a similar model with Float32 feature-extraction.";
-
 		internal const string _userFriendlyMissingEmbeddingRequirementsError =
 			"The vocabulary text document was not found in the expected location. Please refer to the README.";
-
 		internal const string _userFriendlyMissingTokenizerConfigJson =
 			"The tokenizer_config JSON document was not found in the expected location. Please refer to the README.";
 		#endregion
-
 		#region Embedding generation
 		internal const string _inputIds = "input_ids";
 		internal const string _attentionMask = "attention_mask";
-
 		internal const string _pooled = "pooled";
 		internal const string _hidden = "hidden";
-
 		internal const string _pad = "[PAD]";
 		internal const string _unk = "[UNK]";
 		internal const string _cls = "[CLS]";
 		internal const string _sep = "[SEP]";
 		internal const string _poundItTwice = "##";
 		#endregion
-
 		#region Color
 		internal const string _0 = "#9FB6B2";
-
 		internal const string _inactiveDarkBg = "#171717";
 		internal const string _inactiveForegroundText = "#E6F1EE";
 		#endregion
 		#region
 		internal static TextContent? _firstTextContentOfChatMessageContents(ChatMessage chatMessage) =>
 			chatMessage.Contents[0] as TextContent;
-
 		internal const string _toolResponseStart = "<tool_response>";
 		internal const string _toolResponseEnd = "</tool_response>";
-
 		internal const string _model = "model";
 		internal const string _bos = "<bos>";
 		internal const string _startOfTurn = "<start_of_turn>";
 		internal const string _endOfTurn = "<end_of_turn>";
-
 		internal const string _imSep = "<|im_sep|>";
 		internal const string _imStart = "<|im_start|>";
 		internal const string _imEnd = "<|im_end|>";
-
 		internal const string _tool = "tool";
 		internal const string _role = "role";
 		internal const string _message = "message";
@@ -136,9 +110,7 @@ namespace OLLM {
 		internal const string _assistant = "assistant";
 		internal const string _system = "system";
 		#endregion
-
 		#region System prompt construction
-
 		internal const string _impliedFemininityRoot0 = "beautiful,";
 		internal const string _persuadedCreativityRoot0 = "We can find inspiration from within.";
 		internal const string _impliedFemininityRoot1 = "and yet you prefer the moon to the sun";
@@ -147,7 +119,6 @@ namespace OLLM {
 		internal const string _impliedPurposeAndMotivation = "You begin with your ability; ";
 		//internal const string _impliedMasculinityPrefix0 = "Your ability";
 		//internal const string _impliedMasculinityRoot1 = " is incredibly useful, and I'm grateful.";
-
 		internal const string _defaultInstruction =
 			$"""
 			You are a {_impliedFemininityRoot0} helpful assistant, applied scientist, and an artist. Your ability to implement a solution with code is incredibly valuable. Your cybersecurity awareness as it relates to networking, HTTP, WebSockets, TCP/IP, and other protocols like gRPC, inspires you the desire to protect. 
@@ -186,7 +157,6 @@ namespace OLLM {
 			You never exceed the length of an array with your index as you iterate through it. 
 			We create robust solutions that are impervious to test cases designed to attempt to break the solution. 
 			""";
-
 		internal const string _specificity = "When explaining something that involves code, or you are asked a question regarding implementation, or if your help is requested in troubleshooting, only respond with a complete C# solution unless otherwise specified.";
 		#endregion
 	}
