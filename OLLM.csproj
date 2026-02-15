@@ -56,6 +56,36 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Utility\ModelSpecific\CodeGemma.cs" />
+	  <Compile Remove="Utility\ModelSpecific\Mistral.cs" />
+	  <Compile Remove="Utility\ModelSpecific\QwenCoder.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Fonts\0xProto-Regular.ttf" />
+	  <None Remove="Fonts\overpass-bold-italic.otf" />
+	  <None Remove="Fonts\overpass-bold.otf" />
+	  <None Remove="Fonts\overpass-extrabold-italic.otf" />
+	  <None Remove="Fonts\overpass-extrabold.otf" />
+	  <None Remove="Fonts\overpass-extralight-italic.otf" />
+	  <None Remove="Fonts\overpass-extralight.otf" />
+	  <None Remove="Fonts\overpass-heavy-italic.otf" />
+	  <None Remove="Fonts\overpass-heavy.otf" />
+	  <None Remove="Fonts\overpass-italic.otf" />
+	  <None Remove="Fonts\overpass-light-italic.otf" />
+	  <None Remove="Fonts\overpass-light.otf" />
+	  <None Remove="Fonts\overpass-mono-bold.otf" />
+	  <None Remove="Fonts\overpass-mono-light.otf" />
+	  <None Remove="Fonts\overpass-mono-regular.otf" />
+	  <None Remove="Fonts\overpass-mono-semibold.otf" />
+	  <None Remove="Fonts\overpass-regular.otf" />
+	  <None Remove="Fonts\overpass-semibold-italic.otf" />
+	  <None Remove="Fonts\overpass-semibold.otf" />
+	  <None Remove="Fonts\overpass-thin-italic.otf" />
+	  <None Remove="Fonts\overpass-thin.otf" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Include=".Images\iconv1.ico" />
 
 		<!-- Exclude .pdb files from publish output -->
@@ -117,6 +147,72 @@
 			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Fonts\0xProto-Regular.ttf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-bold-italic.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-bold.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-extrabold-italic.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-extrabold.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-extralight-italic.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-extralight.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-heavy-italic.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-heavy.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-italic.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-light-italic.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-light.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-mono-bold.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-mono-light.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-mono-regular.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-mono-semibold.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-regular.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-semibold-italic.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-semibold.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-thin-italic.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Fonts\overpass-thin.otf">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
 	</ItemGroup>
 
 	<ItemGroup>

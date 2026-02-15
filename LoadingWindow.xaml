@@ -10,7 +10,7 @@
         Background="Black"
         AllowsTransparency="False"
         WindowStyle="None"
-        Width="800" Height="200"
+        Width="Auto" Height="Auto"
         WindowStartupLocation="CenterScreen">
 	<WindowChrome.WindowChrome>
 		<WindowChrome CaptionHeight="30" 
@@ -20,9 +20,9 @@
 	</WindowChrome.WindowChrome>
     <Border BorderThickness="1" BorderBrush="#333333" Padding="15">
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-	        <Label Content="Loading..." HorizontalAlignment="Center" Background="Black" Foreground="White" FontFamily="Cascadia Mono ExtraLight" FontSize="16"/>
-	        <Label Content="Looking for local ONNX model." HorizontalAlignment="Center" Margin="0,0,0,0" Background="Black" Foreground="White" FontFamily="Cascadia Mono ExtraLight" FontSize="16"/>
-	        <Label Content="Attempting to load model into your machine's memory." HorizontalAlignment="Center" Background="Black" Foreground="White" FontFamily="Cascadia Mono ExtraLight" FontSize="16"/>
-        </StackPanel>
+	        <Label Content="Loading..." HorizontalAlignment="Center" Background="Black" Foreground="White" FontFamily="./Fonts/#0xProto" FontSize="14" />
+			<Label Content="Looking for local ONNX model." HorizontalAlignment="Center" Margin="0,0,0,0" Background="Black" Foreground="White"  FontFamily="./Fonts/#0xProto" FontSize="14" />
+			<Label Content="Attempting to load model into your machine's memory." HorizontalAlignment="Center" Background="Black" Foreground="White"  FontFamily="./Fonts/#0xProto" FontSize="14" />
+		</StackPanel>
     </Border>
 </Window>
