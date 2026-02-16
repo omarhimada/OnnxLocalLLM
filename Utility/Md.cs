@@ -1,4 +1,6 @@
 using System.Text;
+using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace OLLM.Utility;
 
@@ -22,8 +24,40 @@ public static class Md {
 
 		List<string> bulletLines = [];
 
+		string[] thinkingLineRange = [];
+		string postThinkingTextStart = string.Empty;
+		int indexOfThinkEnd = -1;
+
+		if (lines[0].StartsWith("<think>")) {
+			lines[0] = string.Empty;
+			// With the system prompt construction in Constants, the reasoning model will begin with <think>
+			int indexOfThinkStart = 0;
+			string? lineWithEndThink = lines.FirstOrDefault(line => line.Contains("</think>"));
+			if (lineWithEndThink != null) {
+				indexOfThinkEnd = lines.IndexOf(lineWithEndThink);
+
+				thinkingLineRange = lines[indexOfThinkStart..indexOfThinkEnd];
+				string[] splitLineWithEndThink = lineWithEndThink.Split("</think>");
+
+				string lastThinkingPortion = splitLineWithEndThink[0];
+				postThinkingTextStart = splitLineWithEndThink[1];
+
+				ParagraphBlock thinkingBlock = new(ParseInlines(string.Join(_wsc, thinkingLineRange.Append(lastThinkingPortion))), 0);
+				blocks.Add(thinkingBlock);
+			} else {
+				// Malformed - thinking starts but does not end. 
+				lines[0] = lines[0].Replace("<think>", string.Empty);
+			}
+		}
+
+		if (!string.IsNullOrEmpty(postThinkingTextStart) && indexOfThinkEnd != -1) {
+			// The model was thinking
+			// Separate the thinking in its own paragraph block that we can later style differently, or we can keep it hidden.
+			lines = lines.Except(thinkingLineRange).ToArray();
+		}
+
 		foreach (string raw in lines) {
-			if (raw.StartsWith(_tbt)) {
+			if (raw.StartsWith(_tbt) || raw.StartsWith(_lineBreak)) {
 				if (!inCode) {
 					FlushBullets();
 					FlushParagraph();

@@ -6,11 +6,11 @@ namespace OLLM.Utility;
 
 using static MdFd;
 
-public static class Fd {
+internal static class Fd {
 
-	public static FlowDocument Render(IEnumerable<Block> blocks) {
+	internal static FlowDocument Render(IEnumerable<Block> blocks) {
 		FlowDocument doc = new() {
-			PageWidth = 900,
+			PageWidth = 800,
 		};
 
 		foreach (Block b in blocks) {
@@ -31,7 +31,7 @@ public static class Fd {
 		return doc;
 	}
 
-	private static Paragraph RenderParagraph(ParagraphBlock p) {
+	internal static Paragraph RenderParagraph(ParagraphBlock p) {
 		Paragraph para = new() {
 			Margin = new Thickness(0, p.HeadingLevel > 0 ? 10 : 6, 0, 6)
 		};
@@ -51,7 +51,7 @@ public static class Fd {
 		return para;
 	}
 
-	private static List RenderBulletList(BulletListBlock bl) {
+	internal static List RenderBulletList(BulletListBlock bl) {
 		List list = new() {
 			MarkerStyle = TextMarkerStyle.Disc,
 			Margin = new Thickness(18, 4, 0, 8)
@@ -68,7 +68,7 @@ public static class Fd {
 		return list;
 	}
 
-	private static Paragraph RenderCodeBlock(CodeBlock c) {
+	internal static Paragraph RenderCodeBlock(CodeBlock c) {
 		Paragraph para = new(new Run(c.Code)) {
 			FontFamily = _fontFamily0x,
 			Background = _owd,
@@ -80,7 +80,7 @@ public static class Fd {
 		return para;
 	}
 
-	private static IEnumerable<Inline> RenderInlines(IEnumerable<InlineSpan> spans) {
+	internal static IEnumerable<Inline> RenderInlines(IEnumerable<InlineSpan> spans) {
 		foreach (InlineSpan s in spans) {
 			switch (s) {
 				case TextSpan t:

@@ -1,9 +1,10 @@
+
 using Microsoft.Extensions.AI;
 using System.Text;
 using static OLLM.Constants;
 namespace OLLM.Utility.ModelSpecific;
 
-internal static class Phi4 {
+internal static class Phi4Reasoning {
 	public static string AsFormattedString(string? userPrompt) {
 		if (string.IsNullOrEmpty(userPrompt)) {
 			return string.Empty;

@@ -5,14 +5,20 @@ namespace OLLM.Utility;
 using static Constants;
 
 internal static class MdFd {
+	static MdFd() {
+		_black.Freeze();
+		_ow.Freeze();
+		_owd.Freeze();
+		_white.Freeze();
+	}
+
 	internal static readonly FontFamily _fontFamilyOverpass = new(
-		new Uri("pack://application:,,,/"),
-		"./Fonts/#Overpass"
-	);
+		new Uri(_resourceFontFamilyDeclarationPrefix),
+		$"{_resourceFontFamilyLocationPrefix}Overpass");
+
 	internal static readonly FontFamily _fontFamily0x = new(
-		new Uri("pack://application:,,,/"),
-		"./Fonts/#0xProto"
-	);
+		new Uri(_resourceFontFamilyDeclarationPrefix),
+		$"{_resourceFontFamilyLocationPrefix}0xProto");
 
 	internal static SolidColorBrush _black = new(Color.FromRgb(0, 0, 0));
 	internal static SolidColorBrush _white = new(Color.FromRgb(255, 255, 255));

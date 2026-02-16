@@ -1,3 +1,5 @@
+using System.Windows.Documents;
+
 namespace OLLM.Utility;
 
 public abstract record Block;

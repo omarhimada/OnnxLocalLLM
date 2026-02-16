@@ -73,7 +73,7 @@ internal static class EnsureModelsArePresent {
 		}
 		#endregion
 		// Attempt to retrieve the LLM ONNX
-		if (!TryRequiredModelIsPresent(_preBuildPhi4ModelPath, out string? modelPathToUse) && modelPathToUse == null) {
+		if (!TryRequiredModelIsPresent(_preBuildPhiReasoning4ModelPath, out string? modelPathToUse) && modelPathToUse == null) {
 			potentialFriendlyUserErrorMessage.AppendLine(
 				$"{_userFriendlyModelDirectoryErrorResponse}{Environment.NewLine}{modelPathToUse}");
 		}

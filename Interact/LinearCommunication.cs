@@ -1,15 +1,15 @@
 using Microsoft.ML.OnnxRuntimeGenAI;
-
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace OLLM.Interact;
 
 using State;
+using System.IO.Pipelines;
 using Utility;
 using Utility.ModelSpecific;
 using static Constants;
@@ -22,6 +22,7 @@ internal partial class LinearCommunication(ModelState modelState) {
 
 	private readonly CancellationTokenSource _cts = new();
 	private bool InterruptButtonEnabled { get; set; } = true;
+
 
 	internal async Task _interact(TextBox userInputText, RichTextBox theirResponse, Button chatButton) {
 		try {
@@ -62,39 +63,83 @@ internal partial class LinearCommunication(ModelState modelState) {
 
 	private async Task ChatWithModelAsync(string systemAndUserMessage, RichTextBox theirResponse) {
 		CancellationToken ct = _cts.Token;
-		await Application.Current.Dispatcher.InvokeAsync(() => { theirResponse.Document = new FlowDocument(); }, DispatcherPriority.Normal, ct);
+
+		// The 'inner monologue' of the model as they reason
+		// Does not contain the initial <think> token
+		StringBuilder thinkingTextBuilder = new();
+		// Final response or solution to whatever problem they're addressing
+		StringBuilder finalTextBuilder = new();
+
+		// The flow document that inevitably becomes 'their response'
+		FlowDocument flowDoc = new();
+		Paragraph streamingParagraph = new();
+		Run streamingRun = new(string.Empty);
+		streamingParagraph.Inlines.Add(streamingRun);
+		flowDoc.Blocks.Add(streamingParagraph);
+
+
+		await Application.Current.Dispatcher.InvokeAsync(() => {
+			theirResponse.Document = flowDoc;
+		}, DispatcherPriority.Normal, ct);
+
 		await Task.Run(() => {
+
 			using Sequences sequences = modelState.Tokenizer!.Encode(systemAndUserMessage);
 			modelState.SetGeneratorParameterSearchOptions();
 			modelState.RefreshGenerator();
 			modelState.Generator!.AppendTokenSequences(sequences);
 			using TokenizerStream ts = modelState.Tokenizer!.CreateStream();
+
+			bool thinking = true;
 			while (!modelState.Generator.IsDone() && !ct.IsCancellationRequested) {
 				modelState.Generator.GenerateNextToken();
 				string piece = ts.Decode(modelState.Generator.GetSequence(0)[^1]);
-				Application.Current.Dispatcher.InvokeAsync(() => {
-					theirResponse.AppendText(piece);
-					theirResponse.ScrollToEnd();
-				}, DispatcherPriority.Normal, ct);
+				if (piece == _thinkStart) {
+					continue;
+				}
+
+				switch (thinking) {
+					case true when !piece.Contains(_thinkEnd):
+						thinkingTextBuilder.Append(piece);
+						Application.Current.Dispatcher.InvokeAsync(() => {
+							streamingRun!.Text += piece;
+							theirResponse.ScrollToEnd();
+						}, DispatcherPriority.Normal, ct);
+						break;
+					case true when piece.Contains(_thinkEnd): {
+							string[] spl = piece.Split(_thinkEnd);
+
+							thinkingTextBuilder.Append(spl[0]);
+							finalTextBuilder.Append(spl[1]);
+
+							thinking = false;
+							Application.Current.Dispatcher.InvokeAsync(() => {
+								streamingRun!.Text += spl[0];
+								theirResponse.ScrollToEnd();
+							}, DispatcherPriority.Normal, ct);
+							break;
+						}
+					default:
+						finalTextBuilder.Append(piece);
+						break;
+				}
 			}
 		}, ct);
 
-		List<Block> blocks = Md.Parse(GetPlainText(theirResponse));
-		theirResponse.Document = Fd.Render(blocks);
-		theirResponse.ScrollToEnd();
+
+		// All blocks (paragraphs, etc.) appended to the flow document
+		finalTextBuilder.Append(_nlrs);
+		finalTextBuilder.Append(_lineBreak);
+
+		List<Block> finalParagraphBlocks = Md.Parse(finalTextBuilder.ToString());
+
+		await Application.Current.Dispatcher.InvokeAsync(() => {
+			theirResponse.Document = Fd.Render(finalParagraphBlocks);
+			theirResponse.ScrollToEnd();
+		}, DispatcherPriority.Normal, ct);
 
 		// Debugging
 		//await Remember.MemorizeDiscussionAsync(theirResponse.Text, ct);
-		return;
-		#region Local functions
-		string GetPlainText(RichTextBox rtb) {
-			TextRange range = new(
-				rtb.Document.ContentStart,
-				rtb.Document.ContentEnd);
-
-			return range.Text;
-		}
-		#endregion
 	}
 
 	internal static IEnumerable<Run> ParseMd(IEnumerable<string> tokens) {
@@ -166,13 +211,6 @@ internal partial class LinearCommunication(ModelState modelState) {
 			return run;
 		}
 		#endregion
-	}
-
-	private static IEnumerable<Inline> ParseInline(string line) {
-		string[] tokens = TokensRegex().Split(line);
-		foreach (Run run in ParseMd(tokens)) {
-			yield return run;
-		}
 	}
 
 	private static void SomethingWentWrong(RichTextBox theirResponse, bool? couldNotParseUserInput = false, string? exceptionMessage = null) {

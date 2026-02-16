@@ -60,7 +60,7 @@ internal class ModelState {
 		#region Set generator parameters
 		GeneratorParams?.SetSearchOption(_maxLengthParameter, 8192);
 		//GeneratorParams?.SetSearchOption(_maxNewLengthParameter, 1024);
-		GeneratorParams?.SetSearchOption(_doSample, false);
+		GeneratorParams?.SetSearchOption(_doSample, true);
 		GeneratorParams?.SetSearchOption(_temperature, _getTemperature());
 		GeneratorParams?.SetSearchOption(_topK, 51);
 		GeneratorParams?.SetSearchOption(_topP, 0.9f);
