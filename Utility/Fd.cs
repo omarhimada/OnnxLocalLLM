@@ -1,3 +1,4 @@
+using OLLM.Utility.Syntax;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -7,31 +8,33 @@ namespace OLLM.Utility;
 using static MdFd;
 
 internal static class Fd {
-
-	internal static FlowDocument Render(IEnumerable<Block> blocks) {
+	internal static FlowDocument Render(IEnumerable<FdBlockMd> blocks) {
 		FlowDocument doc = new() {
 			PageWidth = 800,
 		};
 
-		foreach (Block b in blocks) {
+		foreach (FdBlockMd b in blocks) {
 			switch (b) {
-				case ParagraphBlock p:
+				case ParagraphFdBlockMd p:
 					doc.Blocks.Add(RenderParagraph(p));
 					break;
 
-				case BulletListBlock bl:
+				case BulletListFdBlockMd bl:
 					doc.Blocks.Add(RenderBulletList(bl));
 					break;
 
-				case CodeBlock c:
-					doc.Blocks.Add(RenderCodeBlock(c));
+				case CodeFdBlockMd c:
+					doc.Blocks.Add(MdSyntaxApply.RenderCodeBlock(
+						c.Code,
+						c.Lang,
+						14d));
 					break;
 			}
 		}
 		return doc;
 	}
 
-	internal static Paragraph RenderParagraph(ParagraphBlock p) {
+	internal static Paragraph RenderParagraph(ParagraphFdBlockMd p) {
 		Paragraph para = new() {
 			Margin = new Thickness(0, p.HeadingLevel > 0 ? 10 : 6, 0, 6)
 		};
@@ -51,7 +54,7 @@ internal static class Fd {
 		return para;
 	}
 
-	internal static List RenderBulletList(BulletListBlock bl) {
+	internal static List RenderBulletList(BulletListFdBlockMd bl) {
 		List list = new() {
 			MarkerStyle = TextMarkerStyle.Disc,
 			Margin = new Thickness(18, 4, 0, 8)
@@ -68,14 +71,14 @@ internal static class Fd {
 		return list;
 	}
 
-	internal static Paragraph RenderCodeBlock(CodeBlock c) {
+	internal static Paragraph RenderCodeBlock(CodeFdBlockMd c) {
 		Paragraph para = new(new Run(c.Code)) {
 			FontFamily = _fontFamily0x,
-			Background = _owd,
-			Foreground = _ow,
+			Background = _black,
+			Foreground = _readyDosPink,
 			Padding = new Thickness(10),
 			Margin = new Thickness(0, 8, 0, 8),
-			LineHeight = 16,
+			LineHeight = 14,
 		};
 		return para;
 	}
@@ -94,8 +97,8 @@ internal static class Fd {
 				case CodeSpan c:
 					yield return new Run(c.Text) {
 						FontFamily = _fontFamily0x,
-						Background = _owd,
-						Foreground = _ow,
+						Background = _black,
+						Foreground = _readyDosOrange,
 					};
 					break;
 

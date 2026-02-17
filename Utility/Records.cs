@@ -1,11 +1,9 @@
-using System.Windows.Documents;
-
 namespace OLLM.Utility;
 
-public abstract record Block;
-public record ParagraphBlock(List<InlineSpan> Inlines, int HeadingLevel = 0) : Block;
-public record CodeBlock(string Code) : Block;
-public record BulletListBlock(List<List<InlineSpan>> Items) : Block;
+public abstract record FdBlockMd;
+public record ParagraphFdBlockMd(List<InlineSpan> Inlines, int HeadingLevel = 0) : FdBlockMd;
+public record CodeFdBlockMd(string Code, string? Lang) : FdBlockMd;
+public record BulletListFdBlockMd(List<List<InlineSpan>> Items) : FdBlockMd;
 public abstract record InlineSpan;
 public record TextSpan(string Text) : InlineSpan;
 public record CodeSpan(string Text) : InlineSpan;

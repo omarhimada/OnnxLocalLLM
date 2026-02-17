@@ -10,7 +10,7 @@
         Background="Black"
         AllowsTransparency="False"
         WindowStyle="None"
-        Width="Auto" Height="Auto"
+        MinWidth="800" MaxWidth="820" Height="Auto" VerticalAlignment="Stretch"
         WindowStartupLocation="CenterScreen">
 	<WindowChrome.WindowChrome>
 		<WindowChrome CaptionHeight="30" 

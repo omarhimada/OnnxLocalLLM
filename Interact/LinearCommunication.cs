@@ -9,11 +9,9 @@ using System.Windows.Threading;
 namespace OLLM.Interact;
 
 using State;
-using System.IO.Pipelines;
 using Utility;
 using Utility.ModelSpecific;
 using static Constants;
-using static Utility.MdFd;
 
 internal partial class LinearCommunication(ModelState modelState) {
 #pragma warning disable IDE0051
@@ -21,8 +19,48 @@ internal partial class LinearCommunication(ModelState modelState) {
 #pragma warning restore IDE0051
 
 	private readonly CancellationTokenSource _cts = new();
+
 	private bool InterruptButtonEnabled { get; set; } = true;
 
+	private FloatingThoughtAdorner? _thought;
+
+	private AdornerLayer? _layer;
+
+	public void BeginThinkingOverlay(RichTextBox theirResponse, string text) {
+		_layer ??= AdornerLayer.GetAdornerLayer(theirResponse);
+		if (_layer is null)
+			return;
+
+		_thought ??= new FloatingThoughtAdorner(theirResponse);
+		_thought.SetText(text);
+
+		if (!_layer.GetAdorners(theirResponse)?.Contains(_thought) ?? true)
+			_layer.Add(_thought);
+
+		_thought.ShowAtTopRight();
+		_thought.AnimateIn();
+	}
+
+	public void UpdateThinkingOverlay(string text) {
+		if (_thought is null)
+			return;
+		_thought.SetText(text);
+		_thought.ShowAtTopRight();
+	}
+
+	public void EndThinkingOverlay(RichTextBox theirResponse) {
+		if (_layer is null || _thought is null)
+			return;
+
+		_thought.AnimateOut();
+
+		_ = Application.Current.Dispatcher.InvokeAsync(async () => {
+			await Task.Delay(180);
+			_layer.Remove(_thought);
+			_thought = null;
+			_layer = null;
+		});
+	}
 
 	internal async Task _interact(TextBox userInputText, RichTextBox theirResponse, Button chatButton) {
 		try {
@@ -72,14 +110,18 @@ internal partial class LinearCommunication(ModelState modelState) {
 
 		// The flow document that inevitably becomes 'their response'
 		FlowDocument flowDoc = new();
+		//  ^
+		//  |
 		Paragraph streamingParagraph = new();
+		//  ^
+		//  |
 		Run streamingRun = new(string.Empty);
-		streamingParagraph.Inlines.Add(streamingRun);
+		//streamingParagraph.Inlines.Add(streamingRun);
 		flowDoc.Blocks.Add(streamingParagraph);
-
 
 		await Application.Current.Dispatcher.InvokeAsync(() => {
 			theirResponse.Document = flowDoc;
+			BeginThinkingOverlay(theirResponse, string.Empty);
 		}, DispatcherPriority.Normal, ct);
 
 		await Task.Run(() => {
@@ -100,38 +142,46 @@ internal partial class LinearCommunication(ModelState modelState) {
 
 				switch (thinking) {
 					case true when !piece.Contains(_thinkEnd):
+						// Thinking
 						thinkingTextBuilder.Append(piece);
 						Application.Current.Dispatcher.InvokeAsync(() => {
 							streamingRun!.Text += piece;
-							theirResponse.ScrollToEnd();
+							UpdateThinkingOverlay(streamingRun!.Text);
+							//theirResponse.ScrollToEnd();
 						}, DispatcherPriority.Normal, ct);
 						break;
 					case true when piece.Contains(_thinkEnd): {
+							// Thinking ceases
 							string[] spl = piece.Split(_thinkEnd);
 
 							thinkingTextBuilder.Append(spl[0]);
 							finalTextBuilder.Append(spl[1]);
 
 							thinking = false;
-							Application.Current.Dispatcher.InvokeAsync(() => {
-								streamingRun!.Text += spl[0];
-								theirResponse.ScrollToEnd();
-							}, DispatcherPriority.Normal, ct);
 							break;
 						}
 					default:
+						// Construct final response
 						finalTextBuilder.Append(piece);
 						break;
 				}
 			}
 		}, ct);
 
+		await Application.Current.Dispatcher.InvokeAsync(() => {
+			//streamingRun!.Text += spl[0];
+			EndThinkingOverlay(theirResponse);
+			theirResponse.ScrollToEnd();
+		}, DispatcherPriority.Normal, ct);
+
+
 
 		// All blocks (paragraphs, etc.) appended to the flow document
 		finalTextBuilder.Append(_nlrs);
 		finalTextBuilder.Append(_lineBreak);
+		finalTextBuilder.Append(_nlrs);
 
-		List<Block> finalParagraphBlocks = Md.Parse(finalTextBuilder.ToString());
+		List<FdBlockMd> finalParagraphBlocks = Md.Parse(finalTextBuilder.ToString());
 
 		await Application.Current.Dispatcher.InvokeAsync(() => {
 			theirResponse.Document = Fd.Render(finalParagraphBlocks);
@@ -140,77 +190,6 @@ internal partial class LinearCommunication(ModelState modelState) {
 
 		// Debugging
 		//await Remember.MemorizeDiscussionAsync(theirResponse.Text, ct);
-	}
-
-	internal static IEnumerable<Run> ParseMd(IEnumerable<string> tokens) {
-		bool inBold = false;
-		bool inItalic = false;
-		bool inCode = false;
-
-		foreach (string token in tokens) {
-			switch (token) {
-				case _tss:
-				case _tse:
-					inBold = !inBold;
-					continue;
-				case _os:
-				case _ose:
-					inItalic = !inItalic;
-					continue;
-				case _t:
-					inCode = !inCode;
-					continue;
-			}
-
-			string remaining = token;
-			while (remaining.Length > 0) {
-				int nextBold = remaining.IndexOf(_tss, StringComparison.Ordinal);
-				int nextItalic = remaining.IndexOf(_os, StringComparison.Ordinal);
-				int nextCode = remaining.IndexOf(_t, StringComparison.Ordinal);
-				int nextPos = int.MaxValue;
-				string? mdIndicator = null;
-				if (nextBold >= 0 && nextBold < nextPos) { nextPos = nextBold; mdIndicator = _tss; }
-				if (nextItalic >= 0 && nextItalic < nextPos) { nextPos = nextItalic; mdIndicator = _os; }
-				if (nextCode >= 0 && nextCode < nextPos) { nextPos = nextCode; mdIndicator = _t; }
-				if (nextPos == int.MaxValue) {
-					yield return CreateRun(remaining);
-					break;
-				}
-				if (nextPos > 0) {
-					yield return CreateRun(remaining[..nextPos]);
-				}
-				switch (mdIndicator) {
-					case _ts:
-						inBold = !inBold;
-						break;
-					case _oss:
-						inItalic = !inItalic;
-						break;
-					case _t:
-						inCode = !inCode;
-						break;
-				}
-				remaining = remaining[(nextPos + mdIndicator?.Length ?? 1)..];
-			}
-		}
-
-		yield break;
-		#region Local functions
-		Run CreateRun(string text) {
-			Run run = new(text);
-			if (inBold) {
-				run.FontWeight = FontWeights.Bold;
-			}
-			if (inItalic) {
-				run.FontStyle = FontStyles.Italic;
-			}
-			if (inCode) {
-				run.FontFamily = _fontFamily0x;
-				run.Background = _owd;
-			}
-			return run;
-		}
-		#endregion
 	}
 
 	private static void SomethingWentWrong(RichTextBox theirResponse, bool? couldNotParseUserInput = false, string? exceptionMessage = null) {
@@ -232,4 +211,77 @@ internal partial class LinearCommunication(ModelState modelState) {
 
 	[GeneratedRegex(@"^(#{1,6})\s+(.*)")]
 	private static partial Regex HeadingsRegex();
+
+	#region Unused
+	//internal static IEnumerable<Run> ParseMd(IEnumerable<string> tokens) {
+	//	bool inBold = false;
+	//	bool inItalic = false;
+	//	bool inCode = false;
+
+	//	foreach (string token in tokens) {
+	//		switch (token) {
+	//			case _tss:
+	//			case _tse:
+	//				inBold = !inBold;
+	//				continue;
+	//			case _os:
+	//			case _ose:
+	//				inItalic = !inItalic;
+	//				continue;
+	//			case _t:
+	//				inCode = !inCode;
+	//				continue;
+	//		}
+
+	//		string remaining = token;
+	//		while (remaining.Length > 0) {
+	//			int nextBold = remaining.IndexOf(_tss, StringComparison.Ordinal);
+	//			int nextItalic = remaining.IndexOf(_os, StringComparison.Ordinal);
+	//			int nextCode = remaining.IndexOf(_t, StringComparison.Ordinal);
+	//			int nextPos = int.MaxValue;
+	//			string? mdIndicator = null;
+	//			if (nextBold >= 0 && nextBold < nextPos) { nextPos = nextBold; mdIndicator = _tss; }
+	//			if (nextItalic >= 0 && nextItalic < nextPos) { nextPos = nextItalic; mdIndicator = _os; }
+	//			if (nextCode >= 0 && nextCode < nextPos) { nextPos = nextCode; mdIndicator = _t; }
+	//			if (nextPos == int.MaxValue) {
+	//				yield return CreateRun(remaining);
+	//				break;
+	//			}
+	//			if (nextPos > 0) {
+	//				yield return CreateRun(remaining[..nextPos]);
+	//			}
+	//			switch (mdIndicator) {
+	//				case _ts:
+	//					inBold = !inBold;
+	//					break;
+	//				case _oss:
+	//					inItalic = !inItalic;
+	//					break;
+	//				case _t:
+	//					inCode = !inCode;
+	//					break;
+	//			}
+	//			remaining = remaining[(nextPos + mdIndicator?.Length ?? 1)..];
+	//		}
+	//	}
+
+	//	yield break;
+	//	#region Local functions
+	//	Run CreateRun(string text) {
+	//		Run run = new(text);
+	//		if (inBold) {
+	//			run.FontWeight = FontWeights.Bold;
+	//		}
+	//		if (inItalic) {
+	//			run.FontStyle = FontStyles.Italic;
+	//		}
+	//		if (inCode) {
+	//			run.FontFamily = _fontFamily0x;
+	//			run.Background = _owd;
+	//		}
+	//		return run;
+	//	}
+	//	#endregion
+	//}
+	#endregion
 }

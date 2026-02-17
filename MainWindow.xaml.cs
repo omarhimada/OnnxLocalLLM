@@ -49,7 +49,7 @@ internal partial class MainWindow : Window {
 		if (sender is not CheckBox checkBox) {
 			return;
 		}
-		ModelState!.ExpectingCodeResponse = checkBox.IsChecked ?? false;
+		ModelState?.ExpectingCodeResponse = checkBox.IsChecked ?? false;
 	}
 	#region 'thinking' animation
 	private void _thinking() {

@@ -42,7 +42,7 @@
         "num_beams": 1,
         "num_return_sequences": 1,
         "past_present_share_buffer": true,
-        "repetition_penalty": 1.0,
+        "repetition_penalty": 1.12,
         "temperature": 0.8,
         "top_k": 1,
         "top_p": 0.95

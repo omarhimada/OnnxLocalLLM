@@ -25,6 +25,15 @@ internal static class MdFd {
 	internal static SolidColorBrush _ow = new(Color.FromRgb(150, 144, 144));
 	internal static SolidColorBrush _owd = new(Color.FromRgb(24, 23, 23));
 
+	internal static SolidColorBrush _readyDosOrange = new(Color.FromRgb(252, 164, 105));
+	internal static SolidColorBrush _readyDosPurple = new(Color.FromRgb(60, 36, 145));
+	internal static SolidColorBrush _readyDosPink = new(Color.FromRgb(236, 179, 205));
+
+	// ReadyDOS logo colors
+	//FCA469 (orange) 252, 164, 105
+	//3C2491 (purple) 60, 36, 145
+	//ECB3CD (pink) 236, 179, 205
+
 	internal static int CountHeadingLevel(string line) {
 		int i = 0;
 		while (i < line.Length && i < 6 && line[i] == _pio)

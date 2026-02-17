@@ -1,3 +1,4 @@
+using SQLitePCL;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -8,12 +9,12 @@ using static Constants;
 using static MdFd;
 
 public static class Md {
-	public static List<Block> Parse(string? s) {
+	public static List<FdBlockMd> Parse(string? s) {
 		if (s == null) {
 			return [];
 		}
 
-		List<Block> blocks = [];
+		List<FdBlockMd> blocks = [];
 		string[] lines = s.Replace(_nlrs, _nl).Split(_nlc);
 
 		bool inCode = false;
@@ -42,8 +43,8 @@ public static class Md {
 				string lastThinkingPortion = splitLineWithEndThink[0];
 				postThinkingTextStart = splitLineWithEndThink[1];
 
-				ParagraphBlock thinkingBlock = new(ParseInlines(string.Join(_wsc, thinkingLineRange.Append(lastThinkingPortion))), 0);
-				blocks.Add(thinkingBlock);
+				ParagraphFdBlockMd thinkingFdBlockMd = new(ParseInlines(string.Join(_wsc, thinkingLineRange.Append(lastThinkingPortion))), 0);
+				blocks.Add(thinkingFdBlockMd);
 			} else {
 				// Malformed - thinking starts but does not end. 
 				lines[0] = lines[0].Replace("<think>", string.Empty);
@@ -56,15 +57,23 @@ public static class Md {
 			lines = lines.Except(thinkingLineRange).ToArray();
 		}
 
+
+
+		string? lang = null;
 		foreach (string raw in lines) {
-			if (raw.StartsWith(_tbt) || raw.StartsWith(_lineBreak)) {
+			bool tbt = raw.StartsWith(_tbt);
+			if (tbt || raw.StartsWith(_lineBreak)) {
 				if (!inCode) {
 					FlushBullets();
 					FlushParagraph();
 					inCode = true;
+					if (lang == null && tbt) {
+						// ```csharp?
+						lang = raw.Split(_tbt)[1].TrimEnd();
+					}
 				} else {
 					inCode = false;
-					blocks.Add(new CodeBlock(code.ToString().TrimEnd(_nlc, _rc)));
+					blocks.Add(new CodeFdBlockMd(code.ToString().TrimEnd(_nlc, _rc), null));
 				}
 
 				code.Clear();
@@ -108,7 +117,7 @@ public static class Md {
 		FlushParagraph();
 
 		if (inCode && code.Length > 0) {
-			blocks.Add(new CodeBlock(code.ToString().TrimEnd(_nlc, _rc)));
+			blocks.Add(new CodeFdBlockMd(code.ToString().TrimEnd(_nlc, _rc), lang));
 		}
 
 		return blocks;
@@ -126,7 +135,7 @@ public static class Md {
 			}
 
 			List<InlineSpan> inlines = ParseInlines(text);
-			blocks.Add(new ParagraphBlock(inlines, pendingHeading));
+			blocks.Add(new ParagraphFdBlockMd(inlines, pendingHeading));
 			pendingHeading = 0;
 		}
 
@@ -141,7 +150,7 @@ public static class Md {
 			}
 
 			bulletLines.Clear();
-			blocks.Add(new BulletListBlock(items));
+			blocks.Add(new BulletListFdBlockMd(items));
 		}
 	}
 }

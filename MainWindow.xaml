@@ -7,13 +7,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OLLM"
         mc:Ignorable="d options"
-        Title="OLLM" Width="820" MinHeight="600"
+        Title="OLLM" MaxWidth="820" MinWidth="820" MinHeight="825" MaxHeight="825"
         Background="Black"
         AllowsTransparency="False"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen">
 	<Window.Resources>
+		<!-- Brand colors -->
+		<SolidColorBrush x:Key="ReadyDOSOrange" Color="#FCA469" options:Freeze="True" />
+		<SolidColorBrush x:Key="ReadyDOSPurple" Color="#3C2491" options:Freeze="True" />
+		<SolidColorBrush x:Key="ReadyDOSPink" Color="#ECB3CD" options:Freeze="True" />
 		<!-- Gray -->
+		<SolidColorBrush x:Key="DarkerSCB" Color="#050505" options:Freeze="True" />
 		<SolidColorBrush x:Key="DarkSCB" Color="#171717" options:Freeze="True" />
 		<SolidColorBrush x:Key="GraySCB" Color="#747474" options:Freeze="True"/>
 		<SolidColorBrush x:Key="LightSCB" Color="#DADADA" options:Freeze="True"/>
@@ -74,15 +79,15 @@
 			</Setter>
 		</Style>
 		<Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
-			<Setter Property="Background" Value="Black"/>
-			<Setter Property="BorderBrush" Value="{StaticResource GraySCB}"/>
+			<Setter Property="Background" Value="{StaticResource DarkerSCB}"/>
+			<Setter Property="BorderBrush" Value="{StaticResource ReadyDOSPurple}"/>
 			<Setter Property="BorderThickness" Value="1"/>
 			<Setter Property="CaretBrush" Value="{StaticResource LightSCB}"/>
 			<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
 			<Setter Property="FontFamily" Value="{StaticResource OverpassFont}" />
 			<Setter Property="FontSize" Value="14" />
 			<Setter Property="Foreground" Value="{StaticResource LightSCB}"/>
-			<Setter Property="Height" Value="Auto" />
+			<Setter Property="Height" Value="227" />
 			<Setter Property="HorizontalAlignment" Value="Stretch" />
 			<Setter Property="Margin" Value="0,0,0,0"/>
 			<Setter Property="MinHeight" Value="128" />
@@ -106,12 +111,11 @@
 
 						<ControlTemplate.Triggers>
 							<Trigger Property="IsKeyboardFocused" Value="True">
-								<Setter TargetName="UserInputBT" Property="BorderBrush" Value="{StaticResource GraySCB}"/>
+								<Setter TargetName="UserInputBT" Property="BorderBrush" Value="{StaticResource ReadyDOSPurple}"/>
 							</Trigger>
 
 							<Trigger Property="IsMouseOver" Value="True">
-								<Setter Property="BorderBrush" Value="{StaticResource GraySCB}"/>
-								<Setter TargetName="UserInputBT" Property="Background" Value="#171717"/>
+								<Setter Property="BorderBrush" Value="{StaticResource ReadyDOSPurple}"/>
 							</Trigger>
 
 							<Trigger Property="IsEnabled" Value="False">
@@ -123,8 +127,8 @@
 			</Setter>
 		</Style>
 		<Style x:Key="RichTextBoxStyle" TargetType="{x:Type RichTextBox}">
-			<Setter Property="Background" Value="{StaticResource DarkSCB}"/>
-			<Setter Property="BorderBrush" Value="{StaticResource GraySCB}"/>
+			<Setter Property="Background" Value="{StaticResource DarkerSCB}"/>
+			<Setter Property="BorderBrush" Value="{StaticResource ReadyDOSPurple}"/>
 			<Setter Property="BorderThickness" Value="1"/>
 			<Setter Property="CaretBrush" Value="{StaticResource LightSCB}"/>
 			<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
@@ -134,12 +138,12 @@
 			<Setter Property="Height" Value="Auto" />
 			<Setter Property="HorizontalAlignment" Value="Stretch" />
 			<Setter Property="Margin" Value="0,0,0,0"/>
-			<Setter Property="MinHeight" Value="256" />
+			<Setter Property="MinHeight" Value="226" />
 			<Setter Property="MinWidth" Value="800" />
 			<Setter Property="Padding" Value="0,0,0,0"/>
 			<Setter Property="SelectionBrush" Value="{StaticResource GraySCB}"/>
 			<Setter Property="SelectionTextBrush" Value="{StaticResource LightSCB}"/>
-			<Setter Property="VerticalAlignment" Value="Top" />
+			<Setter Property="VerticalAlignment" Value="Stretch" />
 			<Setter Property="Width" Value="Auto" />
 			<Setter Property="Template">
 				<Setter.Value>
@@ -154,11 +158,11 @@
 
 						<ControlTemplate.Triggers>
 							<Trigger Property="IsKeyboardFocused" Value="True">
-								<Setter Property="BorderBrush" Value="{StaticResource GraySCB}"/>
+								<Setter Property="BorderBrush" Value="{StaticResource ReadyDOSPurple}"/>
 							</Trigger>
 
 							<Trigger Property="IsMouseOver" Value="True">
-								<Setter Property="BorderBrush" Value="{StaticResource GraySCB}"/>
+								<Setter Property="BorderBrush" Value="{StaticResource ReadyDOSPurple}"/>
 							</Trigger>
 
 							<Trigger Property="IsEnabled" Value="False">
@@ -176,7 +180,7 @@
 	                  CornerRadius="0"
 	                  GlassFrameThickness="0"/>
 	</WindowChrome.WindowChrome>
-	<Border x:Name="Boundary" BorderThickness="1" BorderBrush="#333333">
+	<Border x:Name="Boundary" BorderThickness="1" BorderBrush="{StaticResource ReadyDOSPurple}">
 		<Grid x:Name="OuterGrid" Background="Black">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="30"/>
@@ -199,7 +203,7 @@
                     FontFamily="pack://application:,,,/Fonts/#0xProto"
                     ToolTip="Lowers the temperature hyperparameter. Useful for producing code." 
                     Background="Black" 
-                    IsChecked="False" 
+                    IsChecked="True" 
                     BorderBrush="#FF414141" 
                     Padding="5,0,0,0" 
                     WindowChrome.IsHitTestVisibleInChrome="True"
@@ -213,7 +217,7 @@
 				<Grid.RowDefinitions>
 					<RowDefinition MinHeight="128" Height="Auto" />
 					<RowDefinition Height="25" />
-					<RowDefinition MinHeight="256" Height="*" />
+					<RowDefinition MinHeight="226" Height="*" />
 				</Grid.RowDefinitions>
 
 				<TextBox x:Name="UserInputText"
@@ -253,7 +257,14 @@
 				             Grid.Row="2"
 				             IsReadOnly="True"
 				             FocusVisualStyle="{x:Null}" 
-				             Style="{StaticResource RichTextBoxStyle}" HorizontalAlignment="Stretch"  />
+				             Style="{StaticResource RichTextBoxStyle}" HorizontalAlignment="Stretch">
+					<RichTextBox.RenderTransform>
+						<TransformGroup>
+							<ScaleTransform ScaleX="1" ScaleY="1"/>
+							<TranslateTransform Y="0"/>
+						</TransformGroup>
+					</RichTextBox.RenderTransform>
+				</RichTextBox>
 			</Grid>
 		</Grid>
 	</Border>
