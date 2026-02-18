@@ -9,6 +9,7 @@ using System.Windows.Threading;
 namespace OLLM.Interact;
 
 using State;
+using State.Thinking;
 using Utility;
 using Utility.ModelSpecific;
 using static Constants;
@@ -22,7 +23,7 @@ internal partial class LinearCommunication(ModelState modelState) {
 
 	private bool InterruptButtonEnabled { get; set; } = true;
 
-	private FloatingThoughtAdorner? _thought;
+	private FloatingAdorner? _thought;
 
 	private AdornerLayer? _layer;
 
@@ -31,7 +32,7 @@ internal partial class LinearCommunication(ModelState modelState) {
 		if (_layer is null)
 			return;
 
-		_thought ??= new FloatingThoughtAdorner(theirResponse);
+		_thought ??= new FloatingAdorner(theirResponse);
 		_thought.SetText(text);
 
 		if (!_layer.GetAdorners(theirResponse)?.Contains(_thought) ?? true)

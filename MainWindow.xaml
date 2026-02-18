@@ -7,7 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OLLM"
         mc:Ignorable="d options"
-        Title="OLLM" MaxWidth="820" MinWidth="820" MinHeight="825" MaxHeight="825"
+        Title="OLLM" MaxWidth="820" MinWidth="820" MinHeight="800" MaxHeight="1440"
         Background="Black"
         AllowsTransparency="False"
         WindowStyle="None"
@@ -43,34 +43,33 @@
 			<Setter Property="Template">
 				<Setter.Value>
 					<ControlTemplate TargetType="{x:Type Button}">
-						<Border x:Name="Bd"
+						<Border x:Name="ButtonBorder"
 						        Background="{TemplateBinding Background}"
 						        BorderBrush="{TemplateBinding BorderBrush}"
 						        BorderThickness="{TemplateBinding BorderThickness}"
 						        CornerRadius="0"
 						        SnapsToDevicePixels="True">
-							<ContentPresenter x:Name="Cp"
+							<ContentPresenter x:Name="BorderContent"
 							                  Margin="{TemplateBinding Padding}"
 							                  HorizontalAlignment="Center"
 							                  VerticalAlignment="Center"
 							                  RecognizesAccessKey="True"/>
 						</Border>
-
 						<ControlTemplate.Triggers>
 							<Trigger Property="IsKeyboardFocused" Value="True">
-								<Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource GraySCB}"/>
+								<Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{StaticResource GraySCB}"/>
 								<Setter Property="Foreground" Value="{StaticResource LightSCB}"/>
 							</Trigger>
 							<Trigger Property="IsMouseOver" Value="True">
-								<Setter TargetName="Bd" Property="Background" Value="{StaticResource GraySCB}"/>
+								<Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource GraySCB}"/>
 								<Setter Property="Foreground" Value="{StaticResource LightSCB}"/>
 							</Trigger>
 							<Trigger Property="IsEnabled" Value="True">
-								<Setter TargetName="Bd" Property="Opacity" Value="1" />
+								<Setter TargetName="ButtonBorder" Property="Opacity" Value="1" />
 								<Setter Property="Foreground" Value="{StaticResource LightSCB}"/>
 							</Trigger>
 							<Trigger Property="IsEnabled" Value="False">
-								<Setter TargetName="Bd" Property="Opacity" Value="0.55"/>
+								<Setter TargetName="ButtonBorder" Property="Opacity" Value="0.55"/>
 								<Setter Property="Foreground" Value="{StaticResource DarkSCB}"/>
 							</Trigger>
 						</ControlTemplate.Triggers>

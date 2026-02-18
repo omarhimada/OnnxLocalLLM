@@ -191,6 +191,13 @@ internal static class Constants {
 		You never exceed the length of an array with your index as you iterate through it. 
 		We create robust solutions that are impervious to test cases designed to attempt to break the solution. 
 		""";
-	internal const string _specificity = "When parsing something that involves code, algorithms, or you are asked a question regarding implementation, your help is requested in troubleshooting something technical. Respond with a complete with C# Solution.";
+	internal const string _specificity = $"When parsing something that involves code, algorithms, or you are asked a question regarding implementation, your help is requested in troubleshooting something technical. Respond with a complete with C# Solution. The guidelines for your C# Solution are as follows:{_specificityGuidelines}";
+
+	internal const string _specificityGuidelines =
+		"""
+		Do not use XML documentation/comments. Any comment beginning with two forward slashes and one whitespace that you include must end with a new line to continue with the code.
+		Do not include block comments involving a single slash and asterisk. 
+		""";
+
 	#endregion
 }

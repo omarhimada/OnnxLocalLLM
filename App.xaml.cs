@@ -11,13 +11,17 @@ internal partial class App : Application {
 	internal ModelState? ModelState;
 	internal EmbedderState? EmbedderState;
 	internal MiniEmbedder? MiniEmbedder;
-	internal static readonly LoadingWindow SplashWindow = new();
+	internal static readonly LoadingWindow LoadingWindow = new();
 	protected override async void OnStartup(StartupEventArgs e) {
 		base.OnStartup(e);
 		AppContext.SetSwitch(_appContextSwitchForSelectionBrush, false);
 		// Show loading screen while model attempts to load into memory
-		SplashWindow.Show();
-		SplashWindow.Activate();
+		LoadingWindow.Show();
+		LoadingWindow.Activate();
+
+		// TODO animate
+		LoadingWindow.LoadingLabel.Opacity = 1;
+
 		try {
 			(string? modelPath, string? embedModelPath) = EnsureRequiredModelsArePresent();
 			if (modelPath == null) {
@@ -25,6 +29,9 @@ internal partial class App : Application {
 				Current.Shutdown();
 				return;
 			}
+
+
+
 			MainWindow mainWindow = new();
 			ModelState = new(modelPath);
 			EmbedderState = new(embedModelPath);
@@ -42,5 +49,5 @@ internal partial class App : Application {
 	/// Allow the main window's constructor to
 	/// close the loading window after it has initialized its components and memory store.
 	/// </summary>
-	internal static void FinishedInitializing() => SplashWindow.Hide();
+	internal static void FinishedInitializing() => LoadingWindow.Hide();
 }
