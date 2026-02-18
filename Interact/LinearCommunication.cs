@@ -27,10 +27,11 @@ internal partial class LinearCommunication(ModelState modelState) {
 
 	private AdornerLayer? _layer;
 
-	public void BeginThinkingOverlay(RichTextBox theirResponse, string text) {
+	public async Task BeginThinkingOverlayAsync(RichTextBox theirResponse, string text) {
 		_layer ??= AdornerLayer.GetAdornerLayer(theirResponse);
-		if (_layer is null)
+		if (_layer is null) {
 			return;
+		}
 
 		_thought ??= new FloatingAdorner(theirResponse);
 		_thought.SetText(text);
@@ -38,24 +39,25 @@ internal partial class LinearCommunication(ModelState modelState) {
 		if (!_layer.GetAdorners(theirResponse)?.Contains(_thought) ?? true)
 			_layer.Add(_thought);
 
-		_thought.ShowAtTopRight();
-		_thought.AnimateIn();
+		await _thought.ShowAtTopRight();
+		await _thought.AnimateIn();
 	}
 
-	public void UpdateThinkingOverlay(string text) {
-		if (_thought is null)
+	public async Task UpdateThinkingOverlay(string text) {
+		if (_thought is null) {
 			return;
+		}
 		_thought.SetText(text);
-		_thought.ShowAtTopRight();
+		await _thought.ShowAtTopRight();
 	}
 
-	public void EndThinkingOverlay(RichTextBox theirResponse) {
-		if (_layer is null || _thought is null)
+	public async Task EndThinkingOverlay(RichTextBox theirResponse) {
+		if (_layer is null || _thought is null) {
 			return;
+		}
 
-		_thought.AnimateOut();
-
-		_ = Application.Current.Dispatcher.InvokeAsync(async () => {
+		await _thought.AnimateOut();
+		await Application.Current.Dispatcher.InvokeAsync(async () => {
 			await Task.Delay(180);
 			_layer.Remove(_thought);
 			_thought = null;
@@ -122,7 +124,7 @@ internal partial class LinearCommunication(ModelState modelState) {
 
 		await Application.Current.Dispatcher.InvokeAsync(() => {
 			theirResponse.Document = flowDoc;
-			BeginThinkingOverlay(theirResponse, string.Empty);
+			BeginThinkingOverlayAsync(theirResponse, string.Empty);
 		}, DispatcherPriority.Normal, ct);
 
 		await Task.Run(() => {

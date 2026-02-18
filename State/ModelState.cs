@@ -19,24 +19,6 @@ internal class ModelState {
 		ModelDirectory = modelDirectory;
 		Config config = new(ModelDirectory);
 		config.AppendProvider(_dml);
-		//config.ClearProviders();
-		//#region Try CUDA first, fallback to CPU
-		// Query the Win32_VideoController WMI class
-		//const string _findAny = "SELECT * FROM Win32_VideoController"; // This will likely find your integrated graphics only
-		//const string _findNvidia = "SELECT * FROM Win32_PnPEntity WHERE Service='nvlddmkm'";
-		//ManagementObjectSearcher searcher = new(_findNvidia);
-		//foreach (ManagementBaseObject? obj in searcher.Get()) {
-		//	if (obj is null) {
-		//		continue;
-		//	}
-		//	// 0x10DE is the registered PCI Vendor ID for NVIDIA
-		//	string? pnpId = obj["PNPDeviceID"]?.ToString();
-		//	bool isNvidia = pnpId?.Contains("VEN_10DE", StringComparison.OrdinalIgnoreCase) ?? false;
-		//	if (isNvidia) {
-		//		config.AppendProvider(_cuda);
-		//	}
-		//}
-		//#endregion
 		#region Point to the direct ONNX model itself to instantiate the inference session
 		string? modelFilePath = Directory.GetFiles(modelDirectory, _onnxSearch).FirstOrDefault();
 		if (string.IsNullOrEmpty(modelFilePath)) {
@@ -58,8 +40,7 @@ internal class ModelState {
 	}
 	internal void SetGeneratorParameterSearchOptions() {
 		#region Set generator parameters
-		GeneratorParams?.SetSearchOption(_maxLengthParameter, 8192);
-		//GeneratorParams?.SetSearchOption(_maxNewLengthParameter, 1024);
+		GeneratorParams?.SetSearchOption(_maxLengthParameter, 32768);
 		GeneratorParams?.SetSearchOption(_doSample, true);
 		GeneratorParams?.SetSearchOption(_temperature, _getTemperature());
 		GeneratorParams?.SetSearchOption(_topK, 51);

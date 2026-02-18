@@ -13,23 +13,22 @@
         MaxWidth="460" MaxHeight="145" 
 		HorizontalAlignment="Center"
 		VerticalAlignment="Center"
-		ResizeMode="None"
         WindowStartupLocation="CenterScreen">
 	<Window.Resources>
 		<SolidColorBrush x:Key="LightSCB" Color="#DADADA" options:Freeze="True"/>
+		<SolidColorBrush x:Key="DarkerSCB" Color="#050505" options:Freeze="True" />
 		<SolidColorBrush x:Key="ReadyDOSOrange" Color="#FCA469" options:Freeze="True" />
 		<SolidColorBrush x:Key="ReadyDOSPurple" Color="#3C2491" options:Freeze="True" />
 
-		<FontFamily x:Key="OverpassFont">pack://application:,,,/Fonts/#Overpass</FontFamily>
+		<FontFamily x:Key="0xProtoFont">pack://application:,,,/Fonts/#0xProto</FontFamily>
 
 		<Style x:Key="LabelStyle" TargetType="{x:Type Label}">
 			<Setter Property="Width" Value="Auto"/>
 			<Setter Property="Height" Value="25"/>
-			<Setter Property="Opacity" Value="0"/>
-			<Setter Property="Background" Value="{StaticResource DarkSCB}"/>
+			<Setter Property="Background" Value="{StaticResource DarkerSCB}"/>
 			<Setter Property="BorderBrush" Value="{StaticResource ReadyDOSPurple}"/>
-			<Setter Property="Foreground" Value="{StaticResource LightSCB}"/>
-			<Setter Property="FontFamily" Value="{StaticResource OverpassFont}" />
+			<Setter Property="Foreground" Value="{StaticResource ReadyDOSOrange}"/>
+			<Setter Property="FontFamily" Value="{StaticResource 0xProtoFont}" />
 			<Setter Property="FontSize" Value="14" />
 			<Setter Property="HorizontalAlignment" Value="Stretch" />
 		</Style>
@@ -40,11 +39,11 @@
 		              CornerRadius="3"
 		              GlassFrameThickness="0"/>
 	</WindowChrome.WindowChrome>
-	<Border BorderThickness="1" Background="{StaticResource DarkSCB}" BorderBrush="{StaticResource ReadyDOSPurple}" Padding="15">
-        <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-	        <Label x:Name="LoadingLabel" Content="Loading..." />
-			<Label x:Name="FoundRequiredModelLabel" Content="Found required model(s)." Opacity="0" />
-			<Label x:Name="InitializingLabel" Content="Initializing." />
+	<Border BorderThickness="3" Background="{StaticResource DarkerSCB}" BorderBrush="{StaticResource ReadyDOSPurple}" Padding="35">
+		<StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+			<Label x:Name="LoadingLabel" Content="Loading..." Style="{StaticResource LabelStyle}" Opacity="0" />
+			<Label x:Name="FoundRequiredModelsLabel" Content="Found required model(s)." Style="{StaticResource LabelStyle}" Opacity="0" />
+			<Label x:Name="InitializingLabel" Content="Initializing." Style="{StaticResource LabelStyle}" Opacity="0" />
 		</StackPanel>
-    </Border>
+	</Border>
 </Window>

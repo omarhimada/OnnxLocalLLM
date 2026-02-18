@@ -4,9 +4,12 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
+using System.Windows.Threading;
 
 namespace OLLM.State.Thinking;
 
+using static Constants;
 using static MdFd;
 
 /// <summary>
@@ -15,33 +18,106 @@ using static MdFd;
 /// </summary>
 public sealed class FloatingAdorner : Adorner {
 	private readonly VisualCollection _visuals;
+
+	// Obstruction layer (blurred snapshot + dim tint)
+	private readonly Grid _veilRoot;
+	private readonly Border _veilBlur;
+	private readonly Border _veilTint;
+
+	// Bubble (card)
 	private readonly Border _bubble;
+	private readonly TextBlock _title;
+	private readonly ScrollViewer _scroll;
+	private readonly TextBlock _body;
+
+	// Auto-scroll / batching
+	private readonly DispatcherTimer _flushTimer;
+	private string _pending = string.Empty;
+	private bool _dirty;
 
 	public FloatingAdorner(UIElement adornedElement) : base(adornedElement) {
 		_visuals = new VisualCollection(this);
 		IsHitTestVisible = false;
+
+		_veilBlur = new Border {
+			HorizontalAlignment = HorizontalAlignment.Stretch,
+			VerticalAlignment = VerticalAlignment.Stretch,
+			Opacity = 0.82,
+			Background = new VisualBrush(adornedElement) {
+				Stretch = Stretch.None,
+				AlignmentX = AlignmentX.Left,
+				AlignmentY = AlignmentY.Top
+			},
+			Effect = new BlurEffect {
+				Radius = 18,
+				KernelType = KernelType.Gaussian
+			}
+		};
+
+		_veilTint = new Border {
+			HorizontalAlignment = HorizontalAlignment.Stretch,
+			VerticalAlignment = VerticalAlignment.Stretch,
+			Background = new SolidColorBrush(Color.FromArgb(140, 0, 0, 0)),
+			Opacity = 0
+		};
+
+		_veilRoot = new Grid {
+			HorizontalAlignment = HorizontalAlignment.Stretch,
+			VerticalAlignment = VerticalAlignment.Stretch,
+			Opacity = 0,
+			IsHitTestVisible = false
+		};
+		_veilRoot.Children.Add(_veilBlur);
+		_veilRoot.Children.Add(_veilTint);
+
+		_title = new TextBlock {
+			Foreground = _white,
+			FontSize = 12,
+			FontWeight = FontWeights.SemiBold,
+			Opacity = 0.92,
+			TextWrapping = TextWrapping.NoWrap,
+			Text = _thinking
+		};
+
+		_body = new TextBlock {
+			Foreground = _white,
+			FontSize = 11,
+			Opacity = 0.92,
+			TextWrapping = TextWrapping.Wrap
+		};
+
+		_scroll = new ScrollViewer {
+			Content = _body,
+			VerticalScrollBarVisibility = ScrollBarVisibility.Hidden,
+			HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+			CanContentScroll = false,
+			MaxWidth = 680,
+			MaxHeight = 227
+		};
+
 		_bubble = new Border {
 			HorizontalAlignment = HorizontalAlignment.Center,
 			VerticalAlignment = VerticalAlignment.Center,
 
 			CornerRadius = new CornerRadius(0),
-			Padding = new Thickness(8, 8, 8, 8),
+			Padding = new Thickness(10, 9, 10, 9),
 			Background = _black,
 			BorderBrush = _readyDosPurple,
 
 			BorderThickness = new Thickness(1),
-			Effect = new System.Windows.Media.Effects.DropShadowEffect {
+			Effect = new DropShadowEffect {
 				BlurRadius = 16,
 				ShadowDepth = 2,
-				Opacity = 0.35
+				Opacity = 0.7
 			},
-			Child = new TextBlock {
-				Foreground = _white,
-				FontSize = 14,
-				TextWrapping = TextWrapping.Wrap,
-				MaxWidth = 680,
-				MaxHeight = 227,
-
+			Child = new StackPanel {
+				Orientation = Orientation.Vertical,
+				Children =
+				{
+					_title,
+					new Border { Height = 1, Margin = new Thickness(0, 6, 0, 6), Background = _readyDosPurple, Opacity = 0.35 },
+					_scroll
+				}
 			},
 			RenderTransformOrigin = new Point(0.5, 0.5),
 			RenderTransform = new TransformGroup {
@@ -54,21 +130,60 @@ public sealed class FloatingAdorner : Adorner {
 			},
 			Opacity = 0
 		};
+
+		_flushTimer = new DispatcherTimer(DispatcherPriority.Background) {
+			Interval = TimeSpan.FromMilliseconds(48)
+		};
+		_flushTimer.Tick += (_, _) => {
+			if (!_dirty)
+				return;
+			_dirty = false;
+			FlushPendingToUi();
+		};
+
+		_visuals.Add(_veilRoot);
 		_visuals.Add(_bubble);
 	}
 
-	public void SetText(string text)
-		=> ((TextBlock)_bubble.Child).Text = text;
+	public void SetTitle(string title)
+		=> _title.Text = title;
 
-	/// <summary>
-	/// Displays the bubble in the top-right corner of the adorned element, offset by the specified margin.
-	/// </summary>
-	/// <remarks>This method must be called on the UI thread. The bubble's position is updated based on the actual
-	/// width of the adorned element and the specified margin to ensure proper alignment and spacing.</remarks>
-	/// <param name="margin">The margin, in pixels, to maintain between the bubble and the edges of the adorned element. Defaults to 14.</param>
-	/// <returns>A task that represents the asynchronous operation of positioning the bubble.</returns>
+	public void SetText(string text) {
+		_body.Text = text;
+		AutoScrollToBottom();
+	}
+
+	public void Append(string chunk) {
+		if (string.IsNullOrEmpty(chunk))
+			return;
+
+		_pending += chunk;
+		_dirty = true;
+
+		if (!_flushTimer.IsEnabled)
+			_flushTimer.Start();
+	}
+
+	private void FlushPendingToUi() {
+		string text = _pending;
+		if (string.IsNullOrEmpty(text))
+			return;
+
+		_pending = string.Empty;
+
+		Application.Current.Dispatcher.InvokeAsync(() => {
+			_body.Text += text;
+			AutoScrollToBottom();
+		}, DispatcherPriority.Background);
+	}
+
+	private void AutoScrollToBottom() {
+		_scroll.UpdateLayout();
+		_scroll.ScrollToEnd();
+	}
+
 	public async Task ShowAtTopRight(double margin = 14) {
-		await Application.Current.Dispatcher.InvokeAsync(new Action(() => {
+		await Application.Current.Dispatcher.InvokeAsync(() => {
 			FrameworkElement fe = (FrameworkElement)AdornedElement;
 			double x = Math.Max(margin, fe.ActualWidth - margin - _bubble.ActualWidth);
 			double y = margin;
@@ -79,21 +194,24 @@ public sealed class FloatingAdorner : Adorner {
 			tt.Y = y;
 
 			InvalidateArrange();
-		}));
+		}, DispatcherPriority.Render);
 	}
 
-	/// <summary>
-	/// Animates the appearance of the UI element by fading it in and scaling it to its original size.
-	/// </summary>
-	/// <remarks>The animation combines a fade-in effect with a scaling transition for a smooth entrance. The
-	/// fade-in duration is 227 milliseconds, and the scaling uses a back easing function to enhance visual appeal. This
-	/// method must be called from a context where the UI element is available and ready to be displayed.</remarks>
-	/// <returns>A task that represents the asynchronous operation of the animation.</returns>
 	public async Task AnimateIn() {
-		await Application.Current.Dispatcher.InvokeAsync(new Action(() => {
+		await Application.Current.Dispatcher.InvokeAsync(() => {
 			Storyboard sb = new();
 
-			DoubleAnimation fade = new(0, 1, TimeSpan.FromMilliseconds(227)) { EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut } };
+			DoubleAnimation veilFade = new(0, 1, TimeSpan.FromMilliseconds(333)) { EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut } };
+			Storyboard.SetTarget(veilFade, _veilRoot);
+			Storyboard.SetTargetProperty(veilFade, new PropertyPath(OpacityProperty));
+			sb.Children.Add(veilFade);
+
+			DoubleAnimation tintFade = new(0, 1, TimeSpan.FromMilliseconds(333)) { EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut } };
+			Storyboard.SetTarget(tintFade, _veilTint);
+			Storyboard.SetTargetProperty(tintFade, new PropertyPath(OpacityProperty));
+			sb.Children.Add(tintFade);
+
+			DoubleAnimation fade = new(0, 1, TimeSpan.FromMilliseconds(333)) { EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut } };
 			Storyboard.SetTarget(fade, _bubble);
 			Storyboard.SetTargetProperty(fade, new PropertyPath(OpacityProperty));
 			sb.Children.Add(fade);
@@ -101,34 +219,41 @@ public sealed class FloatingAdorner : Adorner {
 			TransformGroup tg = (TransformGroup)_bubble.RenderTransform;
 			ScaleTransform scale = (ScaleTransform)tg.Children[0];
 
-			DoubleAnimation sx = new(1, 1, TimeSpan.FromMilliseconds(227)) { EasingFunction = new BackEase { Amplitude = 0.25, EasingMode = EasingMode.EaseOut } };
+			DoubleAnimation sx = new(0.68, 1, TimeSpan.FromMilliseconds(333)) { EasingFunction = new BackEase { Amplitude = 0.25, EasingMode = EasingMode.EaseOut } };
 			Storyboard.SetTarget(sx, scale);
 			Storyboard.SetTargetProperty(sx, new PropertyPath(ScaleTransform.ScaleXProperty));
 			sb.Children.Add(sx);
 
 			DoubleAnimation sy = sx.Clone();
+			Storyboard.SetTarget(sy, scale);
 			Storyboard.SetTargetProperty(sy, new PropertyPath(ScaleTransform.ScaleYProperty));
 			sb.Children.Add(sy);
 
 			sb.Begin();
-		}));
+		}, DispatcherPriority.Render);
 	}
 
-	/// <summary>
-	/// Animates the opacity of the bubble element to fade out over a short duration.
-	/// </summary>
-	/// <remarks>This method ensures that the animation is executed on the application's UI thread by using the
-	/// dispatcher. The opacity is animated from its current value to zero, making the bubble element invisible after the
-	/// animation completes.</remarks>
-	/// <returns>A task that represents the asynchronous operation of the fade-out animation.</returns>
 	public async Task AnimateOut() {
 		await Application.Current.Dispatcher.InvokeAsync(new Action(() => {
+			_flushTimer.Stop();
+			_pending = "";
+			_dirty = false;
+
+			DoubleAnimation veilFade = new(0, TimeSpan.FromMilliseconds(140));
+			_veilRoot.BeginAnimation(OpacityProperty, veilFade);
+
+			DoubleAnimation tintFade = new(0, TimeSpan.FromMilliseconds(140));
+			_veilTint.BeginAnimation(OpacityProperty, tintFade);
+
 			DoubleAnimation fade = new(0, TimeSpan.FromMilliseconds(140));
 			_bubble.BeginAnimation(OpacityProperty, fade);
 		}));
 	}
 
 	protected override Size ArrangeOverride(Size finalSize) {
+		_veilRoot.Measure(finalSize);
+		_veilRoot.Arrange(new Rect(new Point(0, 0), finalSize));
+
 		_bubble.Measure(finalSize);
 		_bubble.Arrange(new Rect(new Point(0, 0), _bubble.DesiredSize));
 		return finalSize;
