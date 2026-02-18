@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net10.0-windows</TargetFramework>
@@ -33,33 +33,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Remove="Interact\Utility\**" />
-		<Compile Remove="ONNX\CodeGemma\**" />
-		<Compile Remove="ONNX\Devstral\**" />
-		<Compile Remove="ONNX\Mistral-14B\**" />
-		<Compile Remove="ONNX\Mistral-7B\**" />
-		<Compile Remove="ONNX\QwenCoder\**" />
-		<EmbeddedResource Remove="Interact\Utility\**" />
-		<EmbeddedResource Remove="ONNX\CodeGemma\**" />
-		<EmbeddedResource Remove="ONNX\Devstral\**" />
-		<EmbeddedResource Remove="ONNX\Mistral-14B\**" />
-		<EmbeddedResource Remove="ONNX\Mistral-7B\**" />
-		<EmbeddedResource Remove="ONNX\QwenCoder\**" />
-		<None Remove="Interact\Utility\**" />
-		<None Remove="ONNX\CodeGemma\**" />
-		<None Remove="ONNX\Devstral\**" />
-		<None Remove="ONNX\Mistral-14B\**" />
-		<None Remove="ONNX\Mistral-7B\**" />
-		<None Remove="ONNX\QwenCoder\**" />
-		<Page Remove="Interact\Utility\**" />
-		<Page Remove="ONNX\CodeGemma\**" />
-		<Page Remove="ONNX\Devstral\**" />
-		<Page Remove="ONNX\Mistral-14B\**" />
-		<Page Remove="ONNX\Mistral-7B\**" />
-		<Page Remove="ONNX\QwenCoder\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<Compile Remove="Utility\ModelSpecific\CodeGemma.cs" />
 		<Compile Remove="Utility\ModelSpecific\Mistral.cs" />
 		<Compile Remove="Utility\ModelSpecific\QwenCoder.cs" />
@@ -85,7 +58,7 @@
 			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
 		</Content>
 		<Content Include="ONNX\Embed\All-MiniLM-L6-v2-ONNX\model.onnx">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 		</Content>
@@ -96,17 +69,14 @@
 		<Content Include="ONNX\Embed\All-MiniLM-L6-v2-ONNX\tokenizer.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
-			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 		</Content>
 		<Content Include="ONNX\Embed\All-MiniLM-L6-v2-ONNX\tokenizer_config.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
-			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 		</Content>
 		<Content Include="ONNX\Embed\All-MiniLM-L6-v2-ONNX\vocab.txt">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
-			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 		</Content>
 
 		<!-- Include Phi-4 model (except the model.onnx and model.onnx_data) in the published directory -->
@@ -150,7 +120,7 @@
 	  </None>
 	</ItemGroup>
 
-	<!-- Do not include native PDBs and .lib in published release (for simplicity UX cleanliness) -->
+	<!-- Do not include native PDBs and .lib in published release (for simplicity and UX cleanliness) -->
 	<Target Name="RemoveNativePDBs" AfterTargets="ComputeFilesToPublish">
 		<ItemGroup>
 			<ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(Extension)' == '.pdb'" />
