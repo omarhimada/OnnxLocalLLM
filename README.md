@@ -2,16 +2,13 @@
 - **Completely local** LLM chat desktop application that uses the *ONNX Generative AI Runtime*. **Does not make any networking requests outside of the local machine.**
 - **Zero HTTP** *(e.g.: API calls to OpenAI, Gemini)*, **zero REST API middle-layer** *(e.g.: GPT4All)* **zero WebSocket middle-layer** *(Ollama, LM Studio, etc.)*.
 - Loads a local LLM model. 
-- The latest release utilizes **Phi-4** from Microsoft. I'll keep adding support for other models, as experimentation continues.
+- The latest release utilizes **Phi-4-Reasoning** from Microsoft.
 
-
-<p align="center">
-    <img src="https://github.com/omarhimada/Local-LLM-ONNX/blob/master/.Images/20260212_Example.gif?raw=true" alt="Example usage of the desktop chat application." style="width: 72%; height: 72%;" />
-</p>
+![Reasoning example GIF](.Images/ReasoningExample.gif)
 
 ## Roadmap 
 - **High Priority**
-    1. Contextual memory/conversation state management with retrieval augmentation and chat histories. **90% complete**
+    1. Memory/conversation state management with retrieval augmentation and chat histories. **90% complete**
         - Initializes a local SQLite database if it does not exist.
   		- Utilize `VectorData` abstractions and connectors for SQLite.
       		- Microsoft is sort of developing solutions in parallel regarding native SQL Vector storage *(i.e.: `Microsoft.SemanticKernel.Connectors.SqliteVec` pre-release)*
@@ -28,10 +25,10 @@
 
 ### Setup
 - Your directory setup should look something like the diagram below, although the `model.onnx` and `model.onnx_data` will be absent. This is due to size (gigabytes).
- - See [**Microsoft's Phi-4** @ huggingface](https://huggingface.co/microsoft/phi-4-onnx/tree/main/gpu/gpu-int4-rtn-block-32) to download the `model.onnx` and `model.onnx_data`.
+ - See [**Microsoft's Phi-4-Reasoning** @ huggingface](https://huggingface.co/microsoft/Phi-4-reasoning-onnx/tree/main/gpu/gpu-int4-rtn-block-32) to download the `model.onnx` and `model.onnx_data`.
 ```
         ,______________________________________________________
-        | OnnxLocalLLM\ONNX\Phi-4
+        | OnnxLocalLLM\ONNX\Phi-4-Reasoning
         |
         | model.onnx        <------------------ Download this 
         | model.onnx_data   <------------------ Download this 
